@@ -161,13 +161,14 @@ settings         user_id, key, value_json
 
 sections         id, user_id, slug, title, period, sort_order,
                  origin ('default'|'custom'), hidden, edited (bool),
+                 reordered (bool),
                  seed_id NULL
 
 items            id, user_id, section_id, title, description, kind
                  ('check'|'counter'|'subticks'|'info'), slots_json,
                  verify (bool), link_url NULL, sort_order, hidden,
                  origin ('default'|'custom'), seed_id NULL,
-                 edited (bool), created_at, updated_at
+                 edited (bool), reordered (bool), created_at, updated_at
 
 ticks            user_id, item_id, slot (0..n-1), period_key, checked_at
                  PRIMARY KEY (user_id, item_id, slot, period_key)
@@ -196,6 +197,9 @@ An item's period comes from its **section**. An item's own `period` is not store
   - default items removed from the seed are hidden, not deleted, and the user sees a notice.
 - Custom items (`origin='custom'`) are never touched by seeding.
 - Sections follow the same rules (they also carry `edited`). An edited default removed from the seed stays visible.
+- **Moving** a default (reorder, or into another section) sets `reordered` instead of `edited`. Seed updates then keep the user's section and order but still update its text. Hiding is not an edit either.
+- The "removed from the defaults" notice lists the hidden titles at the top of the Tracker until dismissed.
+- A custom section that holds default items can't be deleted (the defaults would be lost); move them out first.
 
 ---
 
@@ -211,8 +215,10 @@ An item's period comes from its **section**. An item's own `period` is not store
 | PATCH/DELETE | `/api/sections/:id`               | edit, hide, delete (custom only)                                                                                                               |
 | POST         | `/api/items`                      | create item                                                                                                                                    |
 | PATCH/DELETE | `/api/items/:id`                  | edit, hide, delete (custom)                                                                                                                    |
+| POST         | `/api/sections/reorder`           | new order of sections                                                                                                                          |
 | POST         | `/api/items/reorder`              | new order within or across sections                                                                                                            |
 | POST         | `/api/checklist/restore-defaults` | unhide and reset default items (asks first in the UI)                                                                                          |
+| POST         | `/api/checklist/dismiss-notice`   | hide the "removed from the defaults" notice                                                                                                    |
 | GET          | `/api/worldstate`                 | cached live rotations, normalised (see §7), with `fetchedAt` and staleness                                                                     |
 | POST         | `/api/worldstate/refresh`         | force a refresh (rate-limited)                                                                                                                 |
 | GET/PATCH    | `/api/settings`                   | display time zone, etc.                                                                                                                        |

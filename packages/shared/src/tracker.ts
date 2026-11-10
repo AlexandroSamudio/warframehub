@@ -49,6 +49,8 @@ export const TrackerResponse = z.object({
   displayTz: z.string(),
   clocks: z.array(ResetClock),
   sections: z.array(TrackerSection),
+  /** Defaults hidden because a checklist update removed them, until dismissed (SPEC §5.1). */
+  notice: z.object({ removedTitles: z.array(z.string()) }).nullable(),
 });
 export type TrackerResponse = z.infer<typeof TrackerResponse>;
 

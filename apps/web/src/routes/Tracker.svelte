@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { TrackerItem, TrackerResponse, TrackerSection } from '@warframehub/shared';
   import { onMount } from 'svelte';
+  import ChecklistEditor from '../components/ChecklistEditor.svelte';
   import ResetClocks from '../components/ResetClocks.svelte';
   import Rotations from '../components/Rotations.svelte';
   import SectionCard from '../components/SectionCard.svelte';
-  import { clearSection, getTracker, putTick } from '../lib/api.ts';
+  import { clearSection, dismissNotice, getTracker, putTick } from '../lib/api.ts';
   import { t } from '../lib/i18n/index.ts';
   import { earliestReset } from '../lib/progress.ts';
   import { DISPLAY_TZ } from '../lib/time.ts';
@@ -12,6 +13,20 @@
   let data = $state<TrackerResponse | null>(null);
   let loadFailed = $state(false);
   let saveFailed = $state(false);
+  let editing = $state(false);
+
+  async function toggleEditing() {
+    editing = !editing;
+    // Back from edit mode: show the checklist as it is now saved.
+    if (!editing) await load();
+  }
+
+  async function dismiss() {
+    if (data) data.notice = null;
+    await dismissNotice().catch(() => {
+      saveFailed = true;
+    });
+  }
   let loading = false;
 
   // Countdowns use the server's clock: offset = server time − browser time at the last load.
@@ -97,12 +112,29 @@
       </div>
     {/if}
 
-    <div class="columns">
-      <div class="sections">
-        {#each data.sections as section (section.id)}
-          <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
-        {/each}
+    {#if data.notice}
+      <div class="notice" role="status">
+        <span>{t('notice.removed', { titles: data.notice.removedTitles.join(', ') })}</span>
+        <button type="button" onclick={dismiss}>{t('notice.dismiss')}</button>
       </div>
+    {/if}
+
+    <div class="toolbar">
+      <button type="button" aria-pressed={editing} onclick={toggleEditing}>
+        {editing ? t('edit.done') : t('edit.open')}
+      </button>
+    </div>
+
+    <div class="columns">
+      {#if editing}
+        <ChecklistEditor />
+      {:else}
+        <div class="sections">
+          {#each data.sections as section (section.id)}
+            <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
+          {/each}
+        </div>
+      {/if}
       <Rotations {nowMs} {timeZone} onUpdate={load} />
     </div>
   </div>
@@ -139,6 +171,21 @@
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
     gap: 1rem;
     align-items: start;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
   }
 
   .alert {

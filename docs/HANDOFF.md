@@ -5,7 +5,7 @@ Context from the planning conversation (13 Oct – 10 Nov 2026) that is **not** 
 ## Working agreement
 
 - **Owner:** Alex (GitHub `AlexandroSamudio`). Writes in English (not his first language); replies should be in English, concise, with plain wording. Spanish UI comes later.
-- **Roles:** Claude writes the code; Alex tests and reviews. Work goes on a branch per phase, with a PR to `main` that Alex merges. CI must be green.
+- **Roles:** Claude writes the code; Alex tests and reviews. Work goes on a branch per phase, with a PR to `main`. **Claude merges each PR itself with `gh pr merge --merge --delete-branch` once CI is green** (Alex's rule, 10 Nov 2026), then checks that `main` has it before starting the next phase.
 - **Ask when unsure** about game facts instead of guessing. Alex can check NPC screens in game.
 - **Times:** always give UTC and GMT-3 (Alex is in Argentina, no daylight saving).
 - **No cosmetic content** anywhere in the checklist.
@@ -119,13 +119,11 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phases 0–2 merged (scaffold; periods, database, seed; tracker API and screen).
-- **Branch `phase-3-rotations`:** Phase 3 (SPEC §11):
-  - `apps/api/src/sources/warframestat.ts`: normalisers for the 8 endpoints, tested against real responses saved on 10 Nov 2026 (`sources/fixtures/`)
-  - `apps/api/src/sources/worldstate.ts`: SQLite cache, no polling, stale copy served when offline, 2-minute retry wait, manual refresh once a minute
-  - `GET /api/worldstate`, `POST /api/worldstate/refresh`. The tracker now gets the live Sortie expiry and Baro arrival
-  - Sortie ticks are keyed by the date the Sortie ends (`sortie:2026-11-10`), so live and fallback keys agree
-  - Rotations column: Archon Hunt (shard colour), Sortie, Teshin (estimated from the rotation order when the API lags), Darvo, Baro, Nightwave, events, arbitration
-- **Live data checked 10 Nov 2026 13:29 UTC:** Sortie expiry 17:00 UTC; `steelPath` and `nightwave` were current; `arbitration` returned a placeholder.
-- **Archon shards** (wiki, 10 Nov 2026): Amar = Crimson, Nira = Amber, Boreal = Azure.
-- **Next: Phase 4** (edit mode).
+- `main`: Phases 0–3 merged (scaffold; periods, database, seed; tracker; live rotations).
+- **Branch `phase-4-edit-mode`:** Phase 4 (SPEC §11):
+  - Edit mode (toggle on the Tracker): rename, describe, change kind/slots/verify/link, hide, delete (custom only), add items and sections, change a section's reset period, reorder (drag, ↑/↓ buttons, "Move to section"), restore defaults with an inline confirm
+  - API: `apps/api/src/db/checklist.ts`, `apps/api/src/routes/checklist.ts`, schemas in `packages/shared/src/edit.ts`
+  - New `reordered` flag (migration `0001_reordered.sql`): moving a default keeps the user's order through seed updates without blocking text updates
+  - "Removed from the defaults" notice on the Tracker, with dismiss
+- **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, so Alex's `npm run dev` on 4317/5173 is never touched. Automated mouse drags don't start HTML5 drags in Chrome; drag-and-drop was checked by dispatching the drag events from a script.
+- **Next: Phase 5** (theme and polish).
