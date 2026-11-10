@@ -119,7 +119,7 @@ All period logic lives in `apps/api/src/domain/periods.ts` as **pure functions o
 | ------------ | ---------------------------------------------------------------------- | ------------------- | ------------------------------------------------ |
 | `daily`      | every day 00:00                                                        | 21:00               | fixed rule                                       |
 | `weekly`     | Monday 00:00                                                           | Sunday 21:00        | fixed rule                                       |
-| `eight_hour` | 00:00, 08:00, 16:00                                                    | 21:00, 05:00, 13:00 | fixed rule ⚠️ verify (see §12)                   |
+| `eight_hour` | 04:00, 12:00, 20:00                                                    | 01:00, 09:00, 17:00 | fixed rule (checked in game, 10 Nov 2026)        |
 | `sortie`     | when the current Sortie expires (≈ 16:00 or 17:00 depending on season) | ≈ 13:00 / 14:00     | **live API `sortie.expiry`**; fallback 16:00 UTC |
 | `baro`       | per Baro visit (arrival → departure, every 2 weeks)                    | —                   | **live API `voidTrader.activation`**             |
 | `manual`     | only when the user presses **Clear**                                   | —                   | user                                             |
@@ -132,7 +132,7 @@ Ticks are stored against a **period key**, a string that identifies the current 
 
 - `daily:2026-11-09`
 - `weekly:2026-11-09` (date of that week's Monday)
-- `eight_hour:2026-11-09T16`
+- `eight_hour:2026-11-09T12` (the block's start; between 00:00 and 04:00 UTC the key carries the previous day's `T20`)
 - `sortie:2026-11-10`: the UTC date the Sortie **ends** (live `sortie.expiry`, or the next 16:00 UTC without live data), so live and fallback keys match for most of the day
 - `baro:<activation ISO>` (fallback `baro:unknown` when there is no live data)
 - `manual:<counter>`, where the counter goes up by one each time the user presses Clear
@@ -363,7 +363,7 @@ Each phase ends with something you can run and check.
 - [x] Arcane Vendetta / Radiation / Ignition are sold by **Loid in the Sanctum Anatomica** (in game, 10 Nov 2026; the price wasn't checked)
 - [x] Acrithis' weekly rotation resets with the **weekly reset**, Monday 00:00 UTC (in game, 10 Nov 2026)
 - [x] Steel Path Descendia: 25 Steel Essence at **floor 21** (in game, 10 Nov 2026)
-- [ ] 8-hour vendors: confirm Loid, Grandmother and Archimedean Yonta refresh at 00:00 / 08:00 / 16:00 UTC (taken from the community Task Checklist, not yet confirmed by us). The answer on 10 Nov 2026 was unclear ("correct" but also "every day at 16:00 UTC"); still to check from each vendor's in-game refresh timer
+- [x] 8-hour vendors (Loid, Grandmother, Archimedean Yonta) refresh at **04:00 / 12:00 / 20:00 UTC** (01:00 / 09:00 / 17:00 GMT-3), checked in game on 10 Nov 2026. The wiki confirms the 8-hour cycle (Yonta: "refreshes every 8 hours"). The community Task Checklist's 00:00 / 08:00 / 16:00 was wrong.
 
 **Technical (Claude):**
 
@@ -384,7 +384,7 @@ Each phase ends with something you can run and check.
 
 ---
 
-## Appendix A. Default checklist (seed v2)
+## Appendix A. Default checklist (seed v3)
 
 `⚠️` = shipped with the "verify" badge.
 
@@ -407,7 +407,7 @@ Each phase ends with something you can run and check.
 
 - Sortie (3 missions)
 
-**8-hour vendors** (`eight_hour`) ⚠️ timing
+**8-hour vendors** (`eight_hour`, resets 01:00 / 09:00 / 17:00 local, 04:00 / 12:00 / 20:00 UTC)
 
 - Loid: Entrati lab materials
 - Grandmother (Necralisk): token deals

@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { nextReset, periodKey, SORTIE_FALLBACK_HOUR_UTC } from './periods.js';
+import {
+  EIGHT_HOUR_FIRST_UTC_HOUR,
+  nextReset,
+  periodKey,
+  SORTIE_FALLBACK_HOUR_UTC,
+} from './periods.js';
 
 const at = (iso: string) => new Date(iso);
 const iso = (d: Date | null) => d?.toISOString() ?? null;
@@ -64,17 +69,57 @@ describe('weekly', () => {
   });
 });
 
-describe('eight_hour', () => {
+describe('eight_hour (04:00 / 12:00 / 20:00 UTC, checked in game 10 Nov 2026)', () => {
+  it('starts its cycle at 04:00 UTC', () => {
+    expect(EIGHT_HOUR_FIRST_UTC_HOUR).toBe(4);
+  });
+
   it.each([
-    ['2026-11-09T00:00:00.000Z', 'eight_hour:2026-11-09T00', '2026-11-09T08:00:00.000Z'],
-    ['2026-11-09T07:59:59.999Z', 'eight_hour:2026-11-09T00', '2026-11-09T08:00:00.000Z'],
-    ['2026-11-09T08:00:00.000Z', 'eight_hour:2026-11-09T08', '2026-11-09T16:00:00.000Z'],
-    ['2026-11-09T15:59:59.999Z', 'eight_hour:2026-11-09T08', '2026-11-09T16:00:00.000Z'],
-    ['2026-11-09T16:00:00.000Z', 'eight_hour:2026-11-09T16', '2026-11-10T00:00:00.000Z'],
-    ['2026-11-09T23:59:59.999Z', 'eight_hour:2026-11-09T16', '2026-11-10T00:00:00.000Z'],
+    // [now, key, next reset]
+    ['2026-11-09T03:59:59.999Z', 'eight_hour:2026-11-08T20', '2026-11-09T04:00:00.000Z'],
+    ['2026-11-09T04:00:00.000Z', 'eight_hour:2026-11-09T04', '2026-11-09T12:00:00.000Z'],
+    ['2026-11-09T11:59:59.999Z', 'eight_hour:2026-11-09T04', '2026-11-09T12:00:00.000Z'],
+    ['2026-11-09T12:00:00.000Z', 'eight_hour:2026-11-09T12', '2026-11-09T20:00:00.000Z'],
+    ['2026-11-09T19:59:59.999Z', 'eight_hour:2026-11-09T12', '2026-11-09T20:00:00.000Z'],
+    ['2026-11-09T20:00:00.000Z', 'eight_hour:2026-11-09T20', '2026-11-10T04:00:00.000Z'],
+    ['2026-11-09T23:59:59.999Z', 'eight_hour:2026-11-09T20', '2026-11-10T04:00:00.000Z'],
   ])('%s → %s, next reset %s', (now, key, next) => {
     expect(periodKey('eight_hour', at(now))).toBe(key);
     expect(iso(nextReset('eight_hour', at(now)))).toBe(next);
+  });
+
+  it('does not reset at 00:00 UTC: the 20:00 block runs past midnight', () => {
+    const before = periodKey('eight_hour', at('2026-11-09T23:59:59.999Z'));
+    expect(periodKey('eight_hour', at('2026-11-10T00:00:00.000Z'))).toBe(before);
+    expect(periodKey('eight_hour', at('2026-11-10T03:59:59.999Z'))).toBe(before);
+  });
+
+  it('in GMT-3 the resets are at 01:00, 09:00 and 17:00', () => {
+    expect(periodKey('eight_hour', at('2026-11-09T00:59:59-03:00'))).toBe(
+      'eight_hour:2026-11-08T20',
+    );
+    expect(periodKey('eight_hour', at('2026-11-09T01:00:00-03:00'))).toBe(
+      'eight_hour:2026-11-09T04',
+    );
+    expect(periodKey('eight_hour', at('2026-11-09T09:00:00-03:00'))).toBe(
+      'eight_hour:2026-11-09T12',
+    );
+    expect(periodKey('eight_hour', at('2026-11-09T17:00:00-03:00'))).toBe(
+      'eight_hour:2026-11-09T20',
+    );
+  });
+
+  it('crosses Monday, month and year boundaries', () => {
+    // Monday 00:00 UTC (weekly reset) is still inside Sunday's 20:00 block.
+    expect(periodKey('eight_hour', at('2026-11-16T00:00:00.000Z'))).toBe(
+      'eight_hour:2026-11-15T20',
+    );
+    expect(periodKey('eight_hour', at('2027-01-01T02:00:00.000Z'))).toBe(
+      'eight_hour:2026-12-31T20',
+    );
+    expect(iso(nextReset('eight_hour', at('2026-12-31T23:00:00.000Z')))).toBe(
+      '2027-01-01T04:00:00.000Z',
+    );
   });
 });
 
@@ -185,7 +230,7 @@ describe('time zone independence', () => {
       const now = at('2026-11-08T23:30:00.000Z'); // Sunday in UTC
       expect(periodKey('daily', now)).toBe('daily:2026-11-08');
       expect(periodKey('weekly', now)).toBe('weekly:2026-11-02');
-      expect(periodKey('eight_hour', now)).toBe('eight_hour:2026-11-08T16');
+      expect(periodKey('eight_hour', now)).toBe('eight_hour:2026-11-08T20');
       expect(iso(nextReset('weekly', now))).toBe('2026-11-09T00:00:00.000Z');
     },
   );

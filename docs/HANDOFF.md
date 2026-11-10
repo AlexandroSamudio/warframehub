@@ -47,7 +47,7 @@ Context from the planning conversation (13 Oct – 10 Nov 2026) that is **not** 
   - Solo maintainer, and activity was slowing.
 - **Warframe Task Checklist** (warframetools.com, `warframe-tools/Task-Checklist`)
   - A daily/weekly checklist, GPL-3.0, with 7 contributors.
-  - Source of the 8-hour vendor timing (Loid, Grandmother, Yonta at 00/08/16 UTC), which we still need to verify.
+  - Source of the 8-hour vendor timing (Loid, Grandmother, Yonta at 00/08/16 UTC). **That turned out wrong**: checked in game on 10 Nov 2026, they refresh at 04/12/20 UTC.
 - **Others:**
   - Tenno Tracker, Framehub, Tenno Companion and browse.wf (profile viewer)
   - AlecaFrame, ruled out because it needs Overwolf (a third-party app)
@@ -127,6 +127,7 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
   - `scripts/warframehub-launcher.sh` and `npm run install-launcher` (`.desktop` file + icon)
   - Checked end to end on EndeavourOS: launcher start (~0.6 s), second launch, Quit from the page, idle shutdown after 1 idle minute (stopped at 120 s), `.desktop` file valid (`desktop-file-validate`)
 - **Tested on Bazzite by Alex (10 Nov 2026): runs perfectly**, including the app-menu launcher.
-- **Seed v2 (10 Nov 2026):** four facts confirmed in game (Bird 3 sells the Archon Shard for 30,000 Cavia standing; Loid in the Sanctum Anatomica sells the Vosfor arcanes; Acrithis resets with the weekly reset; Descendia Steel Path pays 25 Steel Essence at floor 21). Still `verify`: "Today's Special" vendors and the three 8-hour vendors (their refresh time is still unclear).
+- **Seed v2 (10 Nov 2026):** four facts confirmed in game (Bird 3 sells the Archon Shard for 30,000 Cavia standing; Loid in the Sanctum Anatomica sells the Vosfor arcanes; Acrithis resets with the weekly reset; Descendia Steel Path pays 25 Steel Essence at floor 21).
+- **Seed v3 (10 Nov 2026):** the 8-hour vendors refresh at 04:00 / 12:00 / 20:00 UTC (checked in game); `periods.ts` uses that anchor. Still `verify`: only the "Today's Special" vendors.
 - **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id or with the Quit endpoint, so Alex's `npm run dev` on 4317/5173 is never touched.
 - **v1 is feature-complete** after this phase. Open items are in SPEC §12; later features are in §13.

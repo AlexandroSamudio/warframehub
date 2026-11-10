@@ -1,5 +1,5 @@
 {
-  "seedVersion": 2,
+  "seedVersion": 3,
   "sections": [
     {
       "seedId": "daily.core",
@@ -98,22 +98,19 @@
           "seedId": "eight-hour.loid",
           "title": "Loid",
           "description": "Entrati lab materials",
-          "kind": "check",
-          "verify": true
+          "kind": "check"
         },
         {
           "seedId": "eight-hour.grandmother",
           "title": "Grandmother (Necralisk)",
           "description": "Token deals",
-          "kind": "check",
-          "verify": true
+          "kind": "check"
         },
         {
           "seedId": "eight-hour.yonta",
           "title": "Archimedean Yonta",
           "description": "Voidplume Pinion",
-          "kind": "check",
-          "verify": true
+          "kind": "check"
         }
       ]
     },

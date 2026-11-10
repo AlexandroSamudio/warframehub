@@ -89,7 +89,7 @@ describe('GET /api/tracker', () => {
       { id: 'daily', nextReset: '2026-11-10T00:00:00.000Z', estimated: false },
       { id: 'weekly', nextReset: '2026-11-16T00:00:00.000Z', estimated: false },
       { id: 'sortie', nextReset: '2026-11-09T16:00:00.000Z', estimated: true },
-      { id: 'eight_hour', nextReset: '2026-11-09T16:00:00.000Z', estimated: false },
+      { id: 'eight_hour', nextReset: '2026-11-09T20:00:00.000Z', estimated: false },
       { id: 'baro', nextReset: null, estimated: false },
     ]);
   });
@@ -158,10 +158,12 @@ describe('PUT /api/ticks and resets (fake clock)', () => {
     expect(await checkedSlots(ctx, hunhow)).toEqual([]);
   });
 
-  it('an 8-hour tick clears at the next 8-hour mark', async () => {
+  it('an 8-hour tick survives midnight and clears at the next mark (04:00 UTC)', async () => {
     const loid = ctx.itemId('eight-hour.loid');
-    await tick(ctx, loid); // 22:00 UTC, block 16:00
-    ctx.state.now = new Date('2026-11-10T00:00:00.000Z');
+    await tick(ctx, loid); // 22:00 UTC, in the 20:00 block
+    ctx.state.now = new Date('2026-11-10T03:59:59.999Z');
+    expect(await checkedSlots(ctx, loid)).toEqual([0]);
+    ctx.state.now = new Date('2026-11-10T04:00:00.000Z');
     expect(await checkedSlots(ctx, loid)).toEqual([]);
   });
 
