@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type {
-    CreateItemRequest,
-    EditableSection,
-    ItemKind,
+  import {
     PeriodType,
-    UpdateItemRequest,
-    UpdateSectionRequest,
+    type CreateItemRequest,
+    type EditableSection,
+    type ItemKind,
+    type UpdateItemRequest,
+    type UpdateSectionRequest,
   } from '@warframehub/shared';
   import { t } from '../lib/i18n/index.ts';
   import EditItem from './EditItem.svelte';
@@ -46,7 +46,7 @@
     onDragEnd,
   }: Props = $props();
 
-  const PERIODS: PeriodType[] = ['daily', 'weekly', 'eight_hour', 'sortie', 'baro', 'manual'];
+  const PERIODS: PeriodType[] = PeriodType.options;
   const KINDS: ItemKind[] = ['check', 'counter', 'subticks', 'info'];
 
   let confirmDelete = $state(false);

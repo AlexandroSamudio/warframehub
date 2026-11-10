@@ -101,7 +101,7 @@
         maxlength="120"
       />
       <select aria-label={t('edit.period')} bind:value={newSectionPeriod}>
-        {#each ['daily', 'weekly', 'eight_hour', 'sortie', 'baro', 'manual'] as const as p (p)}
+        {#each ['daily', 'weekly', 'eight_hour', 'four_day', 'sortie', 'baro', 'manual'] as const as p (p)}
           <option value={p}>{t(`period.${p}`)}</option>
         {/each}
       </select>

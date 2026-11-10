@@ -120,11 +120,12 @@ All period logic lives in `apps/api/src/domain/periods.ts` as **pure functions o
 | `daily`      | every day 00:00                                                        | 21:00               | fixed rule                                       |
 | `weekly`     | Monday 00:00                                                           | Sunday 21:00        | fixed rule                                       |
 | `eight_hour` | 04:00, 12:00, 20:00                                                    | 01:00, 09:00, 17:00 | fixed rule (checked in game, 10 Nov 2026)        |
+| `four_day`   | every 4 days at 00:00, counted from 2026-11-11                         | 21:00               | fixed rule (anchor checked in game, 10 Nov 2026) |
 | `sortie`     | when the current Sortie expires (≈ 16:00 or 17:00 depending on season) | ≈ 13:00 / 14:00     | **live API `sortie.expiry`**; fallback 16:00 UTC |
 | `baro`       | per Baro visit (arrival → departure, every 2 weeks)                    | —                   | **live API `voidTrader.activation`**             |
 | `manual`     | only when the user presses **Clear**                                   | —                   | user                                             |
 
-Ergo Glast and Eleanor Nightingale (every 4 days) are `manual` in v1, because we don't know the anchor date of their 4-day cycle. If we find a reliable anchor, they become a fixed `four_day` period.
+Ergo Glast and Eleanor Nightingale use `four_day` (since seed v5). Their stock changes every 4 days at 00:00 UTC; the anchor is the reset of 2026-11-11 00:00 UTC, checked in game on 10 Nov 2026. `manual` stays available for custom sections.
 
 ### 4.2 Period keys
 
@@ -132,6 +133,7 @@ Ticks are stored against a **period key**, a string that identifies the current 
 
 - `daily:2026-11-09`
 - `weekly:2026-11-09` (date of that week's Monday)
+- `four_day:2026-11-11` (the date the 4-day block started)
 - `eight_hour:2026-11-09T12` (the block's start; between 00:00 and 04:00 UTC the key carries the previous day's `T20`)
 - `sortie:2026-11-10`: the UTC date the Sortie **ends** (live `sortie.expiry`, or the next 16:00 UTC without live data), so live and fallback keys match for most of the day
 - `baro:<activation ISO>` (fallback `baro:unknown` when there is no live data)
@@ -259,7 +261,7 @@ Rules:
 ### 8.1 Screens
 
 1. **Tracker** (home)
-   - **Top bar:** reset clocks (daily, weekly, Sortie, next 8-hour, Baro), each with a countdown and local time plus UTC. A clock is highlighted when its reset is less than 3 hours away (24 hours for weekly).
+   - **Top bar:** reset clocks (daily, weekly, Sortie, next 8-hour, every 4 days, Baro), each with a countdown and local time plus UTC. A clock is highlighted when its reset is less than 3 hours away (24 hours for weekly and every 4 days).
    - **Left column:** checklist sections. Each has a progress meter and its reset label; `manual` sections have a **Clear** button.
    - **Right column:** live rotations (Archon Hunt with shard colour, Sortie, Teshin, Darvo, Baro, Nightwave, events). Each card has a freshness badge: **Live** / **Estimated** / **May be outdated** / **Check in game**.
    - Stacks to one column on narrow windows.
@@ -369,7 +371,7 @@ Each phase ends with something you can run and check.
 **Technical (Claude):**
 
 - [ ] Does warframestat.us expose Archimedea or the Circuit rotation? (WFCD's Rust parser maps the raw `Conquests` field to Archimedea.)
-- [ ] Is there a reliable anchor date for Ergo Glast / Eleanor Nightingale's 4-day cycle?
+- [x] Ergo Glast / Eleanor Nightingale's 4-day cycle: resets at 00:00 UTC, one of them on **2026-11-11** (in game, 10 Nov 2026). Now the `four_day` period.
 - [x] Re-check `steelPath` and `nightwave` freshness before Phase 3. On 10 Nov 2026 both were current. `arbitration` returned a placeholder (`SolNode000`, 1970 dates), so it shows "Check in game".
 
 ---
@@ -385,7 +387,7 @@ Each phase ends with something you can run and check.
 
 ---
 
-## Appendix A. Default checklist (seed v4)
+## Appendix A. Default checklist (seed v5)
 
 `⚠️` = shipped with the "verify" badge. Since seed v4 (10 Nov 2026) no item has it: everything below was checked in game.
 
@@ -414,7 +416,7 @@ Each phase ends with something you can run and check.
 - Grandmother (Necralisk): token deals
 - Archimedean Yonta: Voidplume Pinion
 
-**Every 4 days** (`manual`)
+**Every 4 days** (`four_day`, resets 21:00 local / 00:00 UTC, every 4 days from 11 Nov 2026)
 
 - Ergo Glast: Tenet weapons
 - Eleanor Nightingale: Tenet A/B rotation

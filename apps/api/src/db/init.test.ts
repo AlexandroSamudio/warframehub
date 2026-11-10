@@ -16,10 +16,10 @@ const clone = (seed: SeedFile): SeedFile => structuredClone(seed);
 const totalItems = (seed: SeedFile) => seed.sections.reduce((n, s) => n + s.items.length, 0);
 
 describe('shipped seed (apps/api/seed/checklist.json)', () => {
-  it('parses and covers every period type used in v1', () => {
+  it('parses and uses every automatic period type (nothing needs a manual Clear)', () => {
     expect(shipped.seedVersion).toBeGreaterThanOrEqual(1);
     expect(new Set(shipped.sections.map((s) => s.period))).toEqual(
-      new Set(['daily', 'weekly', 'eight_hour', 'sortie', 'baro', 'manual']),
+      new Set(['daily', 'weekly', 'eight_hour', 'four_day', 'sortie', 'baro']),
     );
   });
 
@@ -168,14 +168,29 @@ describe('database init', () => {
     });
   });
 
-  it('manual sections get a counter starting at 0', () => {
+  it('"Every 4 days" resets on its own (four_day) instead of with a manual Clear', () => {
     const { db } = database;
-    const { userId } = initDatabase(db, shipped, NOW);
+    initDatabase(db, shipped, NOW);
     const fourDay = db.select().from(sections).where(eq(sections.seedId, 'four-day')).get()!;
-    expect(fourDay.period).toBe('manual');
+    expect(fourDay.period).toBe('four_day');
+  });
+
+  it('upgrading from a manual "Every 4 days" switches it, unless the user edited the section', () => {
+    const { db } = database;
+    const old = clone(shipped);
+    old.seedVersion = shipped.seedVersion - 1;
+    old.sections.find((s) => s.seedId === 'four-day')!.period = 'manual';
+    const { userId } = initDatabase(db, old, NOW);
+    const before = db.select().from(sections).where(eq(sections.seedId, 'four-day')).get()!;
+    expect(before.period).toBe('manual');
     expect(
-      db.select().from(manualCounters).where(eq(manualCounters.sectionId, fourDay.id)).get(),
-    ).toEqual({ userId, sectionId: fourDay.id, counter: 0 });
+      db.select().from(manualCounters).where(eq(manualCounters.sectionId, before.id)).get(),
+    ).toEqual({ userId, sectionId: before.id, counter: 0 });
+
+    applySeed(db, userId, shipped, LATER);
+    expect(db.select().from(sections).where(eq(sections.id, before.id)).get()!.period).toBe(
+      'four_day',
+    );
   });
 
   it('a second start with the same seed changes nothing', () => {

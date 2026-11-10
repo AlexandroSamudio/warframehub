@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   EIGHT_HOUR_FIRST_UTC_HOUR,
+  FOUR_DAY_ANCHOR,
   nextReset,
   periodKey,
   SORTIE_FALLBACK_HOUR_UTC,
@@ -120,6 +121,54 @@ describe('eight_hour (04:00 / 12:00 / 20:00 UTC, checked in game 10 Nov 2026)', 
     expect(iso(nextReset('eight_hour', at('2026-12-31T23:00:00.000Z')))).toBe(
       '2027-01-01T04:00:00.000Z',
     );
+  });
+});
+
+describe('four_day (Ergo Glast, Eleanor Nightingale; anchor checked in game 10 Nov 2026)', () => {
+  it('is anchored on the 2026-11-11 00:00 UTC reset', () => {
+    expect(new Date(FOUR_DAY_ANCHOR).toISOString()).toBe('2026-11-11T00:00:00.000Z');
+  });
+
+  it.each([
+    // [now, key, next reset]
+    ['2026-11-10T23:59:59.999Z', 'four_day:2026-11-07', '2026-11-11T00:00:00.000Z'],
+    ['2026-11-11T00:00:00.000Z', 'four_day:2026-11-11', '2026-11-15T00:00:00.000Z'],
+    ['2026-11-14T23:59:59.999Z', 'four_day:2026-11-11', '2026-11-15T00:00:00.000Z'],
+    ['2026-11-15T00:00:00.000Z', 'four_day:2026-11-15', '2026-11-19T00:00:00.000Z'],
+  ])('%s → %s, next reset %s', (now, key, next) => {
+    expect(periodKey('four_day', at(now))).toBe(key);
+    expect(iso(nextReset('four_day', at(now)))).toBe(next);
+  });
+
+  it('resets at 21:00 GMT-3, like the daily reset', () => {
+    expect(periodKey('four_day', at('2026-11-10T20:59:59-03:00'))).toBe('four_day:2026-11-07');
+    expect(periodKey('four_day', at('2026-11-10T21:00:00-03:00'))).toBe('four_day:2026-11-11');
+  });
+
+  it('is not tied to the week: the Monday reset is not a 4-day reset', () => {
+    // 2026-11-16 is a Monday; the 4-day block started on the 15th.
+    expect(periodKey('four_day', at('2026-11-16T00:00:00.000Z'))).toBe('four_day:2026-11-15');
+  });
+
+  it('works before the anchor and across month and year boundaries', () => {
+    expect(periodKey('four_day', at('2026-11-01T12:00:00Z'))).toBe('four_day:2026-10-30');
+    // 2026-11-11 + 13 × 4 days = 2027-01-02
+    expect(periodKey('four_day', at('2027-01-01T23:59:59Z'))).toBe('four_day:2026-12-29');
+    expect(periodKey('four_day', at('2027-01-02T00:00:00Z'))).toBe('four_day:2027-01-02');
+    expect(periodKey('four_day', at('2028-02-29T00:00:00Z'))).toMatch(/^four_day:2028-0[23]-\d\d$/);
+  });
+
+  it('every block is exactly 4 days long', () => {
+    let t = at('2026-01-01T00:00:00Z');
+    for (let i = 0; i < 200; i++) {
+      const next = nextReset('four_day', t)!;
+      const key = periodKey('four_day', t);
+      expect(periodKey('four_day', new Date(next.getTime() - 1))).toBe(key);
+      expect(periodKey('four_day', next)).not.toBe(key);
+      const start = new Date(key.slice('four_day:'.length) + 'T00:00:00Z');
+      expect(next.getTime() - start.getTime()).toBe(4 * 24 * 60 * 60 * 1000);
+      t = next;
+    }
   });
 });
 

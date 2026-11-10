@@ -4,7 +4,15 @@ import { z } from 'zod';
  * How often a section's ticks reset (SPEC §4.1).
  * An item's period always comes from its section.
  */
-export const PeriodType = z.enum(['daily', 'weekly', 'eight_hour', 'sortie', 'baro', 'manual']);
+export const PeriodType = z.enum([
+  'daily',
+  'weekly',
+  'eight_hour',
+  'four_day',
+  'sortie',
+  'baro',
+  'manual',
+]);
 export type PeriodType = z.infer<typeof PeriodType>;
 
 /**

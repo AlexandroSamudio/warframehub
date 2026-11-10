@@ -43,5 +43,7 @@ describe('isResetSoon', () => {
     expect(isResetSoon('weekly', 23 * HOUR)).toBe(true);
     expect(isResetSoon('weekly', 24 * HOUR)).toBe(false);
     expect(isResetSoon('daily', -1)).toBe(false);
+    expect(isResetSoon('four_day', 23 * HOUR)).toBe(true);
+    expect(isResetSoon('four_day', 24 * HOUR)).toBe(false);
   });
 });

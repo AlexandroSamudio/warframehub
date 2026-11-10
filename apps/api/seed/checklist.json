@@ -1,5 +1,5 @@
 {
-  "seedVersion": 4,
+  "seedVersion": 5,
   "sections": [
     {
       "seedId": "daily.core",
@@ -117,7 +117,7 @@
       "seedId": "four-day",
       "slug": "every-4-days",
       "title": "Every 4 days",
-      "period": "manual",
+      "period": "four_day",
       "items": [
         {
           "seedId": "four-day.ergo-glast",
