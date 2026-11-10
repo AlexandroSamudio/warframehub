@@ -119,12 +119,11 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phase 0 scaffold merged (monorepo, `/api/health`, Svelte status page, tooling, CI).
-- **Branch `phase-1-periods-data`:** Phase 1 (SPEC §11):
-  - `apps/api/src/domain/periods.ts` + boundary tests (00:00 UTC, Monday, 8-hour marks, Sortie/Baro fallbacks, machine time zone independence)
-  - Drizzle schema (`apps/api/src/db/schema.ts`), migrations in `apps/api/drizzle/` (applied at startup)
-  - data directory `$XDG_DATA_HOME/warframehub/` (override: `WFHUB_DATA_DIR`), database file `warframehub.db`
-  - seed `apps/api/seed/checklist.json` (SPEC Appendix A) imported on first start and merged on seed updates
-  - better-sqlite3 13 ships prebuilt binaries, so it needs **no** `allowScripts` approval
-- **Not done yet, on purpose:** deleting old tick rows (Phase 2, needs the tracker's current period keys) and the "removed from defaults" notice (Phase 4).
-- **Next: Phase 2** (Tracker: `/api/tracker`, `/api/ticks`, Tracker screen).
+- `main`: Phase 0 (scaffold) and Phase 1 (periods, database, default checklist) merged.
+- **Branch `phase-2-tracker`:** Phase 2 (SPEC §11):
+  - `GET /api/tracker`, `PUT /api/ticks`, `POST /api/sections/:id/clear` (schemas in `packages/shared/src/tracker.ts`, queries in `apps/api/src/db/tracker.ts`)
+  - Tracker screen: reset clocks, checklist sections with progress, checkboxes / counters / sub-ticks, Clear for manual sections
+  - Old ticks deleted at startup and once a day. Sortie/Baro ticks are pruned by age (2 / 30 days), because their keys depend on live data that may be missing
+  - Countdowns use the server clock offset; when a reset passes the page reloads the tracker. The client never computes period keys
+  - Sortie times are fallback estimates (≈, "estimated") and Baro shows "Waiting for live data" until Phase 3 plugs in `liveTimes`
+- **Next: Phase 3** (warframestat.us client, cache, normaliser, rotations column; feed `sortieExpiry` / `baroActivation` into `buildApp({ liveTimes })`).

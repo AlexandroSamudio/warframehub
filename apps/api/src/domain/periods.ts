@@ -86,7 +86,8 @@ export function nextReset(period: PeriodType, now: Date, ctx: PeriodContext = {}
   }
 }
 
-function liveSortieExpiry(now: Date, ctx: PeriodContext): Date | null {
+/** The live Sortie expiry if it's usable (in the future, within about a day), else null. */
+export function liveSortieExpiry(now: Date, ctx: PeriodContext): Date | null {
   const expiry = ctx.sortieExpiry;
   if (!expiry || !isValid(expiry)) return null;
   const ahead = expiry.getTime() - now.getTime();

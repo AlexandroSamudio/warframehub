@@ -1,6 +1,10 @@
 import { ApiError, HealthResponse } from '@warframehub/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildApp } from './app.js';
+import { openDatabase } from './db/client.js';
+
+const database = openDatabase(':memory:');
+const base = { db: database.db, userId: 1 };
 
 describe('API', () => {
   let app: Awaited<ReturnType<typeof buildApp>> | undefined;
@@ -10,6 +14,7 @@ describe('API', () => {
 
   it('GET /api/health reports ok with the server time in UTC', async () => {
     app = await buildApp({
+      ...base,
       now: () => new Date('2026-11-10T03:00:00.000Z'),
       dataDir: '/data/warframehub',
     });
@@ -23,7 +28,7 @@ describe('API', () => {
   });
 
   it('unknown routes return the standard error shape', async () => {
-    app = await buildApp();
+    app = await buildApp(base);
     const res = await app.inject({ method: 'GET', url: '/api/nope' });
 
     expect(res.statusCode).toBe(404);
