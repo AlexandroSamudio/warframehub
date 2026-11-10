@@ -4,3 +4,4 @@ export * from './checklist.js';
 export * from './tracker.js';
 export * from './worldstate.js';
 export * from './edit.js';
+export * from './settings.js';

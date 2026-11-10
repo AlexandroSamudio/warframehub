@@ -70,7 +70,7 @@ export function parseSlots(json: string | null): ItemSlots | null {
   return parsed.success ? parsed.data : null;
 }
 
-function displayTz(db: Db, userId: number): string {
+export function displayTz(db: Db, userId: number): string {
   const row = db
     .select({ valueJson: settings.valueJson })
     .from(settings)
