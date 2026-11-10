@@ -51,6 +51,8 @@ export const sections = sqliteTable(
     hidden: integer('hidden', { mode: 'boolean' }).notNull().default(false),
     /** Set when the user changes a default section, so seed updates leave it alone (SPEC §5.1). */
     edited: integer('edited', { mode: 'boolean' }).notNull().default(false),
+    /** Set when the user reorders sections, so seed updates keep their order. */
+    reordered: integer('reordered', { mode: 'boolean' }).notNull().default(false),
     seedId: text('seed_id'),
   },
   (t) => [
@@ -82,6 +84,8 @@ export const items = sqliteTable(
     seedId: text('seed_id'),
     /** Set when the user changes a default item, so seed updates leave it alone (SPEC §5.1). */
     edited: integer('edited', { mode: 'boolean' }).notNull().default(false),
+    /** Set when the user moves the item, so seed updates keep its section and order. */
+    reordered: integer('reordered', { mode: 'boolean' }).notNull().default(false),
     createdAt: createdAt(),
     updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
   },

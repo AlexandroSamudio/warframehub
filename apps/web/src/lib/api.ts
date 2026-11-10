@@ -1,11 +1,16 @@
 import {
   ApiError,
+  ChecklistResponse,
   ClearSectionResponse,
   HealthResponse,
   PutTickResponse,
   TrackerResponse,
   WorldstateResponse,
+  type CreateItemRequest,
+  type CreateSectionRequest,
   type PutTickRequest,
+  type UpdateItemRequest,
+  type UpdateSectionRequest,
 } from '@warframehub/shared';
 
 /** A failed API call, with the server's error code when it sent one. */
@@ -29,7 +34,7 @@ async function request<T>(
     ...init,
     headers: init.body ? { 'content-type': 'application/json', ...init.headers } : init.headers,
   });
-  const body: unknown = await res.json().catch(() => null);
+  const body: unknown = res.status === 204 ? null : await res.json().catch(() => null);
   if (!res.ok) {
     const parsed = ApiError.safeParse(body);
     throw parsed.success
@@ -61,4 +66,55 @@ export function getWorldstate(signal?: AbortSignal): Promise<WorldstateResponse>
 
 export function refreshWorldstate(): Promise<WorldstateResponse> {
   return request(WorldstateResponse, '/api/worldstate/refresh', { method: 'POST' });
+}
+
+// ---- edit mode -------------------------------------------------------------
+
+const json = (method: string, body?: unknown): RequestInit => ({
+  method,
+  ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+});
+
+export function getChecklist(): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/sections');
+}
+
+export function createSection(body: CreateSectionRequest): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/sections', json('POST', body));
+}
+
+export function updateSection(id: number, body: UpdateSectionRequest): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, `/api/sections/${id}`, json('PATCH', body));
+}
+
+export function deleteSection(id: number): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, `/api/sections/${id}`, json('DELETE'));
+}
+
+export function reorderSections(sectionIds: number[]): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/sections/reorder', json('POST', { sectionIds }));
+}
+
+export function createItem(body: CreateItemRequest): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/items', json('POST', body));
+}
+
+export function updateItem(id: number, body: UpdateItemRequest): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, `/api/items/${id}`, json('PATCH', body));
+}
+
+export function deleteItem(id: number): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, `/api/items/${id}`, json('DELETE'));
+}
+
+export function reorderItems(sectionId: number, itemIds: number[]): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/items/reorder', json('POST', { sectionId, itemIds }));
+}
+
+export function restoreDefaults(): Promise<ChecklistResponse> {
+  return request(ChecklistResponse, '/api/checklist/restore-defaults', json('POST'));
+}
+
+export async function dismissNotice(): Promise<void> {
+  await request({ parse: () => undefined }, '/api/checklist/dismiss-notice', json('POST'));
 }

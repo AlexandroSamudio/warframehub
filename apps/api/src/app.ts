@@ -4,6 +4,8 @@ import { ZodError } from 'zod';
 import type { Db } from './db/client.js';
 import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
+import { loadSeed, type SeedFile } from './domain/seed.js';
+import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
 import { registerWorldstateRoutes } from './routes/worldstate.js';
 import { WorldstateService } from './sources/worldstate.js';
@@ -20,6 +22,8 @@ export interface AppOptions {
   dataDir?: string;
   /** Live rotations (warframestat.us + cache). Created with defaults if not given. */
   worldstate?: WorldstateService;
+  /** The default checklist, for "Restore defaults". Read from disk when not given. */
+  seed?: SeedFile;
   /** Overrides the live Sortie/Baro times taken from `worldstate` (tests). */
   liveTimes?: () => LiveTimes | Promise<LiveTimes>;
 }
@@ -91,6 +95,14 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       }),
   });
   registerWorldstateRoutes(app, { worldstate, now });
+
+  let seed = options.seed;
+  registerChecklistRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    now,
+    seed: () => (seed ??= loadSeed()),
+  });
 
   return app;
 }

@@ -15,7 +15,7 @@ import { and, asc, eq, inArray, lt, ne, sql } from 'drizzle-orm';
 import { liveSortieExpiry, nextReset, periodKey, type PeriodContext } from '../domain/periods.js';
 import { HttpError } from '../http-error.js';
 import type { Db } from './client.js';
-import { DEFAULT_SETTINGS } from './init.js';
+import { DEFAULT_SETTINGS, SEED_NOTICE_KEY, type SeedNotice } from './init.js';
 import { items, manualCounters, sections, settings, ticks } from './schema.js';
 
 /** Live reset times from the world state (Phase 3). Empty means "use the fallbacks". */
@@ -64,7 +64,7 @@ function contextFor(
   return { ...live, manualCounter: counters.get(sectionId) ?? 0 };
 }
 
-function parseSlots(json: string | null): ItemSlots | null {
+export function parseSlots(json: string | null): ItemSlots | null {
   if (json === null) return null;
   const parsed = ItemSlots.safeParse(JSON.parse(json));
   return parsed.success ? parsed.data : null;
@@ -78,6 +78,19 @@ function displayTz(db: Db, userId: number): string {
     .get();
   const value: unknown = row ? JSON.parse(row.valueJson) : DEFAULT_SETTINGS.display_tz;
   return typeof value === 'string' ? value : String(DEFAULT_SETTINGS.display_tz);
+}
+
+function seedNotice(db: Db, userId: number): { removedTitles: string[] } | null {
+  const row = db
+    .select({ valueJson: settings.valueJson })
+    .from(settings)
+    .where(and(eq(settings.userId, userId), eq(settings.key, SEED_NOTICE_KEY)))
+    .get();
+  if (!row) return null;
+  const notice = JSON.parse(row.valueJson) as Partial<SeedNotice>;
+  return Array.isArray(notice.removedTitles) && notice.removedTitles.length > 0
+    ? { removedTitles: notice.removedTitles.map(String) }
+    : null;
 }
 
 /** Everything the Tracker screen needs (SPEC §6 `GET /api/tracker`). Hidden rows are left out. */
@@ -165,6 +178,7 @@ export function loadTracker(
     displayTz: displayTz(db, userId),
     clocks,
     sections: trackerSections,
+    notice: seedNotice(db, userId),
   };
 }
 
