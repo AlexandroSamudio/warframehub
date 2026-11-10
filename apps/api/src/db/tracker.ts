@@ -24,7 +24,7 @@ export interface LiveTimes {
   baroActivation?: Date | null;
 }
 
-const CLOCKS: ClockId[] = ['daily', 'weekly', 'sortie', 'eight_hour', 'baro'];
+const CLOCKS: ClockId[] = ['daily', 'weekly', 'sortie', 'eight_hour', 'four_day', 'baro'];
 
 /**
  * Sortie and Baro keys depend on live data, which can come and go, so their old

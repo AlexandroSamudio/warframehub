@@ -32,8 +32,11 @@ export function formatCountdown(ms: number): string {
   return t('countdown.minutes', { m: minutes });
 }
 
-/** A clock is highlighted when its reset is close: under 24 hours for weekly, 3 hours otherwise. */
+/**
+ * A clock is highlighted when its reset is close: under 24 hours for the long cycles
+ * (weekly, every 4 days), 3 hours otherwise.
+ */
 export function isResetSoon(clockId: string, ms: number): boolean {
-  const limit = clockId === 'weekly' ? DAY : 3 * HOUR;
+  const limit = clockId === 'weekly' || clockId === 'four_day' ? DAY : 3 * HOUR;
   return ms >= 0 && ms < limit;
 }

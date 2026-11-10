@@ -33,7 +33,7 @@ export const TrackerSection = z.object({
 export type TrackerSection = z.infer<typeof TrackerSection>;
 
 /** The reset clocks shown in the Tracker's top bar (SPEC §8.1). */
-export const ClockId = z.enum(['daily', 'weekly', 'sortie', 'eight_hour', 'baro']);
+export const ClockId = z.enum(['daily', 'weekly', 'sortie', 'eight_hour', 'four_day', 'baro']);
 export type ClockId = z.infer<typeof ClockId>;
 
 export const ResetClock = z.object({

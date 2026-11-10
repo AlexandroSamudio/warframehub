@@ -1,5 +1,6 @@
 import {
   ApiError,
+  ChecklistResponse,
   ClearSectionResponse,
   PutTickResponse,
   TrackerResponse,
@@ -37,6 +38,31 @@ async function setup(file = ':memory:', start = '2026-11-09T12:00:00.000Z') {
   return { app, database, userId, state, itemId, sectionId };
 }
 type Ctx = Awaited<ReturnType<typeof setup>>;
+
+/** A custom section that resets only on Clear, with one checkbox item in it. */
+async function customManualItem(ctx: Ctx): Promise<{ sectionId: number; itemId: number }> {
+  const created = ChecklistResponse.parse(
+    (
+      await ctx.app.inject({
+        method: 'POST',
+        url: '/api/sections',
+        payload: { title: 'By hand', period: 'manual' },
+      })
+    ).json(),
+  );
+  const section = created.sections.find((s) => s.slug.startsWith('by-hand'))!;
+  const withItem = ChecklistResponse.parse(
+    (
+      await ctx.app.inject({
+        method: 'POST',
+        url: '/api/items',
+        payload: { sectionId: section.id, title: 'Manual thing', kind: 'check' },
+      })
+    ).json(),
+  );
+  const item = withItem.sections.find((s) => s.id === section.id)!.items[0]!;
+  return { sectionId: section.id, itemId: item.id };
+}
 
 async function tracker(app: FastifyInstance) {
   const res = await app.inject({ method: 'GET', url: '/api/tracker' });
@@ -90,6 +116,7 @@ describe('GET /api/tracker', () => {
       { id: 'weekly', nextReset: '2026-11-16T00:00:00.000Z', estimated: false },
       { id: 'sortie', nextReset: '2026-11-09T16:00:00.000Z', estimated: true },
       { id: 'eight_hour', nextReset: '2026-11-09T20:00:00.000Z', estimated: false },
+      { id: 'four_day', nextReset: '2026-11-11T00:00:00.000Z', estimated: false },
       { id: 'baro', nextReset: null, estimated: false },
     ]);
   });
@@ -243,18 +270,18 @@ describe('POST /api/sections/:id/clear', () => {
   });
 
   it('starts a new period for a manual section, unticking it', async () => {
-    const ergo = ctx.itemId('four-day.ergo-glast');
-    await tick(ctx, ergo);
+    const { sectionId, itemId: item } = await customManualItem(ctx);
+    await tick(ctx, item);
     ctx.state.now = new Date('2026-12-31T00:00:00.000Z'); // manual ticks never expire by time
-    expect(await checkedSlots(ctx, ergo)).toEqual([0]);
+    expect(await checkedSlots(ctx, item)).toEqual([0]);
 
     const res = await ctx.app.inject({
       method: 'POST',
-      url: `/api/sections/${ctx.sectionId('four-day')}/clear`,
+      url: `/api/sections/${sectionId}/clear`,
     });
     expect(res.statusCode).toBe(200);
     expect(ClearSectionResponse.parse(res.json()).periodKey).toBe('manual:1');
-    expect(await checkedSlots(ctx, ergo)).toEqual([]);
+    expect(await checkedSlots(ctx, item)).toEqual([]);
   });
 
   it('refuses non-manual and unknown sections', async () => {
@@ -311,15 +338,16 @@ describe('pruneTicks', () => {
   it('deletes ticks from past periods and keeps current ones', async () => {
     await tick(ctx, ctx.itemId('daily.core.login'));
     await tick(ctx, ctx.itemId('weekly.kuva.palladino'));
-    await tick(ctx, ctx.itemId('four-day.ergo-glast'));
-    expect(count()).toBe(3);
+    await tick(ctx, ctx.itemId('four-day.ergo-glast')); // 4-day block of 2026-11-07
+    await tick(ctx, (await customManualItem(ctx)).itemId);
+    expect(count()).toBe(4);
 
     const nextDay = new Date('2026-11-10T00:00:00.000Z');
     expect(pruneTicks(ctx.database.db, ctx.userId, nextDay)).toBe(1); // only the daily one
-    expect(count()).toBe(2);
+    expect(count()).toBe(3);
 
     const nextWeek = new Date('2026-11-16T00:00:00.000Z');
-    expect(pruneTicks(ctx.database.db, ctx.userId, nextWeek)).toBe(1); // the weekly one
+    expect(pruneTicks(ctx.database.db, ctx.userId, nextWeek)).toBe(2); // weekly + 4-day
     expect(count()).toBe(1); // the manual tick stays until Clear
   });
 

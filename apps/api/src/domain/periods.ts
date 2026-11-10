@@ -26,6 +26,14 @@ export const SORTIE_FALLBACK_HOUR_UTC = 16;
  */
 export const EIGHT_HOUR_FIRST_UTC_HOUR = 4;
 
+/**
+ * Ergo Glast and Eleanor Nightingale change stock every 4 days at 00:00 UTC (21:00 GMT-3).
+ * Anchor checked in game on 10 Nov 2026: a reset at 2026-11-11 00:00 UTC. Any reset works
+ * as the anchor; dates before it are handled too.
+ */
+export const FOUR_DAY_ANCHOR = Date.UTC(2026, 10, 11); // months are 0-based: 10 = November
+const FOUR_DAYS_MS = 4 * DAY_MS;
+
 /** Live expiries further away than this are treated as bad data. A Sortie lasts about a day. */
 const SORTIE_MAX_AHEAD_MS = 25 * HOUR_MS;
 
@@ -51,6 +59,8 @@ export function periodKey(period: PeriodType, now: Date, ctx: PeriodContext = {}
       const start = startOfEightHourBlock(now);
       return `eight_hour:${isoDate(start)}T${pad2(start.getUTCHours())}`;
     }
+    case 'four_day':
+      return `four_day:${isoDate(startOfFourDayBlock(now))}`;
     case 'sortie':
       // Keyed by the UTC date the Sortie ends, so live data and the fallback agree
       // (except between 16:00 and 17:00 UTC when offline) and ticks survive either way.
@@ -77,6 +87,8 @@ export function nextReset(period: PeriodType, now: Date, ctx: PeriodContext = {}
       return new Date(startOfUtcWeek(now).getTime() + 7 * DAY_MS);
     case 'eight_hour':
       return new Date(startOfEightHourBlock(now).getTime() + 8 * HOUR_MS);
+    case 'four_day':
+      return new Date(startOfFourDayBlock(now).getTime() + FOUR_DAYS_MS);
     case 'sortie':
       return sortieEnd(now, ctx);
     case 'baro': {
@@ -128,6 +140,12 @@ function startOfEightHourBlock(d: Date): Date {
   const shifted = new Date(d.getTime() - offset);
   const blockHour = Math.floor(shifted.getUTCHours() / 8) * 8;
   return new Date(startOfUtcDay(shifted).getTime() + blockHour * HOUR_MS + offset);
+}
+
+/** 00:00 UTC on the most recent 4-day reset (counted from FOUR_DAY_ANCHOR). */
+function startOfFourDayBlock(d: Date): Date {
+  const blocks = Math.floor((d.getTime() - FOUR_DAY_ANCHOR) / FOUR_DAYS_MS);
+  return new Date(FOUR_DAY_ANCHOR + blocks * FOUR_DAYS_MS);
 }
 
 function isoDate(d: Date): string {
