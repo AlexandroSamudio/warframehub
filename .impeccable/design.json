@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T16:49:11Z",
+  "title": "Design System: WarframeHub",
+  "extensions": {
+    "colorMeta": {
+      "void-black": {
+        "role": "neutral",
+        "displayName": "Void Black",
+        "canonical": "#07090d",
+        "tonalRamp": [
+          "#1a1d24",
+          "#2d3443",
+          "#3e4b65",
+          "#526893",
+          "#778ab1",
+          "#a1adc4",
+          "#c9ceda",
+          "#ebecf0"
+        ]
+      },
+      "hull-panel": {
+        "role": "neutral",
+        "displayName": "Hull Panel",
+        "canonical": "#10151e",
+        "tonalRamp": [
+          "#1a1d24",
+          "#2d3543",
+          "#3e4c65",
+          "#526994",
+          "#768bb1",
+          "#a1adc4",
+          "#c8cfda",
+          "#ebecf0"
+        ]
+      },
+      "hull-inset": {
+        "role": "neutral",
+        "displayName": "Hull Inset",
+        "canonical": "#171e2a",
+        "tonalRamp": [
+          "#1a1d23",
+          "#2d3543",
+          "#3f4d64",
+          "#536a92",
+          "#788cb0",
+          "#a2aec3",
+          "#c9cfd9",
+          "#ebecf0"
+        ]
+      },
+      "seam-line": {
+        "role": "neutral",
+        "displayName": "Seam Line",
+        "canonical": "#2c3749",
+        "tonalRamp": [
+          "#1a1e23",
+          "#2f3641",
+          "#424e61",
+          "#586c8d",
+          "#7c8eac",
+          "#a4afc1",
+          "#cacfd8",
+          "#ebedef"
+        ]
+      },
+      "seam-line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Seam",
+        "canonical": "#5a6b88",
+        "tonalRamp": [
+          "#1b1e22",
+          "#313640",
+          "#454e5f",
+          "#5d6d89",
+          "#808fa8",
+          "#a7afbe",
+          "#cbd0d7",
+          "#ebedef"
+        ]
+      },
+      "readout-white": {
+        "role": "neutral",
+        "displayName": "Readout White",
+        "canonical": "#e6e9ef",
+        "tonalRamp": [
+          "#1b1d22",
+          "#303540",
+          "#444d60",
+          "#5b6b8a",
+          "#7f8da9",
+          "#a6aebf",
+          "#cbcfd7",
+          "#ebedef"
+        ]
+      },
+      "dim-readout": {
+        "role": "neutral",
+        "displayName": "Dim Readout",
+        "canonical": "#9ba7ba",
+        "tonalRamp": [
+          "#1c1e22",
+          "#31373f",
+          "#464f5d",
+          "#5f6e87",
+          "#8290a6",
+          "#a8b0bd",
+          "#ccd0d6",
+          "#ecedef"
+        ]
+      },
+      "orokin-gold": {
+        "role": "primary",
+        "displayName": "Orokin Gold",
+        "canonical": "#d6b465",
+        "tonalRamp": [
+          "#282215",
+          "#4e4123",
+          "#77602d",
+          "#b18c34",
+          "#ccaa5c",
+          "#d4c091",
+          "#e1d8c1",
+          "#f2efe8"
+        ]
+      },
+      "void-teal": {
+        "role": "secondary",
+        "displayName": "Void Teal",
+        "canonical": "#66cbd9",
+        "tonalRamp": [
+          "#152629",
+          "#22494f",
+          "#2b6f78",
+          "#32a4b4",
+          "#5ac0ce",
+          "#8fcdd6",
+          "#c0dee2",
+          "#e8f1f2"
+        ]
+      },
+      "status-green": {
+        "role": "tertiary",
+        "displayName": "Status Green",
+        "canonical": "#78cc9d",
+        "tonalRamp": [
+          "#17261e",
+          "#274936",
+          "#356e4e",
+          "#42a36d",
+          "#68c08f",
+          "#98cdaf",
+          "#c4ded0",
+          "#e9f1ed"
+        ]
+      },
+      "alert-rose": {
+        "role": "tertiary",
+        "displayName": "Alert Rose",
+        "canonical": "#ec8a8a",
+        "tonalRamp": [
+          "#2b1313",
+          "#531d1d",
+          "#802424",
+          "#c02525",
+          "#da4e4e",
+          "#dc8989",
+          "#e5bdbd",
+          "#f3e7e7"
+        ]
+      },
+      "shard-crimson": {
+        "role": "tertiary",
+        "displayName": "Shard Crimson",
+        "canonical": "#ec6e66",
+        "tonalRamp": [
+          "#2c1312",
+          "#551f1b",
+          "#832620",
+          "#c7291f",
+          "#df5148",
+          "#e08b85",
+          "#e7bebb",
+          "#f4e7e6"
+        ]
+      },
+      "shard-amber": {
+        "role": "tertiary",
+        "displayName": "Shard Amber",
+        "canonical": "#e8ac4c",
+        "tonalRamp": [
+          "#2b2212",
+          "#553f1b",
+          "#835d20",
+          "#c6861f",
+          "#dfa549",
+          "#dfbd86",
+          "#e7d6bb",
+          "#f4efe6"
+        ]
+      },
+      "shard-azure": {
+        "role": "tertiary",
+        "displayName": "Shard Azure",
+        "canonical": "#68b2ee",
+        "tonalRamp": [
+          "#11202c",
+          "#1a3b56",
+          "#1f5785",
+          "#1d7cc9",
+          "#479ce1",
+          "#84b7e1",
+          "#bbd3e8",
+          "#e6eef4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The app name in the header only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Checklist section and screen titles, in gold."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Rotation card titles (teal) and editor section names."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Item titles, descriptions, rotation details."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Clock names, group headings, nav, buttons and badges (uppercase)."
+      },
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "Reset countdowns; tabular Inter for every changing number."
+      },
+      "readout-compact": {
+        "displayName": "Readout compact",
+        "purpose": "The countdown on phones (under 30rem)."
+      },
+      "body-compact": {
+        "displayName": "Body compact",
+        "purpose": "Text inside rotation cards."
+      },
+      "field": {
+        "displayName": "Field",
+        "purpose": "Inputs, selects and textareas."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Button and nav labels (Rajdhani), reset lines, progress counts, descriptions, hints."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Fetch ages, editor field labels, phone clock times."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Badges only (Rajdhani 600, uppercase)."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "120ms ease",
+        "purpose": "Border and background colour on buttons and fields; only without prefers-reduced-motion."
+      },
+      {
+        "name": "progress-fill",
+        "value": "width 200ms ease",
+        "purpose": "Section progress bar fill; only without prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "30rem"
+      },
+      {
+        "name": "settings-stack",
+        "value": "36rem"
+      },
+      {
+        "name": "tracker-stack",
+        "value": "60rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default outlined action; quiet until hovered.",
+      "html": "<button class=\"ds-btn\">Cancel</button>",
+      "css": ".ds-btn { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg, #e6e9ef); background: transparent; border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; padding: 0.2rem 0.8rem; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease; } .ds-btn:hover { border-color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 12%, transparent); } .ds-btn:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Gold outline for the main action on a screen (Edit checklist, Clear).",
+      "html": "<button class=\"ds-btn-primary\">Edit checklist</button>",
+      "css": ".ds-btn-primary { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold, #d6b465); background: transparent; border: 1px solid var(--gold, #d6b465); border-radius: 0; padding: 0.2rem 0.8rem; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease; } .ds-btn-primary:hover { border-color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 12%, transparent); } .ds-btn-primary:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Teal Button",
+      "kind": "button",
+      "refersTo": "button-teal",
+      "description": "Teal outline for live/add actions (Refresh, Add item).",
+      "html": "<button class=\"ds-btn-teal\">Refresh</button>",
+      "css": ".ds-btn-teal { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal, #66cbd9); background: transparent; border: 1px solid var(--teal, #66cbd9); border-radius: 0; padding: 0.2rem 0.8rem; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease; } .ds-btn-teal:hover { border-color: var(--teal, #66cbd9); background: color-mix(in srgb, var(--teal, #66cbd9) 12%, transparent); } .ds-btn-teal:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Rose outline for destructive actions; always behind an inline confirm.",
+      "html": "<button class=\"ds-btn-danger\">Quit WarframeHub</button>",
+      "css": ".ds-btn-danger { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bad, #ec8a8a); background: transparent; border: 1px solid var(--bad, #ec8a8a); border-radius: 0; padding: 0.2rem 0.8rem; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease; } .ds-btn-danger:hover { border-color: var(--bad, #ec8a8a); background: color-mix(in srgb, var(--bad, #ec8a8a) 12%, transparent); } .ds-btn-danger:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Recessed Hull Inset field with a teal focus border.",
+      "html": "<input class=\"ds-input\" placeholder=\"New item title\">",
+      "css": ".ds-input { font: 400 0.875rem/1.5 var(--font-body, Inter, sans-serif); color: var(--fg, #e6e9ef); background: var(--surface-2, #171e2a); border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; padding: 0.25rem 0.5rem; } .ds-input::placeholder { color: var(--muted, #9ba7ba); } .ds-input:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 0; border-color: var(--teal, #66cbd9); }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "description": "Uppercase Rajdhani links; the active one is gold with an underline.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Tracker</a><a href=\"#\">Settings</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 0.25rem; } .ds-nav a { font: 600 0.85rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted, #9ba7ba); text-decoration: none; padding: 0.3rem 0.7rem; border-bottom: 2px solid transparent; } .ds-nav a:hover { color: var(--fg, #e6e9ef); } .ds-nav a[aria-current='page'] { color: var(--gold, #d6b465); border-bottom-color: var(--gold, #d6b465); } .ds-nav a:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Outlined uppercase status tag; colour by meaning (gold verify, teal estimated, green live).",
+      "html": "<span class=\"ds-badge ds-badge-gold\">verify</span> <span class=\"ds-badge ds-badge-teal\">estimated</span> <span class=\"ds-badge ds-badge-ok\">Live</span>",
+      "css": ".ds-badge { display: inline-block; font: 600 0.72rem/1.4 var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.08em; padding: 0 0.4rem; border: 1px solid currentColor; color: var(--muted, #9ba7ba); } .ds-badge-gold { color: var(--gold, #d6b465); } .ds-badge-teal { color: var(--teal, #66cbd9); } .ds-badge-ok { color: var(--ok, #78cc9d); }"
+    },
+    {
+      "name": "Frame Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The signature cut-corner hull panel with a gold corner tick.",
+      "html": "<section class=\"ds-frame\"><h3 class=\"ds-frame-title\">Daily: Core</h3><p class=\"ds-frame-meta\">Resets in 8h 5m · Tue 21:00 (00:00 UTC)</p></section>",
+      "css": ".ds-frame { --cut: 12px; position: relative; isolation: isolate; background: var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); padding: 0.95rem 1.15rem; color: var(--fg, #e6e9ef); font-family: var(--font-body, Inter, sans-serif); } .ds-frame::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--surface, #10151e); clip-path: inherit; } .ds-frame::after { content: ''; position: absolute; top: 0; left: 0; width: 2.5rem; height: 2px; background: var(--gold, #d6b465); } .ds-frame-title { margin: 0; font: 600 1.2rem/1.2 var(--font-display, Rajdhani, sans-serif); letter-spacing: 0.04em; color: var(--gold, #d6b465); } .ds-frame-meta { margin: 0.15rem 0 0; font: 500 0.85rem var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; color: var(--muted, #9ba7ba); }"
+    },
+    {
+      "name": "Reset Clock",
+      "kind": "custom",
+      "description": "Compact frame: label, large tabular countdown, local time with UTC.",
+      "html": "<div class=\"ds-clock\"><span class=\"ds-clock-label\">Daily</span><span class=\"ds-clock-count\">8h 5m</span><span class=\"ds-clock-at\">Tue 21:00 · 00:00 UTC</span></div>",
+      "css": ".ds-clock { --cut: 10px; position: relative; isolation: isolate; background: var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); padding: 0.65rem 0.9rem; display: grid; gap: 0.05rem; max-width: 12rem; color: var(--fg, #e6e9ef); font-family: var(--font-body, Inter, sans-serif); } .ds-clock::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--surface, #10151e); clip-path: inherit; } .ds-clock::after { content: ''; position: absolute; top: 0; left: 0; width: 2.5rem; height: 2px; background: var(--gold, #d6b465); } .ds-clock::after { display: none; } .ds-clock-label { font: 600 0.8rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted, #9ba7ba); } .ds-clock-count { font: 600 1.6rem/1.15 var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; } .ds-clock-at { font: 500 0.85rem var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; color: var(--muted, #9ba7ba); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Orbiter Console",
+    "overview": "WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.\n\nMost visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No game art, logos or copied UI.",
+    "keyCharacteristics": [
+      "Near-black void with soft gold and teal glows at the top corners of the page",
+      "Flat hull panels with two cut corners and a 1px seam that follows the cut",
+      "Rajdhani for names and labels, Inter for reading and for every number that changes",
+      "Gold = names and emphasis; teal = live, interactive, focus; green and rose = status only",
+      "Thin outlined controls with uppercase labels; no solid fills, no rounded corners, no shadows"
+    ],
+    "rules": [
+      {
+        "name": "The Two Accents Rule",
+        "body": "Gold names and frames; teal signals live or interactive. A new element picks one by its job, never both. Green and rose are only for status.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured Contrast Rule",
+        "body": "Every text colour stays at least 5.5:1 on every background, and control borders at least 3:1. A new colour gets its contrast checked before it ships.",
+        "section": "colors"
+      },
+      {
+        "name": "The Steady Digits Rule",
+        "body": "Every number that changes uses Inter with tabular digits. Rajdhani has no tabular digits (measured: digit widths differ by about 60%), so it would make countdowns jitter. Rajdhani is for names and labels only.",
+        "section": "typography"
+      },
+      {
+        "name": "The Uppercase Is a Label Rule",
+        "body": "Uppercase with wide letter spacing is reserved for labels, buttons, badges and the app name. Titles and content stay in sentence case.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Hull Rule",
+        "body": "No `box-shadow`, no glows on components. A surface that needs to stand out changes its seam colour or its background step, not its height.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Cut Corner Rule",
+        "body": "Panels that hold content use the frame shape (`.frame`). Nothing gets rounded corners.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** build new content areas as `.frame` panels on Hull Panel, with a gold corner tick for checklists and planning and a teal one for live data.",
+      "**Do** use Inter with tabular digits for every number that changes, and show local time with UTC beside it.",
+      "**Do** use the shared button, input and badge styles in `app.css`, not one-off copies in components.",
+      "**Do** say state in words and colour together (Live / Estimated / May be outdated / Check in game; Done; verify).",
+      "**Do** keep text at least 5.5:1 and control borders at least 3:1, with a visible teal focus ring on every control.",
+      "**Do** confirm destructive actions inline (Yes / Cancel), never with a browser dialog."
+    ],
+    "donts": [
+      "**Don't** add shadows, glows on components, rounded corners or solid-filled buttons.",
+      "**Don't** use Rajdhani for changing numbers (it has no tabular digits).",
+      "**Don't** use gold and teal on the same element, or green and rose for anything but status.",
+      "**Don't** use DE logos, game art or copied UI assets; decoration is original CSS or SVG geometry.",
+      "**Don't** add a light theme; the console is dark by design.",
+      "**Don't** show cosmetic content (decorations, furniture, skins)."
+    ]
+  }
+}

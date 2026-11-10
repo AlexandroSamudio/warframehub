@@ -57,6 +57,13 @@ body {
   line-height: 1.5;
 }
 
+/* No lone word on the last line of body text (found by the Impeccable detector). */
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
 h1,
 h2,
 h3 {

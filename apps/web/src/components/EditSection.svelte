@@ -226,9 +226,9 @@
   .title {
     flex: 1 1 14rem;
     font-family: var(--font-display);
-    font-size: 1.1rem;
+    font-size: 1.05rem; /* DESIGN.md title */
     font-weight: 600;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
     color: var(--gold);
   }
 

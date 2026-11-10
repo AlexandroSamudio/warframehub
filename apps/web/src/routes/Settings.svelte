@@ -119,7 +119,8 @@
 
   h2 {
     margin: 0;
-    font-size: 1.35rem;
+    font-size: 1.2rem; /* DESIGN.md headline */
+    line-height: 1.2;
     color: var(--gold);
   }
 
