@@ -5,6 +5,8 @@ import type { Db } from './db/client.js';
 import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
+import { registerWorldstateRoutes } from './routes/worldstate.js';
+import { WorldstateService } from './sources/worldstate.js';
 import { APP_VERSION } from './version.js';
 
 export interface AppOptions {
@@ -16,8 +18,10 @@ export interface AppOptions {
   now?: () => Date;
   /** Shown by /api/health. */
   dataDir?: string;
-  /** Live Sortie/Baro times. Phase 3 wires this to the world-state cache. */
-  liveTimes?: () => LiveTimes;
+  /** Live rotations (warframestat.us + cache). Created with defaults if not given. */
+  worldstate?: WorldstateService;
+  /** Overrides the live Sortie/Baro times taken from `worldstate` (tests). */
+  liveTimes?: () => LiveTimes | Promise<LiveTimes>;
 }
 
 function errorBody(code: string, message: string): ApiError {
@@ -66,12 +70,27 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     });
   });
 
+  const worldstate =
+    options.worldstate ??
+    new WorldstateService(options.db, {
+      now,
+      onError: (endpoint, error) =>
+        app.log.warn({ endpoint, err: error }, 'worldstate fetch failed'),
+    });
+
   registerTrackerRoutes(app, {
     db: options.db,
     userId: options.userId,
     now,
-    liveTimes: options.liveTimes ?? (() => ({})),
+    liveTimes:
+      options.liveTimes ??
+      (async () => {
+        // Period keys for Sortie and Baro need the live times (SPEC §4.1).
+        await worldstate.ensureFresh(['sortie', 'voidTrader']);
+        return worldstate.liveTimes();
+      }),
   });
+  registerWorldstateRoutes(app, { worldstate, now });
 
   return app;
 }

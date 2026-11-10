@@ -83,10 +83,10 @@ describe('sortie', () => {
     expect(SORTIE_FALLBACK_HOUR_UTC).toBe(16);
   });
 
-  it('without live data, the period runs 16:00 UTC to 16:00 UTC and is keyed by its start date', () => {
-    expect(periodKey('sortie', at('2026-11-09T15:59:59.999Z'))).toBe('sortie:2026-11-08');
-    expect(periodKey('sortie', at('2026-11-09T16:00:00.000Z'))).toBe('sortie:2026-11-09');
-    expect(periodKey('sortie', at('2026-11-10T00:30:00.000Z'))).toBe('sortie:2026-11-09');
+  it('without live data, the period runs 16:00 to 16:00 UTC and is keyed by the date it ends', () => {
+    expect(periodKey('sortie', at('2026-11-09T15:59:59.999Z'))).toBe('sortie:2026-11-09');
+    expect(periodKey('sortie', at('2026-11-09T16:00:00.000Z'))).toBe('sortie:2026-11-10');
+    expect(periodKey('sortie', at('2026-11-10T00:30:00.000Z'))).toBe('sortie:2026-11-10');
     expect(iso(nextReset('sortie', at('2026-11-09T15:59:59.999Z')))).toBe(
       '2026-11-09T16:00:00.000Z',
     );
@@ -96,26 +96,46 @@ describe('sortie', () => {
   });
 
   it('uses the live expiry when it is in the future', () => {
-    const ctx = { sortieExpiry: at('2026-11-09T17:00:00.000Z') };
-    const now = at('2026-11-09T16:30:00.000Z');
-    expect(periodKey('sortie', now, ctx)).toBe('sortie:2026-11-09T17:00:00.000Z');
-    expect(iso(nextReset('sortie', now, ctx))).toBe('2026-11-09T17:00:00.000Z');
+    const ctx = { sortieExpiry: at('2026-11-10T17:00:00.000Z') };
+    const now = at('2026-11-10T16:30:00.000Z');
+    expect(periodKey('sortie', now, ctx)).toBe('sortie:2026-11-10');
+    expect(iso(nextReset('sortie', now, ctx))).toBe('2026-11-10T17:00:00.000Z');
+  });
+
+  it('live data and the fallback give the same key for most of the day', () => {
+    const live = { sortieExpiry: at('2026-11-10T17:00:00.000Z') }; // real expiry seen 10 Nov 2026
+    for (const t of ['2026-11-09T17:00:00Z', '2026-11-10T03:00:00Z', '2026-11-10T15:59:59Z']) {
+      expect(periodKey('sortie', at(t), live)).toBe(periodKey('sortie', at(t)));
+    }
+  });
+
+  it('the live key changes exactly at the live expiry', () => {
+    expect(
+      periodKey('sortie', at('2026-11-10T16:59:59.999Z'), {
+        sortieExpiry: at('2026-11-10T17:00:00.000Z'),
+      }),
+    ).toBe('sortie:2026-11-10');
+    expect(
+      periodKey('sortie', at('2026-11-10T17:00:00.000Z'), {
+        sortieExpiry: at('2026-11-11T17:00:00.000Z'),
+      }),
+    ).toBe('sortie:2026-11-11');
   });
 
   it('falls back when the live expiry has passed (stale cache)', () => {
     const ctx = { sortieExpiry: at('2026-11-09T16:00:00.000Z') };
     const now = at('2026-11-09T16:00:00.000Z');
-    expect(periodKey('sortie', now, ctx)).toBe('sortie:2026-11-09');
+    expect(periodKey('sortie', now, ctx)).toBe('sortie:2026-11-10');
     expect(iso(nextReset('sortie', now, ctx))).toBe('2026-11-10T16:00:00.000Z');
   });
 
   it('falls back when the live expiry is implausibly far ahead or invalid', () => {
     const now = at('2026-11-09T12:00:00.000Z');
     expect(periodKey('sortie', now, { sortieExpiry: at('2026-11-12T16:00:00Z') })).toBe(
-      'sortie:2026-11-08',
+      'sortie:2026-11-09',
     );
-    expect(periodKey('sortie', now, { sortieExpiry: new Date('nope') })).toBe('sortie:2026-11-08');
-    expect(periodKey('sortie', now, { sortieExpiry: null })).toBe('sortie:2026-11-08');
+    expect(periodKey('sortie', now, { sortieExpiry: new Date('nope') })).toBe('sortie:2026-11-09');
+    expect(periodKey('sortie', now, { sortieExpiry: null })).toBe('sortie:2026-11-09');
   });
 });
 

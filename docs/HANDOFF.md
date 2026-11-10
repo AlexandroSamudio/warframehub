@@ -119,11 +119,13 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phase 0 (scaffold) and Phase 1 (periods, database, default checklist) merged.
-- **Branch `phase-2-tracker`:** Phase 2 (SPEC §11):
-  - `GET /api/tracker`, `PUT /api/ticks`, `POST /api/sections/:id/clear` (schemas in `packages/shared/src/tracker.ts`, queries in `apps/api/src/db/tracker.ts`)
-  - Tracker screen: reset clocks, checklist sections with progress, checkboxes / counters / sub-ticks, Clear for manual sections
-  - Old ticks deleted at startup and once a day. Sortie/Baro ticks are pruned by age (2 / 30 days), because their keys depend on live data that may be missing
-  - Countdowns use the server clock offset; when a reset passes the page reloads the tracker. The client never computes period keys
-  - Sortie times are fallback estimates (≈, "estimated") and Baro shows "Waiting for live data" until Phase 3 plugs in `liveTimes`
-- **Next: Phase 3** (warframestat.us client, cache, normaliser, rotations column; feed `sortieExpiry` / `baroActivation` into `buildApp({ liveTimes })`).
+- `main`: Phases 0–2 merged (scaffold; periods, database, seed; tracker API and screen).
+- **Branch `phase-3-rotations`:** Phase 3 (SPEC §11):
+  - `apps/api/src/sources/warframestat.ts`: normalisers for the 8 endpoints, tested against real responses saved on 10 Nov 2026 (`sources/fixtures/`)
+  - `apps/api/src/sources/worldstate.ts`: SQLite cache, no polling, stale copy served when offline, 2-minute retry wait, manual refresh once a minute
+  - `GET /api/worldstate`, `POST /api/worldstate/refresh`. The tracker now gets the live Sortie expiry and Baro arrival
+  - Sortie ticks are keyed by the date the Sortie ends (`sortie:2026-11-10`), so live and fallback keys agree
+  - Rotations column: Archon Hunt (shard colour), Sortie, Teshin (estimated from the rotation order when the API lags), Darvo, Baro, Nightwave, events, arbitration
+- **Live data checked 10 Nov 2026 13:29 UTC:** Sortie expiry 17:00 UTC; `steelPath` and `nightwave` were current; `arbitration` returned a placeholder.
+- **Archon shards** (wiki, 10 Nov 2026): Amar = Crimson, Nira = Amber, Boreal = Azure.
+- **Next: Phase 4** (edit mode).

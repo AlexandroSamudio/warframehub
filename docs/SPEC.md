@@ -133,7 +133,7 @@ Ticks are stored against a **period key**, a string that identifies the current 
 - `daily:2026-11-09`
 - `weekly:2026-11-09` (date of that week's Monday)
 - `eight_hour:2026-11-09T16`
-- `sortie:<expiry ISO>` (fallback `sortie:2026-11-09`)
+- `sortie:2026-11-10`: the UTC date the Sortie **ends** (live `sortie.expiry`, or the next 16:00 UTC without live data), so live and fallback keys match for most of the day
 - `baro:<activation ISO>` (fallback `baro:unknown` when there is no live data)
 - `manual:<counter>`, where the counter goes up by one each time the user presses Clear
 
@@ -232,7 +232,8 @@ Rules:
 - **Source:** `https://api.warframestat.us/pc/<endpoint>?language=en`. This is the public WFCD API built on DE's world state; no login needed.
 - **Endpoints used in v1:** `sortie`, `archonHunt`, `steelPath`, `dailyDeals`, `voidTrader`, `nightwave`, `events`, `arbitration`.
 - **Caching:** each endpoint is cached in `worldstate_cache`.
-  - It's refreshed when the cached copy has expired (the item's own `expiry` where there is one, otherwise 10 minutes) **and** someone asks for it.
+  - It's refreshed when the cached copy has expired **and** someone asks for it. A copy lasts until the item's own `expiry`, capped at 1 hour (lists such as `nightwave` and `events`: 10 minutes). If upstream is behind (its expiry has already passed), the app asks again after 5 minutes.
+  - After a failed fetch, that endpoint is retried after 2 minutes at the earliest.
   - There is no polling while nobody is looking.
   - Manual refresh is limited to once per minute.
 - **Failure handling:** if a fetch fails, the last good copy is served, marked **stale**, with its age. The page never goes blank because the API is down.
@@ -360,7 +361,7 @@ Each phase ends with something you can run and check.
 
 - [ ] Does warframestat.us expose Archimedea or the Circuit rotation? (WFCD's Rust parser maps the raw `Conquests` field to Archimedea.)
 - [ ] Is there a reliable anchor date for Ergo Glast / Eleanor Nightingale's 4-day cycle?
-- [ ] Re-check `steelPath` and `nightwave` freshness before Phase 3
+- [x] Re-check `steelPath` and `nightwave` freshness before Phase 3. On 10 Nov 2026 both were current. `arbitration` returned a placeholder (`SolNode000`, 1970 dates), so it shows "Check in game".
 
 ---
 
