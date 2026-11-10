@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../app.js';
-import { openDatabase, type OpenDatabase } from '../db/client.js';
+import { openDatabase } from '../db/client.js';
 import { initDatabase } from '../db/init.js';
 import { loadSeed } from '../domain/seed.js';
 import { ItemCatalog } from '../sources/items.js';
