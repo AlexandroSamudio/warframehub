@@ -67,7 +67,7 @@ Context from the planning conversation (13 Oct – 10 Nov 2026) that is **not** 
 
 - **Live world state:** `https://api.warframestat.us/pc/<endpoint>`. Endpoints used: `sortie`, `archonHunt`, `steelPath`, `dailyDeals`, `voidTrader`, `nightwave`, `events`, `arbitration`.
   - Seen stale on 13 Oct 2026: `steelPath.currentReward` (still last week's item) and `nightwave` (still July's challenges).
-  - Not available: the Circuit rotation, Archimedea modifiers, vendor stock.
+  - Not available: vendor stock. (The Circuit and Archimedea **are** available, via `duviriCycle` and `archimedeas`; found on 10 Nov 2026.)
 - **WFCD:** all 53 repos' READMEs were read on 13 Oct 2026. The useful ones for later:
   - `@wfcd/items`: items, components, build costs, drop locations
   - `warframe-drop-data`: DE's drop tables as JSON
@@ -131,5 +131,6 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 - **Seed v3 (10 Nov 2026):** the 8-hour vendors refresh at 04:00 / 12:00 / 20:00 UTC (checked in game); `periods.ts` uses that anchor.
 - **Seed v4 (10 Nov 2026):** "Today's Special" vendors reset at 00:00 UTC (checked in game), the daily reset they already used. **No `verify` items are left in the seed**; every SPEC §12 in-game question is answered.
 - **Seed v5 (10 Nov 2026):** Ergo Glast and Eleanor Nightingale reset on their own every 4 days at 00:00 UTC (new `four_day` period, anchor 2026-11-11 00:00 UTC, checked in game). They no longer need the Clear button, and the top bar has an "Every 4 days" clock.
+- **Seed v6 (10 Nov 2026):** live **Circuit** (normal Warframes, Steel Path Incarnons) and **Deep / Temporal Archimedea** cards (missions, deviation, risks with Elite flag, personal modifiers), from `duviriCycle` and `archimedeas`. They replace the typed notes, which are hidden with the usual notice. A removed default section now stays visible while it holds a user-edited or custom item.
 - **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id or with the Quit endpoint, so Alex's `npm run dev` on 4317/5173 is never touched.
 - **v1 is feature-complete** after this phase. Open items are in SPEC §12; later features are in §13.

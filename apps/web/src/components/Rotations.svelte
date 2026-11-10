@@ -137,6 +137,69 @@
       {/if}
     </RotationCard>
 
+    <RotationCard title={t('card.circuit')} {...c.duviriCycle} {nowMs}>
+      {#if c.duviriCycle.data}
+        {@const ci = c.duviriCycle.data}
+        <p class="group">{t('circuit.normal')}</p>
+        <p class="lead">{ci.normal.join(' · ')}</p>
+        <p class="group">{t('circuit.steelPath')}</p>
+        <p class="lead">{ci.steelPath.join(' · ')}</p>
+        <p class="when">{t('circuit.changes', { countdown: left(ci.expiry), ...at(ci.expiry) })}</p>
+      {/if}
+    </RotationCard>
+
+    {#each c.archimedeas.data ?? [] as arch (arch.kind)}
+      <RotationCard
+        title={t(`card.archimedea.${arch.kind}`)}
+        freshness={c.archimedeas.freshness}
+        fetchedAt={c.archimedeas.fetchedAt}
+        stale={c.archimedeas.stale}
+        {nowMs}
+      >
+        <ol class="missions">
+          {#each arch.missions as m, i (i)}
+            <li>
+              <span class="lead">{t('mission.line', { type: m.missionType, node: m.faction })}</span
+              >
+              {#if m.deviation}
+                <details>
+                  <summary>{t('archimedea.deviation', { name: m.deviation.name })}</summary>
+                  <p class="sub">{m.deviation.description}</p>
+                </details>
+              {/if}
+              {#each m.risks as r, j (j)}
+                <details>
+                  <summary>
+                    {t('archimedea.risk', { name: r.name })}
+                    {#if r.elite}<span class="badge gold" title={t('archimedea.eliteHint')}
+                        >{t('archimedea.elite')}</span
+                      >{/if}
+                  </summary>
+                  <p class="sub">{r.description}</p>
+                </details>
+              {/each}
+            </li>
+          {/each}
+        </ol>
+        {#if arch.personalModifiers.length > 0}
+          <p class="group">{t('archimedea.personal')}</p>
+          <ul>
+            {#each arch.personalModifiers as pm, k (k)}
+              <li>
+                <details>
+                  <summary>{pm.name}</summary>
+                  <p class="sub">{pm.description}</p>
+                </details>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        <p class="when">{ends(arch.expiry)}</p>
+      </RotationCard>
+    {:else}
+      <RotationCard title={t('card.archimedea')} {...c.archimedeas} {nowMs} />
+    {/each}
+
     <RotationCard title={t('card.dailyDeals')} {...c.dailyDeals} {nowMs}>
       {#each c.dailyDeals.data ?? [] as d, i (i)}
         <p class="lead">{d.item}</p>
@@ -269,6 +332,35 @@
     letter-spacing: 0.06em;
     color: var(--muted);
     margin-top: 0.2rem;
+  }
+
+  .missions {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .missions li {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  details {
+    font-size: 0.85rem;
+  }
+
+  summary {
+    cursor: pointer;
+    color: var(--fg);
+  }
+
+  summary .badge {
+    margin-left: 0.35rem;
+  }
+
+  details .sub {
+    margin: 0.1rem 0 0.2rem 1rem;
   }
 
   ul {

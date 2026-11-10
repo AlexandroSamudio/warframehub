@@ -202,6 +202,7 @@ An item's period comes from its **section**. An item's own `period` is not store
 - **Moving** a default (reorder, or into another section) sets `reordered` instead of `edited`. Seed updates then keep the user's section and order but still update its text. Hiding is not an edit either.
 - The "removed from the defaults" notice lists the hidden titles at the top of the Tracker until dismissed.
 - A custom section that holds default items can't be deleted (the defaults would be lost); move them out first.
+- A default section removed from the seed stays visible while it still holds a visible custom item or an edited default, so the user's items never disappear with it.
 
 ---
 
@@ -239,7 +240,7 @@ Rules:
 ## 7. Live data (warframestat.us)
 
 - **Source:** `https://api.warframestat.us/pc/<endpoint>?language=en`. This is the public WFCD API built on DE's world state; no login needed.
-- **Endpoints used in v1:** `sortie`, `archonHunt`, `steelPath`, `dailyDeals`, `voidTrader`, `nightwave`, `events`, `arbitration`.
+- **Endpoints used in v1:** `sortie`, `archonHunt`, `steelPath`, `dailyDeals`, `voidTrader`, `nightwave`, `events`, `arbitration`, plus `duviriCycle` (the Circuit's weekly choices) and `archimedeas` (Deep and Temporal Archimedea), added after v1.
 - **Caching:** each endpoint is cached in `worldstate_cache`.
   - It's refreshed when the cached copy has expired **and** someone asks for it. A copy lasts until the item's own `expiry`, capped at 1 hour (lists such as `nightwave` and `events`: 10 minutes). If upstream is behind (its expiry has already passed), the app asks again after 5 minutes.
   - After a failed fetch, that endpoint is retried after 2 minutes at the earliest.
@@ -250,7 +251,11 @@ Rules:
   - `steelPath.currentReward` and `nightwave` can lag behind the game.
   - The UI shows "may be outdated", plus the fetch time, for any item whose own `activation`/`expiry` doesn't cover now.
   - For Teshin, the app can also show the **expected item from the known 8-week rotation order** labelled "estimated".
-- **Not available from the API:** Circuit rotation, Archimedea modifiers, vendor stock (Palladino, Acrithis and similar). In v1 these are **info rows the user edits** (free text such as "Circuit this week: …"). WFCD's raw world-state parser may expose Archimedea data; we'll check later (§12).
+- **Circuit and Archimedea** (checked 10 Nov 2026):
+  - `duviriCycle.choices` has the Circuit's weekly picks: `EXC_NORMAL` = 3 Warframes, `EXC_HARD` = 5 Steel Path Incarnon Genesis weapons. This week's lists matched the wiki's rotation tables. They change with the weekly reset, Monday 00:00 UTC (wiki).
+  - `archimedeas` has one entry per Archimedea: type `CT_LAB` = **Deep** (Albrecht's Laboratories, The Murmur, which warframestat.us calls "Man in the Wall") and `CT_HEX` = **Temporal** (Höllvania, Scaldra and Techrot), checked against the wiki. Each has 3 missions with a deviation and risks (`isHard` = Elite), plus personal modifiers.
+  - These replaced the typed "Circuit this week" / "Archimedea modifiers this week" notes (seed v6).
+- **Not available from the API:** vendor stock (Palladino, Acrithis and similar).
 - **Normalising:** the API converts the raw responses into small shapes defined in `packages/shared` (e.g. `Sortie { boss, faction, expiry, missions[] }`). If warframestat.us changes, only `apps/api/src/sources/` changes.
 - Requests send a descriptive `User-Agent` (`warframehub/<version> (+repo URL)`).
 
@@ -370,7 +375,7 @@ Each phase ends with something you can run and check.
 
 **Technical (Claude):**
 
-- [ ] Does warframestat.us expose Archimedea or the Circuit rotation? (WFCD's Rust parser maps the raw `Conquests` field to Archimedea.)
+- [x] Does warframestat.us expose Archimedea or the Circuit rotation? **Yes**: `archimedeas` and `duviriCycle.choices` (checked 10 Nov 2026 and matched against the wiki). Shown as live cards since seed v6.
 - [x] Ergo Glast / Eleanor Nightingale's 4-day cycle: resets at 00:00 UTC, one of them on **2026-11-11** (in game, 10 Nov 2026). Now the `four_day` period.
 - [x] Re-check `steelPath` and `nightwave` freshness before Phase 3. On 10 Nov 2026 both were current. `arbitration` returned a placeholder (`SolNode000`, 1970 dates), so it shows "Check in game".
 
@@ -387,7 +392,7 @@ Each phase ends with something you can run and check.
 
 ---
 
-## Appendix A. Default checklist (seed v5)
+## Appendix A. Default checklist (seed v6)
 
 `⚠️` = shipped with the "verify" badge. Since seed v4 (10 Nov 2026) no item has it: everything below was checked in game.
 
@@ -454,9 +459,6 @@ Each phase ends with something you can run and check.
   - Descendia: Steel Path (25 Steel Essence at floor 21)
   - Descendia: Infernum 21 (Roathe)
   - Helminth: apply 3 Invigorations
-- Notes (info rows, user-edited)
-  - Circuit this week
-  - Archimedea modifiers this week
 
 **Baro Ki'Teer** (`baro`)
 

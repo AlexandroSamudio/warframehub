@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { FIXTURES_SAVED_AT, fixture } from './test-fixtures.js';
+import { FIXTURES_SAVED_AT, fixture, LATER_FIXTURES_SAVED_AT } from './test-fixtures.js';
 import {
   cacheTtlMs,
   normaliseArbitration,
+  normaliseArchimedeas,
+  normaliseCircuit,
   normaliseArchonHunt,
   normaliseDailyDeals,
   normaliseEvents,
@@ -200,6 +202,89 @@ describe('arbitration', () => {
       freshness: 'live',
       data: { node: 'Casta (Ceres)', missionType: 'Defense', enemy: 'Grineer' },
     });
+  });
+});
+
+describe('duviriCycle (The Circuit)', () => {
+  it('lists this week’s normal Warframes and Steel Path Incarnons (matches the wiki for 10 Nov 2026)', () => {
+    const { data, freshness } = normaliseCircuit(fixture('duviriCycle'), LATER_FIXTURES_SAVED_AT);
+    expect(freshness).toBe('live');
+    expect(data).toEqual({
+      normal: ['Nidus', 'Octavia', 'Harrow'],
+      steelPath: ['Boar', 'Gammacor', 'Anku', 'Gorgon', 'Angstrum'],
+      expiry: '2026-11-16T00:00:00.000Z', // weekly reset, Monday 00:00 UTC
+    });
+  });
+
+  it('is "outdated" when the feed’s own cycle is old', () => {
+    expect(
+      normaliseCircuit(fixture('duviriCycle'), new Date('2026-11-12T00:00:00Z')).freshness,
+    ).toBe('outdated');
+  });
+
+  it('no choices means "check in game"', () => {
+    const raw = { ...(fixture('duviriCycle') as object), choices: [] };
+    expect(normaliseCircuit(raw, LATER_FIXTURES_SAVED_AT)).toEqual({
+      freshness: 'unavailable',
+      data: null,
+    });
+  });
+});
+
+describe('archimedeas', () => {
+  it('maps CT_LAB to Deep and CT_HEX to Temporal, Deep first', () => {
+    const { data, freshness } = normaliseArchimedeas(
+      fixture('archimedeas'),
+      LATER_FIXTURES_SAVED_AT,
+    );
+    expect(freshness).toBe('live');
+    expect(data!.map((a) => a.kind)).toEqual(['deep', 'temporal']);
+    expect(data![0]).toMatchObject({
+      activation: '2026-11-09T00:00:00.000Z',
+      expiry: '2026-11-16T00:00:00.000Z',
+    });
+  });
+
+  it('keeps missions, deviations, risks (with Elite flag) and personal modifiers', () => {
+    const deep = normaliseArchimedeas(fixture('archimedeas'), LATER_FIXTURES_SAVED_AT).data![0]!;
+    expect(deep.missions).toHaveLength(3);
+    expect(deep.missions[0]).toMatchObject({
+      missionType: 'Extermination',
+      faction: 'The Murmur', // upstream says "Man in the Wall"
+      deviation: { name: 'Fissure Cascade' },
+      risks: [
+        { name: 'Bolstered Belligerents', elite: false },
+        { name: 'Entanglement', elite: true },
+      ],
+    });
+    expect(deep.personalModifiers.map((m) => m.name)).toEqual([
+      'Lethargic Shields',
+      'Undersupplied',
+      'Transference Distortion',
+      'Framecurse syndrome',
+    ]);
+    const temporal = normaliseArchimedeas(fixture('archimedeas'), LATER_FIXTURES_SAVED_AT)
+      .data![1]!;
+    expect(new Set(temporal.missions.map((m) => m.faction))).toEqual(
+      new Set(['Techrot', 'Scaldra']),
+    );
+  });
+
+  it('skips unknown types, and none known means "check in game"', () => {
+    const raw = (fixture('archimedeas') as { type: string }[]).map((a) => ({
+      ...a,
+      type: 'C T_ N E W',
+    }));
+    expect(normaliseArchimedeas(raw, LATER_FIXTURES_SAVED_AT)).toEqual({
+      freshness: 'unavailable',
+      data: null,
+    });
+  });
+
+  it('is "outdated" after the week ends', () => {
+    expect(
+      normaliseArchimedeas(fixture('archimedeas'), new Date('2026-11-16T00:00:00Z')).freshness,
+    ).toBe('outdated');
   });
 });
 

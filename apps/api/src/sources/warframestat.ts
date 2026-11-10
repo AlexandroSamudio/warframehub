@@ -1,4 +1,7 @@
 import type {
+  Archimedea,
+  ArchimedeaKind,
+  Circuit,
   Arbitration,
   ArchonHunt,
   ArchonShard,
@@ -13,6 +16,7 @@ import type {
   WorldstateEndpoint,
 } from '@warframehub/shared';
 import { z } from 'zod';
+import { nextReset } from '../domain/periods.js';
 
 /**
  * warframestat.us (WFCD) responses → the small shapes in `@warframehub/shared` (SPEC §7).
@@ -292,6 +296,91 @@ export function normaliseArbitration(raw: unknown, now: Date): Normalised<Arbitr
   };
 }
 
+const RawDuviriCycle = z.looseObject({
+  ...Dates,
+  choices: z
+    .array(z.looseObject({ categoryKey: z.string(), choices: z.array(z.string()) }))
+    .default([]),
+});
+
+/**
+ * The Circuit's weekly choices. They live in `duviriCycle` next to Duviri's 2-hour mood
+ * cycle; if that cycle is current, the feed (and so the choices) is current too.
+ * Checked against the wiki's rotation tables on 10 Nov 2026 (week 9 / week B).
+ */
+export function normaliseCircuit(raw: unknown, now: Date): Normalised<Circuit> {
+  const r = parse(RawDuviriCycle, raw, 'duviriCycle');
+  const pick = (key: string) => r.choices.find((c) => c.categoryKey === key)?.choices ?? [];
+  const normal = pick('EXC_NORMAL');
+  const steelPath = pick('EXC_HARD');
+  if (normal.length === 0 && steelPath.length === 0)
+    return { freshness: 'unavailable', data: null };
+  return {
+    freshness: covers(r.activation, r.expiry, now) ? 'live' : 'outdated',
+    data: { normal, steelPath, expiry: (nextReset('weekly', now) as Date).toISOString() },
+  };
+}
+
+/** Upstream type codes (spaced out, e.g. "C T_ L A B"), checked against the wiki on 10 Nov 2026. */
+const ARCHIMEDEA_KINDS: Record<string, ArchimedeaKind> = {
+  CT_LAB: 'deep', // Albrecht's Laboratories, against The Murmur
+  CT_HEX: 'temporal', // Höllvania, against Scaldra and Techrot
+};
+
+/** warframestat.us calls The Murmur "Man in the Wall"; the game and wiki say The Murmur. */
+const FACTION_NAMES: Record<string, string> = { 'Man in the Wall': 'The Murmur' };
+
+const RawEffect = z.looseObject({ name: z.string(), description: z.string().default('') });
+const RawArchimedeas = z.array(
+  z.looseObject({
+    ...Dates,
+    type: z.string(),
+    missions: z
+      .array(
+        z.looseObject({
+          faction: z.string(),
+          missionType: z.string(),
+          deviation: RawEffect.nullable().optional(),
+          risks: z.array(RawEffect.extend({ isHard: z.boolean().default(false) })).default([]),
+        }),
+      )
+      .default([]),
+    personalModifiers: z.array(RawEffect).default([]),
+  }),
+);
+
+export function normaliseArchimedeas(raw: unknown, now: Date): Normalised<Archimedea[]> {
+  const list = parse(RawArchimedeas, raw, 'archimedeas');
+  const known = list
+    .map((a) => ({ a, kind: ARCHIMEDEA_KINDS[a.type.replace(/\s+/g, '')] }))
+    .filter((x): x is { a: (typeof list)[number]; kind: ArchimedeaKind } => x.kind !== undefined);
+  if (known.length === 0) return { freshness: 'unavailable', data: null };
+
+  const data: Archimedea[] = known
+    .map(({ a, kind }) => ({
+      kind,
+      activation: iso(a.activation),
+      expiry: iso(a.expiry),
+      missions: a.missions.map((m) => ({
+        missionType: m.missionType,
+        faction: FACTION_NAMES[m.faction] ?? m.faction,
+        deviation: m.deviation
+          ? { name: m.deviation.name, description: m.deviation.description }
+          : null,
+        risks: m.risks.map((r) => ({ name: r.name, description: r.description, elite: r.isHard })),
+      })),
+      personalModifiers: a.personalModifiers.map((p) => ({
+        name: p.name,
+        description: p.description,
+      })),
+    }))
+    .sort((x, y) => (x.kind === y.kind ? 0 : x.kind === 'deep' ? -1 : 1));
+  return {
+    freshness: known.some(({ a }) => covers(a.activation, a.expiry, now)) ? 'live' : 'outdated',
+    data,
+  };
+}
+
 export const NORMALISERS: {
   [K in WorldstateEndpoint]: (raw: unknown, now: Date) => Normalised<unknown>;
 } = {
@@ -303,6 +392,8 @@ export const NORMALISERS: {
   nightwave: normaliseNightwave,
   events: normaliseEvents,
   arbitration: normaliseArbitration,
+  duviriCycle: normaliseCircuit,
+  archimedeas: normaliseArchimedeas,
 };
 
 /**

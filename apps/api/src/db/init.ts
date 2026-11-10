@@ -1,4 +1,4 @@
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, ne, or } from 'drizzle-orm';
 import type { SeedFile, SeedItem } from '../domain/seed.js';
 import type { Db } from './client.js';
 import { items, manualCounters, sections, seedMeta, settings, users } from './schema.js';
@@ -205,13 +205,34 @@ function mergeSections(
 
   const inSeed = new Set(seed.sections.map((s) => s.seedId));
   for (const [seedId, row] of existing) {
-    if (!inSeed.has(seedId) && !row.hidden && !row.edited) {
+    if (!inSeed.has(seedId) && !row.hidden && !row.edited && !holdsUserItems(tx, row.id)) {
       tx.update(sections).set({ hidden: true }).where(eq(sections.id, row.id)).run();
       result.sections.hidden++;
       result.removedTitles.push(row.title);
     }
   }
   return ids;
+}
+
+/**
+ * A removed default section stays visible while it holds something of the user's
+ * (a visible custom item, or a visible default they edited), so that item doesn't vanish.
+ */
+function holdsUserItems(tx: Tx, sectionId: number): boolean {
+  return (
+    tx
+      .select({ id: items.id })
+      .from(items)
+      .where(
+        and(
+          eq(items.sectionId, sectionId),
+          eq(items.hidden, false),
+          or(eq(items.origin, 'custom'), eq(items.edited, true)),
+        ),
+      )
+      .limit(1)
+      .all().length > 0
+  );
 }
 
 function mergeItems(
