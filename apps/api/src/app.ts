@@ -122,6 +122,9 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   registerWorldstateRoutes(app, { worldstate, now });
 
   registerGoalRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    now,
     items:
       options.items ??
       new ItemCatalog(options.db, {

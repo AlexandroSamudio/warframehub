@@ -158,3 +158,53 @@ export const itemCache = sqliteTable('item_cache', {
   payloadJson: text('payload_json').notNull(),
   fetchedAt: integer('fetched_at', { mode: 'timestamp_ms' }).notNull(),
 });
+
+export type GoalStatus = 'active' | 'built';
+
+/** A Warframe or weapon the user wants to build (SPEC §13). Keeps its own recipe copy. */
+export const goals = sqliteTable(
+  'goals',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    uniqueName: text('unique_name').notNull(),
+    name: text('name').notNull(),
+    /** The normalised `ItemRecipe` at the time it was added or last refreshed. */
+    recipeJson: text('recipe_json').notNull(),
+    recipeFetchedAt: integer('recipe_fetched_at', { mode: 'timestamp_ms' }).notNull(),
+    status: text('status').$type<GoalStatus>().notNull().default('active'),
+    sortOrder: integer('sort_order').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    builtAt: integer('built_at', { mode: 'timestamp_ms' }),
+  },
+  (t) => [index('goals_user_status').on(t.userId, t.status)],
+);
+
+/** How many of each part the user has for a goal (parts are per goal). */
+export const goalParts = sqliteTable(
+  'goal_parts',
+  {
+    goalId: integer('goal_id')
+      .notNull()
+      .references(() => goals.id, { onDelete: 'cascade' }),
+    componentKey: text('component_key').notNull(),
+    owned: integer('owned').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.goalId, t.componentKey] })],
+);
+
+/** How much of a resource the user has. Shared by all goals ("I have 12 Orokin Cells"). */
+export const resourceStock = sqliteTable(
+  'resource_stock',
+  {
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    resourceKey: text('resource_key').notNull(),
+    name: text('name').notNull(),
+    amount: integer('amount').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.resourceKey] })],
+);
