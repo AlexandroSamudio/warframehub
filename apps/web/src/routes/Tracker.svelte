@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import ChecklistEditor from '../components/ChecklistEditor.svelte';
   import ResetClocks from '../components/ResetClocks.svelte';
+  import GoalsCard from '../components/GoalsCard.svelte';
   import Rotations from '../components/Rotations.svelte';
   import SectionCard from '../components/SectionCard.svelte';
   import { clearSection, dismissNotice, getTracker, putTick } from '../lib/api.ts';
@@ -135,7 +136,10 @@
           {/each}
         </div>
       {/if}
-      <Rotations {nowMs} {timeZone} onUpdate={load} />
+      <div class="side">
+        <GoalsCard />
+        <Rotations {nowMs} {timeZone} onUpdate={load} />
+      </div>
     </div>
   </div>
 {:else if loadFailed}
@@ -164,6 +168,12 @@
     .columns {
       grid-template-columns: minmax(0, 1fr);
     }
+  }
+
+  .side {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
   }
 
   .sections {

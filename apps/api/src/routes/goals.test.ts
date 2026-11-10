@@ -126,8 +126,19 @@ describe('goals', () => {
       have: 12,
       missing: 3,
     });
-    // Each goal on its own is covered (5 ≤ 12 and 10 ≤ 12).
-    for (const g of body.active) expect(resource(g, 'Orokin Cell').have).toBe(12);
+    // The 12 cells are shared in goal order: Nidus Prime takes its 5, Boar Prime gets 7 of 10.
+    const [first, second] = body.active;
+    expect(resource(first!, 'Orokin Cell')).toMatchObject({ have: 5, stock: 12 });
+    expect(resource(second!, 'Orokin Cell')).toMatchObject({ have: 7, stock: 12 });
+
+    // Reordering changes who gets the cells first.
+    const reordered = GoalsResponse.parse(
+      (await call(ctx, 'POST', '/api/goals/reorder', { goalIds: [second!.id, first!.id] })).json(),
+    );
+    expect(reordered.active.map((g) => [g.name, resource(g, 'Orokin Cell').have])).toEqual([
+      ['Boar Prime', 10],
+      ['Nidus Prime', 2],
+    ]);
 
     const unknown = await call(ctx, 'PUT', '/api/resources', { key: '/Lotus/Nope', amount: 1 });
     expect(ApiError.parse(unknown.json()).error.code).toBe('unknown_resource');

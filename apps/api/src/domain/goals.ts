@@ -22,13 +22,21 @@ export interface GoalInput {
 /** resourceKey → amount. Missing keys mean 0. */
 export type Stock = Map<string, number>;
 
-export function buildGoal(input: GoalInput, stock: Stock): Goal {
+/**
+ * Builds one goal. `share` is how much of each resource this goal may count; for active
+ * goals it comes from {@link buildGoals}, which hands the shared stock out in goal order.
+ */
+export function buildGoal(input: GoalInput, stock: Stock, share: Stock = stock): Goal {
   const { recipe } = input;
   const parts = recipe.parts.map((p) => ({
     ...p,
     owned: Math.min(input.owned.get(p.key) ?? 0, p.count),
   }));
-  const resources = recipe.resources.map((r) => ({ ...r, have: stock.get(r.key) ?? 0 }));
+  const resources = recipe.resources.map((r) => ({
+    ...r,
+    have: Math.min(share.get(r.key) ?? 0, r.count),
+    stock: stock.get(r.key) ?? 0,
+  }));
 
   // Each part unit counts once; each resource counts once when the stock covers it.
   const total = parts.reduce((n, p) => n + p.count, 0) + resources.length;
@@ -54,6 +62,25 @@ export function buildGoal(input: GoalInput, stock: Stock): Goal {
     builtAt: input.builtAt ? input.builtAt.toISOString() : null,
     recipeFetchedAt: input.recipeFetchedAt.toISOString(),
   };
+}
+
+/**
+ * Builds every goal, handing the shared stock to active goals in the order given (the
+ * user's priority): the first goal takes what it needs, the next gets what's left.
+ * Built goals don't take a share; they just show the stock.
+ */
+export function buildGoals(inputs: GoalInput[], stock: Stock): Goal[] {
+  const left = new Map(stock);
+  return inputs.map((input) => {
+    if (input.status !== 'active') return buildGoal(input, stock);
+    const share: Stock = new Map();
+    for (const r of input.recipe.resources) {
+      const take = Math.min(left.get(r.key) ?? 0, r.count);
+      share.set(r.key, take);
+      left.set(r.key, (left.get(r.key) ?? 0) - take);
+    }
+    return buildGoal(input, stock, share);
+  });
 }
 
 /**

@@ -1,6 +1,6 @@
 import type { ItemRecipe } from '@warframehub/shared';
 import { describe, expect, it } from 'vitest';
-import { buildGoal, shoppingList, type GoalInput } from './goals.js';
+import { buildGoal, buildGoals, shoppingList, type GoalInput } from './goals.js';
 
 const T = new Date('2026-11-10T18:00:00.000Z');
 
@@ -95,6 +95,45 @@ describe('buildGoal', () => {
   it('caps an owned count above what the recipe needs (e.g. after a recipe update)', () => {
     const g = buildGoal(input(1, nidusPrime, [['Chassis', 3]]), new Map());
     expect(g.parts.find((p) => p.name === 'Chassis')!.owned).toBe(1);
+  });
+});
+
+describe('buildGoals (shared stock in goal order)', () => {
+  it('gives the first goal its share, the next what is left, and never counts a cell twice', () => {
+    const stock = new Map([['orokin cell', 12]]);
+    const [nidus, boar] = buildGoals([input(1, nidusPrime), input(2, boarPrime)], stock);
+    expect(nidus!.resources.find((r) => r.name === 'Orokin Cell')).toMatchObject({
+      have: 5,
+      stock: 12,
+    });
+    expect(boar!.resources.find((r) => r.name === 'Orokin Cell')).toMatchObject({
+      have: 7,
+      stock: 12,
+    });
+  });
+
+  it('only the first goal can be ready when the stock covers just one', () => {
+    const owned = (r: ItemRecipe): [string, number][] => r.parts.map((p) => [p.name, p.count]);
+    const stock = new Map([
+      ['credits', 100000],
+      ['orokin cell', 10],
+    ]);
+    const [boar, nidus] = buildGoals(
+      [input(1, boarPrime, owned(boarPrime)), input(2, nidusPrime, owned(nidusPrime))],
+      stock,
+    );
+    expect(boar!.ready).toBe(true);
+    expect(nidus!.ready).toBe(false); // the 10 cells went to Boar Prime
+  });
+
+  it('built goals take no share', () => {
+    const stock = new Map([['orokin cell', 5]]);
+    const [built, active] = buildGoals(
+      [input(1, boarPrime, [], 'built'), input(2, nidusPrime)],
+      stock,
+    );
+    expect(active!.resources.find((r) => r.name === 'Orokin Cell')!.have).toBe(5);
+    expect(built!.resources.find((r) => r.name === 'Orokin Cell')!.stock).toBe(5);
   });
 });
 

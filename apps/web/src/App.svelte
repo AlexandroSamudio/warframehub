@@ -4,13 +4,14 @@
   import { getHealth, heartbeat } from './lib/api.ts';
   import { t } from './lib/i18n/index.ts';
   import { hrefFor, router, type Route } from './lib/route.svelte.ts';
+  import Goals from './routes/Goals.svelte';
   import Settings from './routes/Settings.svelte';
   import Tracker from './routes/Tracker.svelte';
 
   let health = $state<HealthResponse | null>(null);
   let stopped = $state(false);
 
-  const NAV: Route[] = ['tracker', 'settings'];
+  const NAV: Route[] = ['tracker', 'goals', 'settings'];
   // The server stops after a while with no open page; this tells it we're here (SPEC §9.2).
   const HEARTBEAT_MS = 60_000;
 
@@ -54,6 +55,8 @@
         <h2>{t('stopped.title')}</h2>
         <p>{t('stopped.body')}</p>
       </section>
+    {:else if router.route === 'goals'}
+      <Goals />
     {:else if router.route === 'settings'}
       <Settings onStopped={() => (stopped = true)} />
     {:else}
