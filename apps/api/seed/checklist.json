@@ -1,5 +1,5 @@
 {
-  "seedVersion": 3,
+  "seedVersion": 4,
   "sections": [
     {
       "seedId": "daily.core",
@@ -58,8 +58,7 @@
         {
           "seedId": "daily.quick.todays-special",
           "title": "\"Today's Special\" vendors",
-          "kind": "check",
-          "verify": true
+          "kind": "check"
         },
         {
           "seedId": "daily.quick.acrithis",

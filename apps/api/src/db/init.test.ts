@@ -23,16 +23,18 @@ describe('shipped seed (apps/api/seed/checklist.json)', () => {
     );
   });
 
-  it('flags exactly the still-unconfirmed items with "verify"', () => {
+  it('has no unconfirmed items left: everything was checked in game on 10 Nov 2026', () => {
     const flagged = shipped.sections.flatMap((s) =>
       s.items.filter((i) => i.verify).map((i) => i.seedId),
     );
-    expect(flagged.sort()).toEqual(
-      [
-        // Still to confirm in game (SPEC §12). The rest were confirmed on 10 Nov 2026.
-        'daily.quick.todays-special',
-      ].sort(),
-    );
+    expect(flagged).toEqual([]);
+  });
+
+  it('"Today\'s Special" vendors reset with the daily reset (00:00 UTC)', () => {
+    const section = shipped.sections.find((s) =>
+      s.items.some((i) => i.seedId === 'daily.quick.todays-special'),
+    )!;
+    expect(section.period).toBe('daily');
   });
 
   it('has the counters and sub-ticks from SPEC Appendix A', () => {

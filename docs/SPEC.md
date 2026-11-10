@@ -363,6 +363,7 @@ Each phase ends with something you can run and check.
 - [x] Arcane Vendetta / Radiation / Ignition are sold by **Loid in the Sanctum Anatomica** (in game, 10 Nov 2026; the price wasn't checked)
 - [x] Acrithis' weekly rotation resets with the **weekly reset**, Monday 00:00 UTC (in game, 10 Nov 2026)
 - [x] Steel Path Descendia: 25 Steel Essence at **floor 21** (in game, 10 Nov 2026)
+- [x] "Today's Special" vendors reset at **00:00 UTC**, with the daily reset (in game, 10 Nov 2026)
 - [x] 8-hour vendors (Loid, Grandmother, Archimedean Yonta) refresh at **04:00 / 12:00 / 20:00 UTC** (01:00 / 09:00 / 17:00 GMT-3), checked in game on 10 Nov 2026. The wiki confirms the 8-hour cycle (Yonta: "refreshes every 8 hours"). The community Task Checklist's 00:00 / 08:00 / 16:00 was wrong.
 
 **Technical (Claude):**
@@ -384,9 +385,9 @@ Each phase ends with something you can run and check.
 
 ---
 
-## Appendix A. Default checklist (seed v3)
+## Appendix A. Default checklist (seed v4)
 
-`⚠️` = shipped with the "verify" badge.
+`⚠️` = shipped with the "verify" badge. Since seed v4 (10 Nov 2026) no item has it: everything below was checked in game.
 
 **Daily** (`daily`, resets 21:00 local / 00:00 UTC)
 
@@ -399,7 +400,7 @@ Each phase ends with something you can run and check.
 - Quick visits
   - Spend Syndicate standing if capped
   - Darvo's Daily Deal
-  - "Today's Special" vendors ⚠️
+  - "Today's Special" vendors (reset at 00:00 UTC with the other dailies)
   - Acrithis daily shop (Pathos Clamps)
   - Marie Leroux's daily shop
 
