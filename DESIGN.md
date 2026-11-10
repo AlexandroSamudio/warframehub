@@ -324,6 +324,18 @@ A folded frame (10px cut). The header row has:
 
 When open, it gets the gold corner tick and 32px ↑/↓ icon buttons. Parts are checkboxes (or a count field). Resources show this goal's **share** in green when covered and in gold when short ("7 of 10 for this goal · 3 short"), next to the shared amount field. A ready goal's seam turns green.
 
+### Materials Line
+
+Under a crafted part in a goal card: a small "TO CRAFT" label (Rajdhani, uppercase), then the materials as **quantity + name pairs** (quantity 600 weight in Readout White with tabular digits, name in Dim Readout, 0.85rem). Each pair is one unbreakable unit (`nowrap`), so it never splits across lines, and the list is a real `<ul>` with a label for screen readers. Credits come first, then A–Z.
+
+### Goal Card resources
+
+Two groups under Label headings: **For {item}** (the item's own recipe; a row that also includes parts says "incl. 45,000 for parts") and **Only for parts, until you have them**. Each group lists what's most missing first. Owning a part removes its materials.
+
+### Part Note
+
+A single-line text field (200 characters) with the visible label "Where do you get this?" above it, saved on change with a polite "Saved" (same pattern as the Amount Field). It appears for parts no drop table lists ("Get another way" in the farm queue, and on the part in its card).
+
 ### Amount Field
 
 A right-aligned tabular input with thousands separators. Under it, a reserved message line: rose "Whole numbers only" (`aria-invalid`, `aria-describedby`), or green "Saved" for 2 seconds (polite live region). Leaving an invalid entry restores the saved amount.

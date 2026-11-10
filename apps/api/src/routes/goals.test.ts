@@ -235,6 +235,91 @@ describe('goals', () => {
     expect(resource((await goals(ctx)).active[0]!, 'Plastids').count).toBe(900);
   });
 
+  it('each part mentions its crafting materials, and they count until you own the part', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const chassis = part(g, 'Chassis');
+    expect(chassis.craft!.credits).toBe(15000);
+    expect(chassis.craft!.ingredients.map((i) => `${i.name} ×${i.count}`)).toEqual(
+      expect.arrayContaining([
+        'Tellurium ×2',
+        'Plastids ×450',
+        'Polymer Bundle ×1425',
+        'Alloy Plate ×5500',
+      ]),
+    );
+    expect(part(g, 'Blueprint').craft).toBeNull(); // the frame's own recipe is the resources
+
+    // 25,000 own + 15,000 for each of the three crafted parts.
+    expect(resource(g, 'Credits')).toMatchObject({ count: 70000, forParts: 45000 });
+    expect(resource(g, 'Alloy Plate')).toMatchObject({ count: 5500, forParts: 5500 });
+
+    const after = GoalsResponse.parse(
+      (
+        await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+          componentKey: chassis.key,
+          owned: 1,
+        })
+      ).json(),
+    ).active[0]!;
+    expect(resource(after, 'Credits')).toMatchObject({ count: 55000, forParts: 30000 });
+    expect(after.resources.find((r) => r.name === 'Alloy Plate')).toBeUndefined();
+    expect(after.progress.total).toBe(g.progress.total);
+  });
+
+  it('can set the stock of a material only a part needs', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const plastids = resource(g, 'Plastids');
+    const res = await call(ctx, 'PUT', '/api/resources', { key: plastids.key, amount: 200 });
+    expect(res.statusCode).toBe(200);
+    const body = GoalsResponse.parse(res.json());
+    expect(resource(body.active[0]!, 'Plastids')).toMatchObject({ have: 200, stock: 200 });
+    expect(body.shoppingList.find((r) => r.name === 'Plastids')).toMatchObject({ missing: 250 });
+  });
+
+  it('saves a note on a part, alone or with the count, and keeps it', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus');
+    const blueprint = part(g, 'Blueprint');
+    const noted = GoalsResponse.parse(
+      (
+        await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+          componentKey: blueprint.key,
+          note: '  Quest reward  ',
+        })
+      ).json(),
+    ).active[0]!;
+    expect(part(noted, 'Blueprint')).toMatchObject({ note: 'Quest reward', owned: 0 });
+
+    const ticked = GoalsResponse.parse(
+      (
+        await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+          componentKey: blueprint.key,
+          owned: 1,
+        })
+      ).json(),
+    ).active[0]!;
+    expect(part(ticked, 'Blueprint')).toMatchObject({ note: 'Quest reward', owned: 1 });
+
+    const cleared = GoalsResponse.parse(
+      (
+        await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+          componentKey: blueprint.key,
+          note: '',
+        })
+      ).json(),
+    ).active[0]!;
+    expect(part(cleared, 'Blueprint').note).toBe('');
+
+    const empty = await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+      componentKey: blueprint.key,
+    });
+    expect(empty.statusCode).toBe(400);
+    const long = await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+      componentKey: blueprint.key,
+      note: 'x'.repeat(201),
+    });
+    expect(long.statusCode).toBe(400);
+  });
+
   it('existing goals still load offline (they keep their own recipe copy)', async () => {
     await add(ctx, 'nidus', 'Nidus');
     ctx.api.state.online = false;

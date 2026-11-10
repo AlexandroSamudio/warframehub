@@ -260,7 +260,8 @@ Rules:
   - Each item has `components[]` with counts and drop locations (rotation, rarity, chance). Component `category: "Components"` is a part; anything else (`"Misc"`) is a resource. `buildPrice` becomes a Credits resource.
   - Only Warframes (category `Warframes` **and** type `Warframe`; Necramechs and Archwings come back under `Warframes` or `Archwing`) and Primary / Secondary / Melee weapons are kept.
   - Prime parts drop from relics, and `vaulted` is on the item.
-  - The data has **no sub-recipes** (e.g. the resources to craft a Chassis). Some parts have no drops (quest, market, vendor), and vaulted relics have none either.
+  - warframestat.us has **no part recipes** (the materials to craft a Chassis): see "Part recipes" below. Some parts have no drops (quest, market, vendor), and vaulted relics have none either.
+- **Part recipes** (checked 10 Nov 2026): DE's own public content export, `https://content.warframe.com/PublicExport/` (index `index_en.txt.lzma`, then `Manifest/ExportRecipes_en.json!<hash>` and `ExportResources_en.json!<hash>`). A part's recipe is the one whose `resultType` is the part's `uniqueName`, e.g. `…/NidusChassisComponent`. `npm run update-part-recipes` (needs `xz`) reads it and writes the small file `apps/api/data/part-recipes.json` (447 recipes), which is committed; the app never calls DE. Rerun it when new Warframes come out. The frame's own recipe isn't in it (its result is the Warframe), and Prime weapon parts have no recipe because they drop finished.
   - Search is cached for 24 hours per query in `item_cache`; items are cached by `uniqueName`, so adding a goal needs no second request. At most one upstream search per second. Offline, cached results are served as stale.
 - **Normalising:** the API converts the raw responses into small shapes defined in `packages/shared` (e.g. `Sortie { boss, faction, expiry, missions[] }`). If warframestat.us changes, only `apps/api/src/sources/` changes.
 - Requests send a descriptive `User-Agent` (`warframehub/<version> (+repo URL)`).
@@ -394,7 +395,7 @@ Each phase ends with something you can run and check.
 "Build this Warframe or weapon." Screen `#/goals`, plus a goals card on the Tracker.
 
 - **Scope:** Warframes and Primary / Secondary / Melee weapons, Primes included (Alex's choice).
-- **Data:** warframestat.us item search (§7), cached in `item_cache`. Each goal keeps its own copy of the recipe (`goals.recipe_json`), so it works offline. "Update recipe" fetches it again and keeps part counts.
+- **Data:** warframestat.us item search (§7), cached in `item_cache`. Each goal keeps its own copy of the recipe (`goals.recipe_json`), so it works offline. "Update recipe" fetches it again and keeps part counts. Part crafting materials come from the bundled DE data (§7), filled in when a goal loads, so older goals get them too.
 - **Ownership:**
   - **Parts** are ticked per goal (`goal_parts`).
   - **Resources** are one shared stock (`resource_stock`, "I have 12 Orokin Cells"). It is **split in goal order**: the higher goal takes what it needs first, and the next gets what's left. Each card shows its share ("7 of 10 for this goal · 3 short"), and progress and "ready to build" use it. ↑/↓ sets the priority.
@@ -406,7 +407,12 @@ Each phase ends with something you can run and check.
   Relic drops show one row per relic with Intact / Exceptional / Flawless / Radiant chances.
 
 - **Mark as built** moves a goal to Completed, from where it can be brought back. Resource amounts are not changed (update them yourself). Remove deletes the goal and its ticks, not the stock.
-- **Known gaps, shown in the UI:** no sub-recipes (the resources to craft a Chassis); "Not in drop tables (quest, market or vendor)" for parts with no drop data.
+- **Part materials:** every crafted part (Chassis, Neuroptics, Systems…) shows what it takes to craft: "To craft: 15,000 Credits · 5,000 Nano Spores · …".
+  - Until you own the part, those materials count as the goal's resources (shared stock, goal order) and in the farm queue; "incl. 45,000 for parts" says how much of a total is for parts. Owning the part removes them.
+  - Progress and "ready to build" keep the item's own resources as their fixed set, so the total doesn't change as you tick parts.
+  - A non-Blueprint Warframe part with no recipe in the data says "Recipe not found. Check in game."
+  - The card lists resources in two groups ("For {item}" and "Only for parts, until you have them"), most missing first. In the farm queue the Resources group shows the top 5, with "Show all".
+- **Parts with no drop data** (quest, Market, vendor): they leave "Farm now" for **Get another way**. There you keep your own note per part ("Where do you get this?", up to 200 characters, `goal_parts.note`), also shown on the part in its goal card. The app doesn't guess how such a part is obtained.
 - **API:**
   - `GET /api/goals/search?q=`
   - `GET` / `POST /api/goals`

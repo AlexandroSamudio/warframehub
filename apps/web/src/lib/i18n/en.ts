@@ -179,6 +179,8 @@ export const en = {
   'farm.nothing': 'Nothing missing. Every active goal is ready to build.',
   'farm.parts': 'Parts',
   'farm.resources': 'Resources',
+  'farm.showAllResources': 'Show all {count}',
+  'farm.showFewer': 'Show fewer',
   'farm.for': 'for {goal}',
   'farm.count': '{count}×',
   'farm.best': 'Best: {location} · {chance}',
@@ -187,6 +189,9 @@ export const en = {
   'farm.allDrops': 'All drop locations ({count})',
   'farm.showAll': 'Show all {count}',
   'farm.farmNow': 'Farm now',
+  'farm.otherTitle': 'Get another way',
+  'farm.otherHint':
+    'No drop table lists these (quest, Market, vendor…). Add a note so you remember where.',
   'farm.vaultedTitle': 'Vaulted: trade or wait',
   'farm.vaultedOnce':
     'These relics no longer drop. Trade for the parts, or wait until the item is unvaulted.',
@@ -201,7 +206,6 @@ export const en = {
 
   'goal.progress': '{done} of {total}',
   'goal.parts': 'Parts',
-  'goal.resources': 'Resources',
   'goal.partLabel': '{name} for {goal}',
   'goal.shareEnough': '{count} of {count} for this goal',
   'goal.shareShort': '{have} of {count} for this goal · {short} short',
@@ -217,9 +221,18 @@ export const en = {
   'goal.cancel': 'Cancel',
   'goal.moveUp': 'Move {name} up',
   'goal.moveDown': 'Move {name} down',
-  'goal.recipeDate': 'Recipe from warframestat.us, {date}.',
-  'goal.subRecipes':
-    "Crafted parts (e.g. a Chassis) need their own resources, which the data doesn't list.",
+  'goal.recipeDate':
+    "Recipe from warframestat.us, {date}. Part materials from Digital Extremes' public export.",
+  'goal.resourcesFor': 'For {name}',
+  'goal.resourcesForParts': 'Only for parts, until you have them',
+  'goal.inclParts': 'incl. {count} for parts',
+  'part.craftLabel': 'To craft',
+  'part.craftList': 'Materials to craft {name}',
+  'part.craftMissing': 'Recipe not found. Check in game.',
+  'part.noteLabel': 'Where do you get this?',
+  'part.notePlaceholder': 'e.g. Quest reward',
+  'part.noteSaved': 'Saved',
+  'part.noteTooLong': 'Up to 200 characters',
 
   'completed.title': 'Completed ({count})',
   'completed.builtOn': 'Built {date}',

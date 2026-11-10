@@ -1,10 +1,13 @@
-import type { Goal, GoalsResponse, ItemDrop } from '@warframehub/shared';
+import type { Goal, GoalResource, GoalsResponse, ItemDrop } from '@warframehub/shared';
 import { describe, expect, it } from 'vitest';
 import {
   farmQueue,
   formatAmount,
   formatChance,
+  formatMaterials,
   groupDrops,
+  materialList,
+  splitResources,
   joinNames,
   parseAmount,
   progressPercent,
@@ -42,6 +45,8 @@ function goal(
       count,
       owned,
       drops: drops ?? [],
+      craft: null,
+      note: '',
     })),
     resources: [],
     progress: { done: 0, total: 1 },
@@ -75,10 +80,67 @@ describe('farmQueue', () => {
     expect(q.farmNow.map((p) => `${p.goalName} ${p.name}`)).toEqual([
       'Nidus Systems', // 14.29%
       'Boar Blueprint', // 1.03%
-      'Nidus Blueprint', // no drop data, last
     ]);
+    // No drop data: not farmable, so the user keeps a note on where it comes from.
+    expect(q.other.map((p) => `${p.goalName} ${p.name}`)).toEqual(['Nidus Blueprint']);
     expect(q.vaulted.map((p) => `${p.goalName} ${p.name}`)).toEqual(['Nidus Prime Chassis']);
     expect(q.resources.map((r) => r.name)).toEqual(['Credits']);
+  });
+});
+
+describe('formatMaterials', () => {
+  it('lists Credits first, then the materials A-Z, with thousands separators', () => {
+    expect(
+      formatMaterials({
+        credits: 15000,
+        ingredients: [
+          { key: 'p', name: 'Plastids', count: 1400 },
+          { key: 'a', name: 'Alloy Plate', count: 5500 },
+        ],
+      }),
+    ).toBe('15,000 Credits · 5,500 Alloy Plate · 1,400 Plastids');
+    expect(
+      formatMaterials({ credits: 0, ingredients: [{ key: 'x', name: 'Rubedo', count: 3 }] }),
+    ).toBe('3 Rubedo');
+  });
+});
+
+describe('materialList and splitResources', () => {
+  it('lists materials as quantity + name pairs, Credits first', () => {
+    expect(
+      materialList({
+        credits: 15000,
+        ingredients: [
+          { key: 'p', name: 'Plastids', count: 1400 },
+          { key: 'a', name: 'Alloy Plate', count: 5500 },
+        ],
+      }),
+    ).toEqual([
+      { count: 15000, name: 'Credits' },
+      { count: 5500, name: 'Alloy Plate' },
+      { count: 1400, name: 'Plastids' },
+    ]);
+  });
+
+  it("splits resources into the item's own and parts-only, most missing first", () => {
+    const r = (name: string, count: number, forParts: number, have = 0): GoalResource => ({
+      key: name,
+      name,
+      count,
+      forParts,
+      have,
+      stock: have,
+      drops: [],
+    });
+    const { forItem, forPartsOnly } = splitResources([
+      r('Kuva', 2000, 0),
+      r('Credits', 70000, 45000),
+      r('Circuits', 3500, 3500),
+      r('Plastids', 1000, 1000, 1000),
+      r('Orokin Cell', 6, 6),
+    ]);
+    expect(forItem.map((x) => x.name)).toEqual(['Credits', 'Kuva']); // 70,000 missing, then 2,000
+    expect(forPartsOnly.map((x) => x.name)).toEqual(['Circuits', 'Orokin Cell', 'Plastids']);
   });
 });
 

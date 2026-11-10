@@ -5,12 +5,14 @@ import type {
   ItemSearchResponse,
   ItemSearchResult,
   RecipeComponent,
+  RecipePart,
 } from '@warframehub/shared';
 import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
 import { itemCache } from '../db/schema.js';
 import { HttpError } from '../http-error.js';
+import { partCraft } from './part-recipes.js';
 import { UnexpectedDataError } from './warframestat.js';
 import { FETCH_TIMEOUT_MS, USER_AGENT, type FetchFn } from './worldstate.js';
 
@@ -82,7 +84,7 @@ function drops(raw: z.infer<typeof RawDrop>[] = []): ItemDrop[] {
 }
 
 /** Parts and resources in the order the game lists them: Blueprint first, then A–Z. */
-function byGameOrder(a: RecipeComponent, b: RecipeComponent): number {
+function byGameOrder(a: { name: string }, b: { name: string }): number {
   if (a.name === 'Blueprint') return -1;
   if (b.name === 'Blueprint') return 1;
   return a.name.localeCompare(b.name);
@@ -100,7 +102,7 @@ export function normaliseItem(raw: unknown): ItemRecipe | null {
   const category = categoryOf(item);
   if (!category) return null;
 
-  const parts: RecipeComponent[] = [];
+  const parts: RecipePart[] = [];
   const resources: RecipeComponent[] = [];
   for (const c of item.components) {
     const component = {
@@ -109,7 +111,8 @@ export function normaliseItem(raw: unknown): ItemRecipe | null {
       count: c.itemCount,
       drops: drops(c.drops),
     };
-    (c.category === 'Components' ? parts : resources).push(component);
+    if (c.category === 'Components') parts.push({ ...component, craft: partCraft(c.uniqueName) });
+    else resources.push(component);
   }
   if (item.buildPrice && item.buildPrice > 0) {
     resources.push({ key: 'credits', name: 'Credits', count: item.buildPrice, drops: [] });

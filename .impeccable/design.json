@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-10T19:12:58Z",
+  "generatedAt": "2026-11-10T19:54:18Z",
   "title": "Design System: WarframeHub",
   "extensions": {
     "colorMeta": {
@@ -370,6 +370,13 @@
       "description": "Right-aligned tabular amount with thousands separators and a reserved message line (Whole numbers only / Saved).",
       "html": "<span class=\"ds-amount\"><input class=\"ds-amount-input\" value=\"1,250,000\" aria-label=\"Have Credits\"><span class=\"ds-amount-msg\">Saved</span></span>",
       "css": ".ds-amount { display: inline-flex; flex-direction: column; align-items: flex-end; } .ds-amount-input { width: 7.5rem; text-align: right; font: 400 0.875rem/1.5 var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; color: var(--fg, #e6e9ef); background: var(--surface-2, #171e2a); border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; padding: 0.25rem 0.5rem; } .ds-amount-input:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 0; border-color: var(--teal, #66cbd9); } .ds-amount-msg { font-size: 0.75rem; line-height: 1.4; color: var(--ok, #78cc9d); }"
+    },
+    {
+      "name": "Materials Line",
+      "kind": "custom",
+      "description": "\"To craft\" label plus quantity + name pairs; each pair is unbreakable.",
+      "html": "<div class=\"ds-craft\"><span class=\"ds-craft-label\">To craft</span><ul class=\"ds-materials\"><li><b>15,000</b> Credits</li><li><b>5,000</b> Nano Spores</li><li><b>3</b> Neurodes</li></ul></div>",
+      "css": ".ds-craft { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.6rem; font: 400 0.85rem var(--font-body, Inter, sans-serif); color: var(--muted, #9ba7ba); } .ds-craft-label { font: 600 0.8rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.1em; } .ds-materials { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.1rem 0.9rem; } .ds-materials li { white-space: nowrap; } .ds-materials b { font-weight: 600; color: var(--fg, #e6e9ef); font-variant-numeric: tabular-nums; }"
     }
   ],
   "narrative": {

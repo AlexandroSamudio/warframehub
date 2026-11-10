@@ -1,0 +1,1 @@
+ALTER TABLE `goal_parts` ADD `note` text DEFAULT '' NOT NULL;

@@ -17,7 +17,7 @@ import {
   reactivate,
   refreshRecipe,
   reorderGoals,
-  setPartOwned,
+  updatePart,
   setStock,
 } from '../db/goals.js';
 import type { ItemCatalog } from '../sources/items.js';
@@ -53,7 +53,7 @@ export function registerGoalRoutes(app: FastifyInstance, deps: GoalRouteDeps): v
 
   app.patch('/api/goals/:id/parts', async (request) => {
     const { id } = IdParams.parse(request.params);
-    setPartOwned(db, userId, id, UpdateGoalPartRequest.parse(request.body));
+    updatePart(db, userId, id, UpdateGoalPartRequest.parse(request.body));
     return current();
   });
 

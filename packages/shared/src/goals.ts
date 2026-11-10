@@ -30,6 +30,28 @@ export const RecipeComponent = z.object({
 });
 export type RecipeComponent = z.infer<typeof RecipeComponent>;
 
+/** One material a part needs to craft (from DE's public export). */
+export const CraftIngredient = z.object({
+  /** The item's `uniqueName`, the same id the resources use, so stock is shared. */
+  key: z.string(),
+  name: z.string(),
+  count: z.int().positive(),
+});
+export type CraftIngredient = z.infer<typeof CraftIngredient>;
+
+/** What it takes to craft a part (a Chassis, Neuroptics, Systems…) in the Foundry. */
+export const PartCraft = z.object({
+  credits: z.int().min(0),
+  ingredients: z.array(CraftIngredient),
+});
+export type PartCraft = z.infer<typeof PartCraft>;
+
+/** A part of a recipe. `craft` is null when it isn't crafted (e.g. Prime weapon parts drop finished). */
+export const RecipePart = RecipeComponent.extend({
+  craft: PartCraft.nullable().default(null),
+});
+export type RecipePart = z.infer<typeof RecipePart>;
+
 export const ItemRecipe = z.object({
   uniqueName: z.string(),
   name: z.string(),
@@ -43,7 +65,7 @@ export const ItemRecipe = z.object({
   /** Build time in seconds, or null when unknown. */
   buildTime: z.int().min(0).nullable(),
   /** Blueprint and built parts (Chassis, Barrel…). Owned per goal. */
-  parts: z.array(RecipeComponent),
+  parts: z.array(RecipePart),
   /** Resources (Kuva, Plastids, Credits…). Amounts are shared across goals. */
   resources: z.array(RecipeComponent),
 });
@@ -76,13 +98,20 @@ export type ItemSearchResponse = z.infer<typeof ItemSearchResponse>;
 export const GoalStatus = z.enum(['active', 'built']);
 export type GoalStatus = z.infer<typeof GoalStatus>;
 
-export const GoalPart = RecipeComponent.extend({
+export const GoalPart = RecipePart.extend({
   /** How many the user has (0..count). */
   owned: z.int().min(0),
+  /** The user's own note, e.g. where this part comes from when no drop table lists it. */
+  note: z.string(),
 });
 export type GoalPart = z.infer<typeof GoalPart>;
 
 export const GoalResource = RecipeComponent.extend({
+  /**
+   * How much of `count` is for crafting parts you don't have yet. The rest is the item's
+   * own recipe. It drops as you get the parts.
+   */
+  forParts: z.int().min(0),
   /**
    * This goal's share of the stock. Active goals get the shared stock in goal order
    * (the user's priority), so two goals never count the same Orokin Cells.
@@ -142,10 +171,16 @@ export type GoalsResponse = z.infer<typeof GoalsResponse>;
 export const CreateGoalRequest = z.object({ uniqueName: z.string().min(1).max(300) });
 export type CreateGoalRequest = z.infer<typeof CreateGoalRequest>;
 
-export const UpdateGoalPartRequest = z.object({
-  componentKey: z.string().min(1).max(300),
-  owned: z.int().min(0).max(1_000),
-});
+/** Change how many you have, your note, or both. */
+export const UpdateGoalPartRequest = z
+  .object({
+    componentKey: z.string().min(1).max(300),
+    owned: z.int().min(0).max(1_000).optional(),
+    note: z.string().trim().max(200).optional(),
+  })
+  .refine((body) => body.owned !== undefined || body.note !== undefined, {
+    message: 'send owned, note, or both',
+  });
 export type UpdateGoalPartRequest = z.infer<typeof UpdateGoalPartRequest>;
 
 export const SetStockRequest = z.object({
