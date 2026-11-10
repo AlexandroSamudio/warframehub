@@ -147,3 +147,14 @@ export const seedMeta = sqliteTable('seed_meta', {
   seedVersion: integer('seed_version').notNull(),
   appliedAt: integer('applied_at', { mode: 'timestamp_ms' }).notNull(),
 });
+
+/**
+ * Item data for the goal planner, from warframestat.us item search (SPEC §13).
+ * Shared by all users. Keys: `search:<query>` (a list of uniqueNames) and
+ * `item:<uniqueName>` (the raw upstream item, normalised on read).
+ */
+export const itemCache = sqliteTable('item_cache', {
+  key: text('key').primaryKey(),
+  payloadJson: text('payload_json').notNull(),
+  fetchedAt: integer('fetched_at', { mode: 'timestamp_ms' }).notNull(),
+});

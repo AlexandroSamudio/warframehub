@@ -6,6 +6,8 @@ import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
+import { registerGoalRoutes } from './routes/goals.js';
+import { ItemCatalog } from './sources/items.js';
 import { registerSystemRoutes } from './routes/system.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
 import { registerWebApp } from './routes/web.js';
@@ -24,6 +26,8 @@ export interface AppOptions {
   dataDir?: string;
   /** Live rotations (warframestat.us + cache). Created with defaults if not given. */
   worldstate?: WorldstateService;
+  /** Goal planner item search (warframestat.us + cache). Created with defaults if not given. */
+  items?: ItemCatalog;
   /** The default checklist, for "Restore defaults". Read from disk when not given. */
   seed?: SeedFile;
   /** Overrides the live Sortie/Baro times taken from `worldstate` (tests). */
@@ -116,6 +120,15 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       }),
   });
   registerWorldstateRoutes(app, { worldstate, now });
+
+  registerGoalRoutes(app, {
+    items:
+      options.items ??
+      new ItemCatalog(options.db, {
+        now,
+        onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
+      }),
+  });
 
   registerSystemRoutes(app, {
     db: options.db,

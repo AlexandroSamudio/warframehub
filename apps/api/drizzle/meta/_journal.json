@@ -15,6 +15,13 @@
       "when": 1794318372933,
       "tag": "0001_reordered",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794331394993,
+      "tag": "0002_item_cache",
+      "breakpoints": true
     }
   ]
 }

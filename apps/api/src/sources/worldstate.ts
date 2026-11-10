@@ -18,8 +18,9 @@ import {
 } from './warframestat.js';
 
 const SOURCE = 'warframestat';
-const USER_AGENT = `warframehub/${APP_VERSION} (+https://github.com/AlexandroSamudio/warframehub)`;
-const FETCH_TIMEOUT_MS = 8_000;
+/** Sent with every warframestat.us request (SPEC §7). */
+export const USER_AGENT = `warframehub/${APP_VERSION} (+https://github.com/AlexandroSamudio/warframehub)`;
+export const FETCH_TIMEOUT_MS = 8_000;
 /** After a failed fetch, wait this long before trying that endpoint again. */
 const RETRY_AFTER_FAILURE_MS = 2 * 60_000;
 /** Manual refresh is limited to once a minute (SPEC §7). */

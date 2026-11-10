@@ -45,5 +45,5 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
   - **New screens:** `shape` a brief (`.impeccable/surfaces/`) that names an existing screen to follow (usually the Tracker). Build code-first; image generation isn't set up.
   - **Edit UI files with the Edit/Write tools**, not shell scripts. The plugin's design hook only scans Edit/Write. Fix each finding, or record a deliberate exception with `hooks ignore-value … --reason …`.
   - **Before a UI PR:** run `critique`, then `audit`, plus a page scan of the running build at desktop and phone widths (`impeccable detect --viewport 390x844 http://127.0.0.1:4399/`). List the results in the PR.
-  - Run Impeccable commands with `IMPECCABLE_NO_TELEMETRY=1`; whether to turn telemetry off permanently is Alex's choice.
+  - Impeccable telemetry is off (Alex, 10 Nov 2026: `impeccable telemetry off`); leave it off.
 - Keep dependencies minimal; a new runtime dependency needs a reason in the PR.
