@@ -8,6 +8,7 @@ describe('HealthResponse', () => {
       app: 'warframehub',
       version: '0.1.0',
       serverTime: '2026-11-10T00:00:00.000Z',
+      dataDir: '/home/tenno/.local/share/warframehub',
     };
     expect(HealthResponse.parse(payload)).toEqual(payload);
   });
@@ -18,6 +19,7 @@ describe('HealthResponse', () => {
       app: 'warframehub',
       version: '0.1.0',
       serverTime: 'Tuesday',
+      dataDir: '/tmp',
     });
     expect(result.success).toBe(false);
   });

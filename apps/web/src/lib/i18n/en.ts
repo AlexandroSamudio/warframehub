@@ -6,6 +6,7 @@ export const en = {
   'health.ok': 'API connected',
   'health.version': 'Version {version}',
   'health.serverTime': 'Server time: {local} ({utc} UTC)',
+  'health.dataDir': 'Data folder: {path}',
   'health.error': "Can't reach the API. Is it running? Start everything with npm run dev.",
   'health.retry': 'Try again',
 } as const;

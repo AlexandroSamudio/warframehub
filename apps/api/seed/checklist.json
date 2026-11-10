@@ -1,0 +1,322 @@
+{
+  "seedVersion": 1,
+  "sections": [
+    {
+      "seedId": "daily.core",
+      "slug": "daily-core",
+      "title": "Daily: Core",
+      "period": "daily",
+      "items": [
+        { "seedId": "daily.core.login", "title": "Daily login reward", "kind": "check" },
+        { "seedId": "daily.core.first-win", "title": "First Win of the Day", "kind": "check" },
+        {
+          "seedId": "daily.core.sp-incursions",
+          "title": "Steel Path Incursions",
+          "description": "5 Steel Essence each",
+          "kind": "counter",
+          "slots": { "count": 6 }
+        },
+        {
+          "seedId": "daily.core.circuit",
+          "title": "The Circuit: 4 stages",
+          "description": "530 points with the daily bonus",
+          "kind": "check"
+        },
+        { "seedId": "daily.core.simaris", "title": "Simaris daily target", "kind": "check" }
+      ]
+    },
+    {
+      "seedId": "daily.quick",
+      "slug": "daily-quick-visits",
+      "title": "Daily: Quick visits",
+      "period": "daily",
+      "items": [
+        {
+          "seedId": "daily.quick.syndicate-standing",
+          "title": "Spend Syndicate standing if capped",
+          "kind": "check"
+        },
+        { "seedId": "daily.quick.darvo", "title": "Darvo's Daily Deal", "kind": "check" },
+        {
+          "seedId": "daily.quick.todays-special",
+          "title": "\"Today's Special\" vendors",
+          "kind": "check",
+          "verify": true
+        },
+        {
+          "seedId": "daily.quick.acrithis",
+          "title": "Acrithis daily shop",
+          "description": "Pathos Clamps",
+          "kind": "check"
+        },
+        {
+          "seedId": "daily.quick.marie-leroux",
+          "title": "Marie Leroux's daily shop",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "sortie",
+      "slug": "sortie",
+      "title": "Sortie",
+      "period": "sortie",
+      "items": [
+        {
+          "seedId": "sortie.sortie",
+          "title": "Sortie",
+          "description": "3 missions",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "eight-hour",
+      "slug": "eight-hour-vendors",
+      "title": "8-hour vendors",
+      "period": "eight_hour",
+      "items": [
+        {
+          "seedId": "eight-hour.loid",
+          "title": "Loid",
+          "description": "Entrati lab materials",
+          "kind": "check",
+          "verify": true
+        },
+        {
+          "seedId": "eight-hour.grandmother",
+          "title": "Grandmother (Necralisk)",
+          "description": "Token deals",
+          "kind": "check",
+          "verify": true
+        },
+        {
+          "seedId": "eight-hour.yonta",
+          "title": "Archimedean Yonta",
+          "description": "Voidplume Pinion",
+          "kind": "check",
+          "verify": true
+        }
+      ]
+    },
+    {
+      "seedId": "four-day",
+      "slug": "every-4-days",
+      "title": "Every 4 days",
+      "period": "manual",
+      "items": [
+        {
+          "seedId": "four-day.ergo-glast",
+          "title": "Ergo Glast",
+          "description": "Tenet weapons",
+          "kind": "check"
+        },
+        {
+          "seedId": "four-day.eleanor",
+          "title": "Eleanor Nightingale",
+          "description": "Tenet A/B rotation",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "weekly.minor",
+      "slug": "weekly-minor-missions",
+      "title": "Weekly: Minor missions",
+      "period": "weekly",
+      "items": [
+        { "seedId": "weekly.minor.darvo", "title": "Darvo's weekly mission", "kind": "check" },
+        {
+          "seedId": "weekly.minor.maroo",
+          "title": "Maroo's weekly mission",
+          "description": "Ayatan Sculpture",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "weekly.passes",
+      "slug": "weekly-passes",
+      "title": "Weekly: Passes",
+      "period": "weekly",
+      "items": [
+        {
+          "seedId": "weekly.passes.nightwave",
+          "title": "Nightwave weekly missions + shop",
+          "kind": "check"
+        },
+        { "seedId": "weekly.passes.calendar-1999", "title": "1999 Calendar", "kind": "check" }
+      ]
+    },
+    {
+      "seedId": "weekly.kuva",
+      "slug": "weekly-kuva-route",
+      "title": "Weekly: Kuva route",
+      "period": "weekly",
+      "items": [
+        {
+          "seedId": "weekly.kuva.yonta",
+          "title": "Archimedean Yonta",
+          "description": "35,000 Kuva for 5 Voidplume Pinions",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.kuva.palladino",
+          "title": "Palladino",
+          "description": "35,000 Kuva for 10 Riven Slivers",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.kuva.acrithis",
+          "title": "Acrithis",
+          "description": "10,000 Kuva for 10 Pathos Clamps",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.kuva.hunhow",
+          "title": "Hunhow",
+          "description": "17,000 Kuva each",
+          "kind": "counter",
+          "slots": { "count": 3 }
+        },
+        {
+          "seedId": "weekly.kuva.teshin",
+          "title": "Teshin",
+          "description": "Kuva for Steel Essence",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.kuva.nightwave-arbitrations",
+          "title": "Nightwave / Arbitrations Kuva",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "weekly.vendors",
+      "slug": "weekly-big-vendors",
+      "title": "Weekly: Big vendors",
+      "period": "weekly",
+      "items": [
+        {
+          "seedId": "weekly.vendors.acrithis",
+          "title": "Acrithis weekly rotation",
+          "description": "Reset day to confirm: Sunday or Monday 00:00 UTC",
+          "kind": "check",
+          "verify": true
+        },
+        { "seedId": "weekly.vendors.palladino", "title": "Palladino", "kind": "check" },
+        {
+          "seedId": "weekly.vendors.teshin",
+          "title": "Teshin: spend Steel Essence",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.vendors.vosfor",
+          "title": "Vosfor arcanes",
+          "kind": "subticks",
+          "slots": { "labels": ["Vendetta", "Radiation", "Ignition"] },
+          "verify": true
+        },
+        {
+          "seedId": "weekly.vendors.kahl",
+          "title": "Kahl-175 weekly mission",
+          "description": "Stock",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.vendors.chipper",
+          "title": "Chipper: 1 Archon Shard",
+          "description": "Currency to confirm: Stock or Cavia standing",
+          "kind": "check",
+          "verify": true
+        },
+        {
+          "seedId": "weekly.vendors.cavalero",
+          "title": "Cavalero",
+          "description": "This week's Incarnon adapters (Platinum)",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "weekly.endgame",
+      "slug": "weekly-endgame",
+      "title": "Weekly: Endgame",
+      "period": "weekly",
+      "items": [
+        { "seedId": "weekly.endgame.archon-hunt", "title": "Archon Hunt", "kind": "check" },
+        {
+          "seedId": "weekly.endgame.search-pulses",
+          "title": "Search Pulses",
+          "kind": "counter",
+          "slots": { "count": 5 }
+        },
+        { "seedId": "weekly.endgame.netracells", "title": "Netracell run(s)", "kind": "check" },
+        {
+          "seedId": "weekly.endgame.deep-archimedea",
+          "title": "Deep Archimedea (Elite)",
+          "description": "Aim for 34 points",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.endgame.temporal-archimedea",
+          "title": "Temporal Archimedea",
+          "description": "Go for all 37 points",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.endgame.descendia",
+          "title": "Descendia: normal",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.endgame.descendia-sp",
+          "title": "Descendia: Steel Path",
+          "description": "Floor for 25 Steel Essence to confirm: 18 or 21",
+          "kind": "check",
+          "verify": true
+        },
+        {
+          "seedId": "weekly.endgame.descendia-infernum",
+          "title": "Descendia: Infernum 21",
+          "description": "Roathe",
+          "kind": "check"
+        },
+        {
+          "seedId": "weekly.endgame.helminth",
+          "title": "Helminth: apply 3 Invigorations",
+          "kind": "check"
+        }
+      ]
+    },
+    {
+      "seedId": "weekly.notes",
+      "slug": "weekly-notes",
+      "title": "Weekly: Notes",
+      "period": "weekly",
+      "items": [
+        { "seedId": "weekly.notes.circuit", "title": "Circuit this week", "kind": "info" },
+        {
+          "seedId": "weekly.notes.archimedea",
+          "title": "Archimedea modifiers this week",
+          "kind": "info"
+        }
+      ]
+    },
+    {
+      "seedId": "baro",
+      "slug": "baro",
+      "title": "Baro Ki'Teer",
+      "period": "baro",
+      "items": [
+        {
+          "seedId": "baro.visit",
+          "title": "Visit Baro",
+          "description": "Ducats + Credits",
+          "kind": "check"
+        }
+      ]
+    }
+  ]
+}

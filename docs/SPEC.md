@@ -134,7 +134,7 @@ Ticks are stored against a **period key**, a string that identifies the current 
 - `weekly:2026-11-09` (date of that week's Monday)
 - `eight_hour:2026-11-09T16`
 - `sortie:<expiry ISO>` (fallback `sortie:2026-11-09`)
-- `baro:<activation ISO>`
+- `baro:<activation ISO>` (fallback `baro:unknown` when there is no live data)
 - `manual:<counter>`, where the counter goes up by one each time the user presses Clear
 
 **Resets need no timer or background job.** When the period changes, the key changes, so the old ticks stop matching and the list shows as unticked. Old tick rows are deleted on startup and once a day; history is not kept by design.
@@ -160,7 +160,8 @@ settings         user_id, key, value_json
                  keys: display_tz, platform ('pc'), show_hidden, ...
 
 sections         id, user_id, slug, title, period, sort_order,
-                 origin ('default'|'custom'), hidden, seed_id NULL
+                 origin ('default'|'custom'), hidden, edited (bool),
+                 seed_id NULL
 
 items            id, user_id, section_id, title, description, kind
                  ('check'|'counter'|'subticks'|'info'), slots_json,
@@ -177,7 +178,8 @@ manual_counters  user_id, section_id, counter
 worldstate_cache source ('warframestat'), endpoint, fetched_at,
                  expires_at, payload_json, last_error NULL
 
-seed_meta        seed_version, applied_at
+seed_meta        user_id, seed_version, applied_at
+                 (per user: each user gets their own copy of the defaults)
 ```
 
 An item's period comes from its **section**. An item's own `period` is not stored in v1; we can add it later if needed.
@@ -193,6 +195,7 @@ An item's period comes from its **section**. An item's own `period` is not store
   - **edited items are never overwritten**;
   - default items removed from the seed are hidden, not deleted, and the user sees a notice.
 - Custom items (`origin='custom'`) are never touched by seeding.
+- Sections follow the same rules (they also carry `edited`). An edited default removed from the seed stays visible.
 
 ---
 

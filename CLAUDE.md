@@ -19,6 +19,7 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
 - `npm run dev`: API on :4317 and web on :5173 (Vite proxies `/api`)
 - `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`
 - `npm run format`: Prettier + ESLint autofix
+- `npm run db:generate -w @warframehub/api`: after changing `apps/api/src/db/schema.ts`, writes a new SQL migration to `apps/api/drizzle/` (commit it; never edit applied migrations)
 
 ## How the workspaces fit together
 
