@@ -23,20 +23,17 @@ describe('shipped seed (apps/api/seed/checklist.json)', () => {
     );
   });
 
-  it('flags exactly the unconfirmed items from SPEC Appendix A with "verify"', () => {
+  it('flags exactly the still-unconfirmed items with "verify"', () => {
     const flagged = shipped.sections.flatMap((s) =>
       s.items.filter((i) => i.verify).map((i) => i.seedId),
     );
     expect(flagged.sort()).toEqual(
       [
+        // Still to confirm in game (SPEC §12). The rest were confirmed on 10 Nov 2026.
         'daily.quick.todays-special',
         'eight-hour.grandmother',
         'eight-hour.loid',
         'eight-hour.yonta',
-        'weekly.endgame.descendia-sp',
-        'weekly.vendors.acrithis',
-        'weekly.vendors.chipper',
-        'weekly.vendors.vosfor',
       ].sort(),
     );
   });
@@ -66,6 +63,61 @@ describe('shipped seed (apps/api/seed/checklist.json)', () => {
     const noSlots = JSON.parse(JSON.stringify(shipped));
     delete noSlots.sections[0].items[2].slots; // Steel Path Incursions counter
     expect(SeedFile.safeParse(noSlots).success).toBe(false);
+  });
+});
+
+describe('seed v2 (facts confirmed in game, 10 Nov 2026)', () => {
+  const byId = new Map(shipped.sections.flatMap((s) => s.items).map((i) => [i.seedId, i]));
+
+  it('has the confirmed vendor facts', () => {
+    expect(byId.get('weekly.vendors.chipper')).toMatchObject({
+      title: 'Bird 3: 1 Archon Shard',
+      description: '30,000 Cavia standing',
+      verify: false,
+    });
+    expect(byId.get('weekly.vendors.vosfor')).toMatchObject({
+      description: 'Loid, Sanctum Anatomica',
+      verify: false,
+    });
+    expect(byId.get('weekly.vendors.acrithis')).toMatchObject({ description: '', verify: false });
+    expect(byId.get('weekly.endgame.descendia-sp')).toMatchObject({
+      description: '25 Steel Essence at floor 21',
+      verify: false,
+    });
+  });
+
+  it('upgrading from v1 updates unedited items and keeps edited ones', () => {
+    const database = openDatabase(':memory:');
+    const v1 = clone(shipped);
+    v1.seedVersion = 1;
+    const chipper = v1.sections
+      .flatMap((s) => s.items)
+      .find((i) => i.seedId === 'weekly.vendors.chipper')!;
+    chipper.title = 'Chipper: 1 Archon Shard';
+    chipper.verify = true;
+    const descendia = v1.sections
+      .flatMap((s) => s.items)
+      .find((i) => i.seedId === 'weekly.endgame.descendia-sp')!;
+    descendia.verify = true;
+    const { userId } = initDatabase(database.db, v1, NOW);
+    database.db
+      .update(items)
+      .set({ title: 'My Descendia note', edited: true })
+      .where(eq(items.seedId, 'weekly.endgame.descendia-sp'))
+      .run();
+
+    const result = applySeed(database.db, userId, shipped, LATER);
+    expect(result).toMatchObject({ applied: true, fromVersion: 1, toVersion: shipped.seedVersion });
+    const row = (id: string) => database.db.select().from(items).where(eq(items.seedId, id)).get()!;
+    expect(row('weekly.vendors.chipper')).toMatchObject({
+      title: 'Bird 3: 1 Archon Shard',
+      verify: false,
+    });
+    expect(row('weekly.endgame.descendia-sp')).toMatchObject({
+      title: 'My Descendia note',
+      verify: true,
+    });
+    database.close();
   });
 });
 
@@ -176,7 +228,11 @@ describe('seed update (SPEC §5.1)', () => {
     });
     const result = applySeed(db, userId, v2, LATER);
 
-    expect(result).toMatchObject({ applied: true, fromVersion: 1, toVersion: 2 });
+    expect(result).toMatchObject({
+      applied: true,
+      fromVersion: shipped.seedVersion,
+      toVersion: shipped.seedVersion + 1,
+    });
     expect(result.items.updated).toBe(1);
     expect(item('weekly.kuva.palladino').title).toBe('My Palladino note');
     expect(item('weekly.kuva.yonta')).toMatchObject({
