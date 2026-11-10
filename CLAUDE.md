@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code sessions in this repo. The full design is in `docs/SPEC.md`; read it before changing behaviour.
+Guidance for Claude Code sessions in this repo. The full design is in `docs/SPEC.md`; read it before changing behaviour. `docs/HANDOFF.md` has the background: how we work together, research done so far, data-source findings, and current status.
 
 ## Project
 
