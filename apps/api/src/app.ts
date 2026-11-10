@@ -6,6 +6,8 @@ export interface AppOptions {
   logger?: boolean;
   /** Injectable clock, so tests can pin the time. */
   now?: () => Date;
+  /** Shown by /api/health. */
+  dataDir?: string;
 }
 
 export async function buildApp(options: AppOptions = {}): Promise<FastifyInstance> {
@@ -24,6 +26,7 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
       app: 'warframehub',
       version: APP_VERSION,
       serverTime: now().toISOString(),
+      dataDir: options.dataDir ?? '',
     });
   });
 

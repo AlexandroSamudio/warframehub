@@ -9,13 +9,17 @@ describe('API', () => {
   });
 
   it('GET /api/health reports ok with the server time in UTC', async () => {
-    app = await buildApp({ now: () => new Date('2026-11-10T03:00:00.000Z') });
+    app = await buildApp({
+      now: () => new Date('2026-11-10T03:00:00.000Z'),
+      dataDir: '/data/warframehub',
+    });
     const res = await app.inject({ method: 'GET', url: '/api/health' });
 
     expect(res.statusCode).toBe(200);
     const body = HealthResponse.parse(res.json());
     expect(body.serverTime).toBe('2026-11-10T03:00:00.000Z');
     expect(body.version).toMatch(/^\d+\.\d+\.\d+/);
+    expect(body.dataDir).toBe('/data/warframehub');
   });
 
   it('unknown routes return the standard error shape', async () => {

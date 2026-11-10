@@ -119,10 +119,12 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: spec, README, CLAUDE.md, license.
-- **PR #1 `phase-0-scaffold`:** monorepo scaffold, `/api/health`, a Svelte status page, tooling and CI (green). Waiting for Alex to test on EndeavourOS and merge.
-- **Next: Phase 1** (SPEC §11):
-  - `apps/api/src/domain/periods.ts` with boundary tests
-  - Drizzle schema + migrations (adds `better-sqlite3` and `drizzle-orm`, which need `allowScripts` approval for better-sqlite3's install step)
-  - data directory under `$XDG_DATA_HOME/warframehub/`
-  - importing `apps/api/seed/checklist.json` (content from SPEC Appendix A)
+- `main`: Phase 0 scaffold merged (monorepo, `/api/health`, Svelte status page, tooling, CI).
+- **Branch `phase-1-periods-data`:** Phase 1 (SPEC §11):
+  - `apps/api/src/domain/periods.ts` + boundary tests (00:00 UTC, Monday, 8-hour marks, Sortie/Baro fallbacks, machine time zone independence)
+  - Drizzle schema (`apps/api/src/db/schema.ts`), migrations in `apps/api/drizzle/` (applied at startup)
+  - data directory `$XDG_DATA_HOME/warframehub/` (override: `WFHUB_DATA_DIR`), database file `warframehub.db`
+  - seed `apps/api/seed/checklist.json` (SPEC Appendix A) imported on first start and merged on seed updates
+  - better-sqlite3 13 ships prebuilt binaries, so it needs **no** `allowScripts` approval
+- **Not done yet, on purpose:** deleting old tick rows (Phase 2, needs the tracker's current period keys) and the "removed from defaults" notice (Phase 4).
+- **Next: Phase 2** (Tracker: `/api/tracker`, `/api/ticks`, Tracker screen).

@@ -39,6 +39,7 @@
           utc: formatUtc(health.serverTime),
         })}
       </p>
+      <p class="detail">{t('health.dataDir', { path: health.dataDir })}</p>
     {:else if failed}
       <p class="bad">{t('health.error')}</p>
       <button type="button" onclick={check}>{t('health.retry')}</button>
