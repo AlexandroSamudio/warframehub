@@ -1,11 +1,18 @@
 <script lang="ts">
   import type { HealthResponse } from '@warframehub/shared';
   import { onMount } from 'svelte';
-  import { getHealth } from './lib/api.ts';
+  import { getHealth, heartbeat } from './lib/api.ts';
   import { t } from './lib/i18n/index.ts';
+  import { hrefFor, router, type Route } from './lib/route.svelte.ts';
+  import Settings from './routes/Settings.svelte';
   import Tracker from './routes/Tracker.svelte';
 
   let health = $state<HealthResponse | null>(null);
+  let stopped = $state(false);
+
+  const NAV: Route[] = ['tracker', 'settings'];
+  // The server stops after a while with no open page; this tells it we're here (SPEC §9.2).
+  const HEARTBEAT_MS = 60_000;
 
   onMount(() => {
     getHealth()
@@ -13,6 +20,10 @@
       .catch(() => {
         // The Tracker shows its own "can't reach the API" message.
       });
+    const timer = setInterval(() => {
+      if (!stopped) void heartbeat().catch(() => {});
+    }, HEARTBEAT_MS);
+    return () => clearInterval(timer);
   });
 </script>
 
@@ -26,10 +37,28 @@
     </svg>
     <h1>{t('app.title')}</h1>
     <p class="tagline eyebrow">{t('app.tagline')}</p>
+    {#if !stopped}
+      <nav aria-label={t('nav.label')}>
+        {#each NAV as route (route)}
+          <a href={hrefFor(route)} aria-current={router.route === route ? 'page' : undefined}>
+            {t(`nav.${route}`)}
+          </a>
+        {/each}
+      </nav>
+    {/if}
   </header>
 
   <main>
-    <Tracker />
+    {#if stopped}
+      <section class="stopped frame accent" role="status">
+        <h2>{t('stopped.title')}</h2>
+        <p>{t('stopped.body')}</p>
+      </section>
+    {:else if router.route === 'settings'}
+      <Settings onStopped={() => (stopped = true)} />
+    {:else}
+      <Tracker />
+    {/if}
   </main>
 
   {#if health}
@@ -77,6 +106,48 @@
     margin: 0;
     padding-left: 0.75rem;
     border-left: 1px solid var(--line-strong);
+  }
+
+  nav {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+  }
+
+  nav a {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border-bottom: 2px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--fg);
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .stopped {
+    max-width: 36rem;
+    padding: 1.2rem 1.4rem;
+  }
+
+  .stopped h2 {
+    margin: 0 0 0.4rem;
+    color: var(--gold);
+  }
+
+  .stopped p {
+    margin: 0;
+    color: var(--muted);
   }
 
   footer {

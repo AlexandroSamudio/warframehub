@@ -119,11 +119,13 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phases 0–4 merged (scaffold; periods, database, seed; tracker; live rotations; edit mode).
-- **Branch `phase-5-theme`:** Phase 5 (SPEC §11):
-  - Theme in `apps/web/src/app.css`: colour tokens (contrast measured: text ≥ 5.5:1, control borders ≥ 3:1), `.frame` panels with cut corners, shared button/input/badge styles, focus ring, reduced-motion guard
-  - Fonts: Rajdhani (headings, labels) and Inter (body, and all changing numbers, since Rajdhani has no tabular digits), bundled via `@fontsource`
-  - Layout checked at 360 px, 768 px and desktop: no sideways scrolling; clocks two per row on phones
-  - Keyboard: visible focus everywhere, Tab order follows the page, Space ticks items and counter slots
-- **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id, so Alex's `npm run dev` on 4317/5173 is never touched. Narrow widths are checked by loading the app in iframes of the target width, because the browser window can't be resized from automation.
-- **Next: Phase 6** (launcher, Quit button, idle shutdown).
+- `main`: Phases 0–5 merged.
+- **Branch `phase-6-launcher`:** Phase 6, the last v1 phase (SPEC §11):
+  - The API serves the built web app on the same port (`apps/api/src/routes/web.ts`, hand-written, path-traversal tested)
+  - `POST /api/shutdown` (Quit), `POST /api/heartbeat`, `GET`/`PATCH /api/settings`; idle shutdown (`apps/api/src/idle.ts`)
+  - Settings screen (time zone, data folder, version, idle time, Quit) behind a small hash router (`#/settings`)
+  - `scripts/warframehub-launcher.sh` and `npm run install-launcher` (`.desktop` file + icon)
+  - Checked end to end on EndeavourOS: launcher start (~0.6 s), second launch, Quit from the page, idle shutdown after 1 idle minute (stopped at 120 s), `.desktop` file valid (`desktop-file-validate`)
+- **Not yet tested on Bazzite.** The launcher looks for mise on PATH, in `~/.local/bin`, and in Homebrew's `/home/linuxbrew/.linuxbrew/bin`.
+- **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id or with the Quit endpoint, so Alex's `npm run dev` on 4317/5173 is never touched.
+- **v1 is feature-complete** after this phase. Open items are in SPEC §12; later features are in §13.

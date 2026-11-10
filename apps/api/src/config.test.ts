@@ -9,7 +9,15 @@ describe('loadConfig', () => {
       host: '127.0.0.1',
       port: 4317,
       dataDir: '/home/tenno/.local/share/warframehub',
+      idleMinutes: 30,
     });
+  });
+
+  it('reads WFHUB_IDLE_MINUTES, where 0 turns idle shutdown off', () => {
+    expect(loadConfig({ WFHUB_IDLE_MINUTES: '0' }, HOME).idleMinutes).toBe(0);
+    expect(loadConfig({ WFHUB_IDLE_MINUTES: '5' }, HOME).idleMinutes).toBe(5);
+    expect(() => loadConfig({ WFHUB_IDLE_MINUTES: '-1' }, HOME)).toThrow(/WFHUB_IDLE_MINUTES/);
+    expect(() => loadConfig({ WFHUB_IDLE_MINUTES: 'soon' }, HOME)).toThrow(/WFHUB_IDLE_MINUTES/);
   });
 
   it('reads WFHUB_HOST and WFHUB_PORT', () => {

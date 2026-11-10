@@ -1,12 +1,14 @@
 import { HealthResponse, type ApiError } from '@warframehub/shared';
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 import type { Db } from './db/client.js';
 import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
+import { registerSystemRoutes } from './routes/system.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
+import { registerWebApp } from './routes/web.js';
 import { registerWorldstateRoutes } from './routes/worldstate.js';
 import { WorldstateService } from './sources/worldstate.js';
 import { APP_VERSION } from './version.js';
@@ -26,6 +28,14 @@ export interface AppOptions {
   seed?: SeedFile;
   /** Overrides the live Sortie/Baro times taken from `worldstate` (tests). */
   liveTimes?: () => LiveTimes | Promise<LiveTimes>;
+  /** Built web app to serve on the same port (SPEC §3.2). Skipped if missing. */
+  webRoot?: string;
+  /** Called on every request, for idle shutdown (SPEC §9.2). */
+  onActivity?: () => void;
+  /** Minutes without a page before the server stops (shown in Settings). 0 = never. */
+  idleMinutes?: number;
+  /** Stops the process (Quit button). Without it, `POST /api/shutdown` only answers. */
+  onShutdown?: () => void;
 }
 
 function errorBody(code: string, message: string): ApiError {
@@ -33,8 +43,19 @@ function errorBody(code: string, message: string): ApiError {
 }
 
 export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
-  const app = Fastify({ logger: options.logger ?? false });
+  const app = Fastify({
+    logger: options.logger ?? false,
+    // Errors Fastify raises before routing (e.g. a malformed URL) use the standard shape too.
+    frameworkErrors: (error, _request, reply) => {
+      void (reply as FastifyReply).code(400).send(errorBody('bad_request', error.message));
+    },
+  });
   const now = options.now ?? (() => new Date());
+
+  if (options.onActivity) {
+    const onActivity = options.onActivity;
+    app.addHook('onRequest', async () => onActivity());
+  }
 
   app.setNotFoundHandler((request, reply) => {
     void reply
@@ -96,6 +117,14 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   });
   registerWorldstateRoutes(app, { worldstate, now });
 
+  registerSystemRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    dataDir: options.dataDir ?? '',
+    idleMinutes: options.idleMinutes ?? 0,
+    onShutdown: options.onShutdown ?? (() => {}),
+  });
+
   let seed = options.seed;
   registerChecklistRoutes(app, {
     db: options.db,
@@ -103,6 +132,9 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     now,
     seed: () => (seed ??= loadSeed()),
   });
+
+  // Last, so every /api route wins over the catch-all.
+  if (options.webRoot) registerWebApp(app, options.webRoot);
 
   return app;
 }

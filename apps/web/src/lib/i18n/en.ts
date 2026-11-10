@@ -134,6 +134,32 @@ export const en = {
   'edit.restoreConfirm': 'Put every default item and section back as shipped? Your own items stay.',
   'edit.restoreYes': 'Yes, restore',
 
+  'nav.label': 'Main',
+  'nav.tracker': 'Tracker',
+  'nav.settings': 'Settings',
+
+  'settings.title': 'Settings',
+  'settings.timeZone': 'Display time zone',
+  'settings.timeZoneHint':
+    'Times are shown in this zone, with UTC next to them. Resets always follow UTC.',
+  'settings.saved': 'Saved',
+  'settings.saveError': "Couldn't save the time zone: {message}",
+  'settings.dataDir': 'Data folder',
+  'settings.dataDirHint': 'Your ticks and checklist live here, outside the app folder.',
+  'settings.version': 'Version',
+  'settings.idle': 'Stops on its own',
+  'settings.idleOn': 'After {minutes} minutes with no WarframeHub tab open',
+  'settings.idleOff': 'Never (development mode)',
+  'settings.loadError': "Can't load settings. Is the server running?",
+  'settings.quit': 'Quit WarframeHub',
+  'settings.quitHint': 'Stops the server. Open WarframeHub from the app menu to start it again.',
+  'settings.quitConfirm': 'Stop WarframeHub now?',
+  'settings.quitYes': 'Yes, quit',
+  'settings.quitError': "Couldn't stop the server: {message}",
+
+  'stopped.title': 'WarframeHub has stopped',
+  'stopped.body': 'You can close this tab. Open WarframeHub from the app menu to start it again.',
+
   'footer.version': 'Version {version}',
   'footer.dataDir': 'Data folder: {path}',
 } as const;

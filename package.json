@@ -21,7 +21,8 @@
     "test:watch": "vitest",
     "typecheck": "npm run typecheck --workspaces",
     "lint": "eslint . && prettier --check .",
-    "format": "prettier --write . && eslint --fix ."
+    "format": "prettier --write . && eslint --fix .",
+    "install-launcher": "node scripts/install-launcher.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

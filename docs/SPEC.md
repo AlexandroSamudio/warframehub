@@ -222,6 +222,7 @@ An item's period comes from its **section**. An item's own `period` is not store
 | GET          | `/api/worldstate`                 | cached live rotations, normalised (see §7), with `fetchedAt` and staleness                                                                     |
 | POST         | `/api/worldstate/refresh`         | force a refresh (rate-limited)                                                                                                                 |
 | GET/PATCH    | `/api/settings`                   | display time zone, etc.                                                                                                                        |
+| POST         | `/api/heartbeat`                  | an open page says it's still there (idle shutdown, §9.2)                                                                                       |
 | POST         | `/api/shutdown`                   | Quit button: stops the server cleanly                                                                                                          |
 
 Rules:
@@ -313,13 +314,14 @@ npm run lint && npm run typecheck
   - `mise install`
   - `npm ci`
   - `npm run build`
-  - `npm run install-launcher`, which writes a `.desktop` file to `~/.local/share/applications/`
+  - `npm run install-launcher`, which writes a `.desktop` file to `~/.local/share/applications/` and an icon to `~/.local/share/icons/hicolor/scalable/apps/` (`-- --uninstall` removes both)
 - **Click "WarframeHub"** in the app menu:
   - It starts the server if it isn't running, waits until `/api/health` answers, then opens the browser.
   - If the server is already running, it just opens the browser.
+  - The launcher is `scripts/warframehub-launcher.sh`. It runs the built server with the pinned Node via mise, logging to `<data dir>/server.log` (started fresh past 1 MB). Problems (not built yet, mise missing, port used by another program, server didn't start) show a desktop notification.
 - **Stopping:**
   - the **Quit** button,
-  - or automatically after **30 minutes with no open page**: the page sends a small heartbeat every minute.
+  - or automatically after **30 minutes with no open page**: the page sends a small heartbeat every minute, and any request counts as activity. `WFHUB_IDLE_MINUTES` changes the time; `0` turns it off, which is what `npm run dev` does.
   - Nothing runs at boot or in the background.
 - **Updating:** `git pull && npm ci && npm run build`. Database migrations run on the next start.
 

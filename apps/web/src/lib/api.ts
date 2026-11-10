@@ -4,12 +4,14 @@ import {
   ClearSectionResponse,
   HealthResponse,
   PutTickResponse,
+  SettingsResponse,
   TrackerResponse,
   WorldstateResponse,
   type CreateItemRequest,
   type CreateSectionRequest,
   type PutTickRequest,
   type UpdateItemRequest,
+  type UpdateSettingsRequest,
   type UpdateSectionRequest,
 } from '@warframehub/shared';
 
@@ -117,4 +119,24 @@ export function restoreDefaults(): Promise<ChecklistResponse> {
 
 export async function dismissNotice(): Promise<void> {
   await request({ parse: () => undefined }, '/api/checklist/dismiss-notice', json('POST'));
+}
+
+// ---- settings and lifecycle -------------------------------------------------
+
+export function getSettings(): Promise<SettingsResponse> {
+  return request(SettingsResponse, '/api/settings');
+}
+
+export function updateSettings(body: UpdateSettingsRequest): Promise<SettingsResponse> {
+  return request(SettingsResponse, '/api/settings', json('PATCH', body));
+}
+
+/** Tells the server a page is still open (SPEC §9.2 idle shutdown). */
+export async function heartbeat(): Promise<void> {
+  await request({ parse: () => undefined }, '/api/heartbeat', json('POST'));
+}
+
+/** Quit button: stops the server. */
+export async function shutdown(): Promise<void> {
+  await request({ parse: () => undefined }, '/api/shutdown', json('POST'));
 }

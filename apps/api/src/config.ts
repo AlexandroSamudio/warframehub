@@ -6,6 +6,8 @@ export interface Config {
   port: number;
   /** Where the database lives. Always outside the repo (SPEC §2). */
   dataDir: string;
+  /** Stop after this many minutes with no open page (SPEC §9.2). 0 = never. */
+  idleMinutes: number;
 }
 
 /**
@@ -18,7 +20,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, home = homedir(
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new Error(`WFHUB_PORT must be a port number (1-65535), got "${env.WFHUB_PORT}"`);
   }
-  return { host, port, dataDir: resolveDataDir(env, home) };
+  const idleMinutes = Number(env.WFHUB_IDLE_MINUTES ?? 30);
+  if (!Number.isInteger(idleMinutes) || idleMinutes < 0) {
+    throw new Error(
+      `WFHUB_IDLE_MINUTES must be a whole number of minutes (0 = never), got "${env.WFHUB_IDLE_MINUTES}"`,
+    );
+  }
+  return { host, port, dataDir: resolveDataDir(env, home), idleMinutes };
 }
 
 /**
