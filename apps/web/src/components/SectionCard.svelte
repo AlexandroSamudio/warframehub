@@ -16,6 +16,7 @@
   let { section, nowMs, timeZone, onToggle, onClear }: Props = $props();
 
   const progress = $derived(sectionProgress(section));
+  const complete = $derived(progress.total > 0 && progress.done >= progress.total);
   const headingId = $derived(`section-${section.id}`);
 
   const resetLabel = $derived.by(() => {
@@ -30,15 +31,19 @@
   });
 </script>
 
-<section class="card" aria-labelledby={headingId}>
+<section class="card frame accent" class:complete aria-labelledby={headingId}>
   <header>
     <div class="heading">
       <h2 id={headingId}>{section.title}</h2>
-      <p class="reset">{resetLabel}</p>
+      <p class="reset num">{resetLabel}</p>
     </div>
+    {#if complete}
+      <span class="badge ok">{t('section.complete')}</span>
+    {/if}
     {#if section.period === 'manual'}
       <button
         type="button"
+        class="primary"
         onclick={() => onClear(section)}
         title={t('section.clearHint', { title: section.title })}
       >
@@ -49,8 +54,12 @@
 
   {#if progress.total > 0}
     <div class="progress">
-      <meter min="0" max={progress.total} value={progress.done} aria-labelledby={headingId}></meter>
-      <span>{t('section.progress', { done: progress.done, total: progress.total })}</span>
+      <div class="bar" aria-hidden="true">
+        <div class="fill" style:width="{(progress.done / progress.total) * 100}%"></div>
+      </div>
+      <span class="num"
+        >{t('section.progress', { done: progress.done, total: progress.total })}</span
+      >
     </div>
   {/if}
 
@@ -63,73 +72,77 @@
 
 <style>
   .card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    padding: 0.9rem 1.1rem;
-    clip-path: polygon(
-      0 0,
-      calc(100% - 12px) 0,
-      100% 12px,
-      100% 100%,
-      12px 100%,
-      0 calc(100% - 12px)
-    );
+    padding: 0.95rem 1.15rem 0.8rem;
+  }
+
+  .card.complete {
+    --frame-line: color-mix(in srgb, var(--ok) 45%, var(--line));
   }
 
   header {
     display: flex;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
+  }
+
+  .heading {
+    flex: 1;
+    min-width: 0;
   }
 
   h2 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 1.2rem;
+    line-height: 1.2;
     color: var(--gold);
-    letter-spacing: 0.03em;
   }
 
   .reset {
-    margin: 0.1rem 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 500;
     color: var(--muted);
-    font-variant-numeric: tabular-nums;
   }
 
   .progress {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-top: 0.6rem;
-    font-size: 0.8rem;
+    gap: 0.7rem;
+    margin-top: 0.65rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    font-variant-numeric: tabular-nums;
   }
 
-  meter {
+  .bar {
     flex: 1;
-    height: 0.4rem;
+    height: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    box-sizing: content-box;
+  }
+
+  .fill {
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--teal),
+      color-mix(in srgb, var(--teal) 60%, var(--gold))
+    );
+  }
+
+  .complete .fill {
+    background: var(--ok);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fill {
+      transition: width 200ms ease;
+    }
   }
 
   ul {
     list-style: none;
     margin: 0.4rem 0 0;
     padding: 0;
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--gold);
-    padding: 0.2rem 0.8rem;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: color-mix(in srgb, var(--gold) 15%, transparent);
   }
 </style>

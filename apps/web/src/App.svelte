@@ -18,8 +18,14 @@
 
 <div class="page">
   <header>
+    <!-- Original mark: nested diamonds. Not a DE logo. -->
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+      <path d="M16 2 30 16 16 30 2 16Z" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <path d="M16 9 23 16 16 23 9 16Z" fill="currentColor" opacity="0.85" />
+      <path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="1.5" />
+    </svg>
     <h1>{t('app.title')}</h1>
-    <p class="tagline">{t('app.tagline')}</p>
+    <p class="tagline eyebrow">{t('app.tagline')}</p>
   </header>
 
   <main>
@@ -45,32 +51,41 @@
 
   header {
     display: flex;
-    align-items: baseline;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.75rem;
     flex-wrap: wrap;
+  }
+
+  .mark {
+    width: 1.9rem;
+    height: 1.9rem;
+    color: var(--gold);
+    flex: none;
   }
 
   h1 {
     margin: 0;
-    font-size: 1.6rem;
-    letter-spacing: 0.04em;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--gold);
   }
 
   .tagline {
     margin: 0;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 0.8rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--line-strong);
   }
 
   footer {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1.5rem;
-    font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--muted);
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
   }
 </style>

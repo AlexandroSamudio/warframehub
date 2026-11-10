@@ -97,7 +97,7 @@
   }
 </script>
 
-<section class="card" class:hidden={section.hidden}>
+<section class="card frame accent" class:hidden={section.hidden}>
   <header>
     <input
       class="title"
@@ -119,16 +119,18 @@
       </select>
     </label>
     <div class="actions">
-      {#if section.hidden}<span class="tag">{t('edit.hidden')}</span>{/if}
-      {#if section.origin === 'custom'}<span class="tag">{t('edit.custom')}</span>{/if}
+      {#if section.hidden}<span class="badge">{t('edit.hidden')}</span>{/if}
+      {#if section.origin === 'custom'}<span class="badge teal">{t('edit.custom')}</span>{/if}
       <button
         type="button"
+        class="icon"
         disabled={isFirst}
         onclick={() => onShiftSection(section.id, -1)}
         aria-label={t('edit.moveSectionUp', { title: section.title })}>↑</button
       >
       <button
         type="button"
+        class="icon"
         disabled={isLast}
         onclick={() => onShiftSection(section.id, 1)}
         aria-label={t('edit.moveSectionDown', { title: section.title })}>↓</button
@@ -198,15 +200,14 @@
     <select aria-label={t('edit.kind')} bind:value={newKind}>
       {#each KINDS as kind (kind)}<option value={kind}>{t(`kind.${kind}`)}</option>{/each}
     </select>
-    <button type="submit" disabled={newTitle.trim() === ''}>{t('edit.addItem')}</button>
+    <button type="submit" class="teal" disabled={newTitle.trim() === ''}>{t('edit.addItem')}</button
+    >
   </form>
 </section>
 
 <style>
   .card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    padding: 0.8rem 1rem;
+    padding: 0.85rem 1.05rem;
     display: grid;
     gap: 0.5rem;
   }
@@ -224,7 +225,10 @@
 
   .title {
     flex: 1 1 14rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
     font-weight: 600;
+    letter-spacing: 0.03em;
     color: var(--gold);
   }
 
@@ -269,51 +273,8 @@
     flex: 1 1 12rem;
   }
 
-  .tag {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    padding: 0 0.3rem;
-  }
-
   .confirm {
     font-size: 0.8rem;
-    color: var(--bad);
-  }
-
-  input,
-  select {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    padding: 0.25rem 0.45rem;
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.8rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--line);
-    padding: 0.15rem 0.6rem;
-    cursor: pointer;
-  }
-
-  button:hover:not(:disabled) {
-    border-color: var(--gold);
-  }
-
-  button:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  button.danger {
-    border-color: var(--bad);
     color: var(--bad);
   }
 </style>

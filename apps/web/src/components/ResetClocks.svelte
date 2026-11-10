@@ -16,23 +16,24 @@
 <section class="clocks" aria-label={t('clocks.label')}>
   {#each clocks as clock (clock.id)}
     {@const left = clock.nextReset ? Date.parse(clock.nextReset) - nowMs : null}
-    <div class="clock" class:soon={left !== null && isResetSoon(clock.id, left)}>
-      <span class="name">{t(`clock.${clock.id}`)}</span>
+    {@const soon = left !== null && isResetSoon(clock.id, left)}
+    <div class="clock frame" class:accent={soon} class:soon>
+      <span class="eyebrow">{t(`clock.${clock.id}`)}</span>
       {#if clock.nextReset && left !== null}
-        <span class="countdown">
+        <span class="countdown num">
           {#if clock.estimated}
             <abbr title={t('clock.estimatedHint')}>≈</abbr>
           {/if}
           {formatCountdown(Math.max(0, left))}
         </span>
-        <span class="at">
+        <span class="at num">
           {t('clock.at', {
             local: formatLocal(clock.nextReset, timeZone),
             utc: formatUtc(clock.nextReset),
           })}
         </span>
         {#if clock.estimated}
-          <span class="tag" title={t('clock.estimatedHint')}>{t('clock.estimated')}</span>
+          <span class="badge teal" title={t('clock.estimatedHint')}>{t('clock.estimated')}</span>
         {/if}
       {:else}
         <span class="at">{t('clock.unknown')}</span>
@@ -44,34 +45,40 @@
 <style>
   .clocks {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.75rem), 1fr));
     gap: 0.5rem;
   }
 
   .clock {
+    --cut: 10px;
     display: grid;
-    gap: 0.1rem;
-    padding: 0.6rem 0.8rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-top: 2px solid var(--line);
+    align-content: start;
+    gap: 0.05rem;
+    padding: 0.65rem 0.9rem 0.7rem;
   }
 
   .clock.soon {
-    border-top-color: var(--gold);
-  }
-
-  .name {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
+    --frame-line: color-mix(in srgb, var(--gold) 55%, var(--line));
   }
 
   .countdown {
-    font-family: var(--font-mono);
-    font-size: 1.25rem;
-    font-variant-numeric: tabular-nums;
+    font-size: 1.6rem;
+    line-height: 1.15;
+  }
+
+  /* Phones: two clocks per row, slightly smaller. */
+  @media (max-width: 30rem) {
+    .clock {
+      padding: 0.5rem 0.65rem 0.55rem;
+    }
+
+    .countdown {
+      font-size: 1.3rem;
+    }
+
+    .at {
+      font-size: 0.75rem;
+    }
   }
 
   .soon .countdown {
@@ -84,17 +91,13 @@
   }
 
   .at {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 500;
     color: var(--muted);
-    font-variant-numeric: tabular-nums;
   }
 
-  .tag {
+  .badge {
     justify-self: start;
-    font-size: 0.7rem;
-    color: var(--teal);
-    border: 1px solid currentColor;
-    padding: 0 0.3rem;
+    margin-top: 0.2rem;
   }
 </style>

@@ -30,6 +30,7 @@ export const en = {
   'section.baroUnknown': 'Resets when Baro next arrives',
   'section.progress': '{done} of {total} done',
   'section.clear': 'Clear',
+  'section.complete': 'Done',
   'section.clearHint': 'Untick everything in {title}',
 
   'item.verify': 'verify',

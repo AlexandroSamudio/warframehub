@@ -70,7 +70,7 @@
 </script>
 
 <div class="editor">
-  {#if error}<p class="error" role="alert">{error}</p>{/if}
+  {#if error}<p class="error frame" role="alert">{error}</p>{/if}
 
   {#if checklist}
     {#each checklist.sections as section, i (section.id)}
@@ -105,7 +105,9 @@
           <option value={p}>{t(`period.${p}`)}</option>
         {/each}
       </select>
-      <button type="submit" disabled={newSectionTitle.trim() === ''}>{t('edit.addSection')}</button>
+      <button type="submit" class="teal" disabled={newSectionTitle.trim() === ''}
+        >{t('edit.addSection')}</button
+      >
     </form>
 
     <div class="restore">
@@ -138,8 +140,8 @@
 
   .error {
     margin: 0;
+    --frame-line: var(--bad);
     padding: 0.5rem 0.8rem;
-    border: 1px solid var(--bad);
     color: var(--bad);
   }
 
@@ -163,35 +165,5 @@
     padding-top: 0.6rem;
     border-top: 1px solid var(--line);
     font-size: 0.85rem;
-  }
-
-  input,
-  select {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    padding: 0.25rem 0.45rem;
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--gold);
-    padding: 0.2rem 0.8rem;
-    cursor: pointer;
-  }
-
-  button:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  button.danger {
-    border-color: var(--bad);
-    color: var(--bad);
   }
 </style>

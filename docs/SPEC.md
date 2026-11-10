@@ -278,7 +278,7 @@ Rules:
 - **Warframe-inspired:**
   - dark void background with Orokin **gold** accents and a cool **teal/cyan** secondary
   - thin geometric frames and angled corners on panels
-  - a technical display font for headings and numbers, plus a clean body font
+  - a technical display font for headings and labels (**Rajdhani**), plus a clean body font (**Inter**). Both SIL OFL 1.1, bundled with the app via `@fontsource`; nothing is fetched from font services. Numbers that change (countdowns, counts) use Inter's tabular digits, because Rajdhani has none.
 - **Original artwork only.** No DE logos, game art or copied UI assets.
 - **Readable first:**
   - good contrast

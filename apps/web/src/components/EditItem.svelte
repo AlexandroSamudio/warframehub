@@ -113,9 +113,9 @@
       maxlength="120"
       onchange={(e) => saveText('title', e)}
     />
-    {#if item.hidden}<span class="tag">{t('edit.hidden')}</span>{/if}
-    {#if item.origin === 'custom'}<span class="tag">{t('edit.custom')}</span>{/if}
-    {#if item.edited}<span class="tag">{t('edit.edited')}</span>{/if}
+    {#if item.hidden}<span class="badge">{t('edit.hidden')}</span>{/if}
+    {#if item.origin === 'custom'}<span class="badge teal">{t('edit.custom')}</span>{/if}
+    {#if item.edited}<span class="badge gold">{t('edit.edited')}</span>{/if}
   </div>
 
   <div class="fields">
@@ -162,12 +162,14 @@
   <div class="actions">
     <button
       type="button"
+      class="icon"
       disabled={isFirst}
       onclick={() => onShift(item.id, -1)}
       aria-label={t('edit.moveItemUp', { title: item.title })}>↑</button
     >
     <button
       type="button"
+      class="icon"
       disabled={isLast}
       onclick={() => onShift(item.id, 1)}
       aria-label={t('edit.moveItemDown', { title: item.title })}>↓</button
@@ -230,15 +232,6 @@
     font-weight: 600;
   }
 
-  .tag {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    padding: 0 0.3rem;
-  }
-
   .fields {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
@@ -274,53 +267,5 @@
   .confirm {
     font-size: 0.8rem;
     color: var(--bad);
-  }
-
-  input,
-  textarea,
-  select {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    padding: 0.2rem 0.4rem;
-  }
-
-  textarea {
-    resize: vertical;
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.8rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--line);
-    padding: 0.1rem 0.55rem;
-    cursor: pointer;
-  }
-
-  button:hover:not(:disabled) {
-    border-color: var(--gold);
-  }
-
-  button:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  button.danger {
-    border-color: var(--bad);
-    color: var(--bad);
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
   }
 </style>

@@ -106,21 +106,21 @@
     <ResetClocks clocks={data.clocks} {nowMs} {timeZone} />
 
     {#if saveFailed}
-      <div class="alert" role="alert">
+      <div class="alert frame" role="alert">
         <span>{t('tracker.saveError')}</span>
         <button type="button" onclick={() => (saveFailed = false)}>{t('tracker.dismiss')}</button>
       </div>
     {/if}
 
     {#if data.notice}
-      <div class="notice" role="status">
+      <div class="notice frame" role="status">
         <span>{t('notice.removed', { titles: data.notice.removedTitles.join(', ') })}</span>
         <button type="button" onclick={dismiss}>{t('notice.dismiss')}</button>
       </div>
     {/if}
 
     <div class="toolbar">
-      <button type="button" aria-pressed={editing} onclick={toggleEditing}>
+      <button type="button" class="primary" aria-pressed={editing} onclick={toggleEditing}>
         {editing ? t('edit.done') : t('edit.open')}
       </button>
     </div>
@@ -139,7 +139,7 @@
     </div>
   </div>
 {:else if loadFailed}
-  <div class="alert" role="alert">
+  <div class="alert frame" role="alert">
     <span>{t('tracker.error')}</span>
     <button type="button" onclick={load}>{t('tracker.retry')}</button>
   </div>
@@ -183,8 +183,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    --frame-line: var(--gold);
     padding: 0.6rem 0.9rem;
-    border: 1px solid var(--gold);
     color: var(--gold);
   }
 
@@ -193,26 +193,12 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    --frame-line: var(--bad);
     padding: 0.6rem 0.9rem;
-    border: 1px solid var(--bad);
     color: var(--bad);
   }
 
   .muted {
     color: var(--muted);
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.85rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--gold);
-    padding: 0.2rem 0.8rem;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: color-mix(in srgb, var(--gold) 15%, transparent);
   }
 </style>
