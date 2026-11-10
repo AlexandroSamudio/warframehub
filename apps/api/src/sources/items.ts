@@ -218,6 +218,26 @@ export class ItemCatalog {
     }
   }
 
+  /**
+   * Fetches an item again ("Update recipe"), ignoring the day-long search cache.
+   * Returns the new recipe, or null if warframestat.us no longer lists it.
+   */
+  async refresh(uniqueName: string, name: string): Promise<ItemRecipe | null> {
+    const query = name.trim().toLowerCase().replace(/\s+/g, ' ');
+    try {
+      await this.fetchAndStore(query);
+    } catch (error) {
+      this.onError(query, error);
+      throw new HttpError(
+        503,
+        'items_unavailable',
+        "Can't reach warframestat.us to update this recipe. Try again when you're online.",
+      );
+    }
+    const { uniqueNames } = JSON.parse(this.row(`search:${query}`)!.payloadJson) as CachedSearch;
+    return uniqueNames.includes(uniqueName) ? this.get(uniqueName) : null;
+  }
+
   /** A cached recipe, or null if this item was never seen in a search. */
   get(uniqueName: string): ItemRecipe | null {
     const row = this.row(`item:${uniqueName}`);

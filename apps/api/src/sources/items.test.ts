@@ -1,20 +1,13 @@
 import { ApiError, ItemSearchResponse } from '@warframehub/shared';
-import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../app.js';
 import { openDatabase, type OpenDatabase } from '../db/client.js';
 import { initDatabase } from '../db/init.js';
 import { loadSeed } from '../domain/seed.js';
 import { ItemCatalog, normaliseItem, rankResults, toSearchResult } from './items.js';
+import { fakeItemsApi, itemsFixture } from './test-fixtures.js';
 import { UnexpectedDataError } from './warframestat.js';
-import type { FetchFn } from './worldstate.js';
 
-/** Real warframestat.us item search responses saved on 2026-11-10 at 17:22 UTC. */
-function itemsFixture(name: string): Record<string, unknown>[] {
-  return JSON.parse(
-    readFileSync(new URL(`./fixtures/items/${name}.json`, import.meta.url), 'utf8'),
-  ) as Record<string, unknown>[];
-}
 const byName = (file: string, name: string) => itemsFixture(file).find((i) => i.name === name)!;
 
 describe('normaliseItem', () => {
@@ -103,26 +96,6 @@ describe('rankResults', () => {
     expect(rankResults('nidus', results).map((r) => r.name)).toEqual(['Nidus', 'Nidus Prime']);
   });
 });
-
-/** A fake warframestat.us that serves the saved fixtures and can go offline. */
-function fakeItemsApi() {
-  const state = { online: true, calls: [] as string[], userAgents: [] as string[] };
-  const fetchFn: FetchFn = async (url, init) => {
-    const u = new URL(url);
-    state.calls.push(u.pathname);
-    state.userAgents.push(new Headers(init.headers).get('user-agent') ?? '');
-    if (!state.online) throw new TypeError('fetch failed');
-    const [, kind, , query] = u.pathname.split('/'); // /warframes/search/nidus
-    let body: unknown;
-    try {
-      body = itemsFixture(`${kind}_search_${decodeURIComponent(query!)}`);
-    } catch {
-      body = []; // no fixture for this query: upstream returns an empty list
-    }
-    return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
-  };
-  return { state, fetchFn };
-}
 
 describe('ItemCatalog', () => {
   let database: OpenDatabase;
