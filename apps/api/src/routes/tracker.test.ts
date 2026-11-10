@@ -226,13 +226,29 @@ describe('PUT /api/ticks and resets (fake clock)', () => {
     expect(PutTickResponse.parse(res.json()).periodKey).toBe('daily:2026-11-09');
   });
 
-  it.each([
-    ['an info row', 'weekly.notes.circuit', 0, 400, 'not_tickable'],
-    ['a slot past the end', 'daily.core.sp-incursions', 6, 400, 'bad_slot'],
-  ])('rejects %s', async (_what, seedId, slot, status, code) => {
-    const res = await tick(ctx, ctx.itemId(seedId), slot);
-    expect(res.statusCode).toBe(status);
-    expect(ApiError.parse(res.json()).error.code).toBe(code);
+  it.each([['a slot past the end', 'daily.core.sp-incursions', 6, 400, 'bad_slot']])(
+    'rejects %s',
+    async (_what, seedId, slot, status, code) => {
+      const res = await tick(ctx, ctx.itemId(seedId), slot);
+      expect(res.statusCode).toBe(status);
+      expect(ApiError.parse(res.json()).error.code).toBe(code);
+    },
+  );
+
+  it('rejects ticking an info row (a note has no checkbox)', async () => {
+    const created = ChecklistResponse.parse(
+      (
+        await ctx.app.inject({
+          method: 'POST',
+          url: '/api/items',
+          payload: { sectionId: ctx.sectionId('weekly.minor'), title: 'A note', kind: 'info' },
+        })
+      ).json(),
+    );
+    const note = created.sections.flatMap((x) => x.items).find((i) => i.title === 'A note')!;
+    const res = await tick(ctx, note.id);
+    expect(res.statusCode).toBe(400);
+    expect(ApiError.parse(res.json()).error.code).toBe('not_tickable');
   });
 
   it('rejects unknown items and malformed bodies with the standard error shape', async () => {

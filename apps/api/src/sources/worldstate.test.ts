@@ -51,9 +51,11 @@ describe('WorldstateService', () => {
     await service.ensureFresh();
     expect(upstream.state.calls.sort()).toEqual(
       [
+        'archimedeas',
         'archonHunt',
         'arbitration',
         'dailyDeals',
+        'duviriCycle',
         'events',
         'nightwave',
         'sortie',
@@ -65,7 +67,7 @@ describe('WorldstateService', () => {
 
     advance(60_000);
     await service.ensureFresh();
-    expect(upstream.state.calls).toHaveLength(8); // nothing expired yet
+    expect(upstream.state.calls).toHaveLength(10); // nothing expired yet
 
     const cards = service.cards();
     expect(cards.archonHunt).toMatchObject({
@@ -123,7 +125,7 @@ describe('WorldstateService', () => {
     await service.ensureFresh();
     upstream.state.calls = [];
     await service.refreshAll();
-    expect(upstream.state.calls).toHaveLength(8);
+    expect(upstream.state.calls).toHaveLength(10);
     advance(59_000);
     await expect(service.refreshAll()).rejects.toMatchObject({ statusCode: 429 });
     advance(1_000);

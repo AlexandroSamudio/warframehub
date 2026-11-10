@@ -1,5 +1,5 @@
 {
-  "seedVersion": 5,
+  "seedVersion": 6,
   "sections": [
     {
       "seedId": "daily.core",
@@ -323,24 +323,6 @@
           "seedId": "weekly.endgame.helminth",
           "title": "Helminth: apply 3 Invigorations",
           "kind": "check"
-        }
-      ]
-    },
-    {
-      "seedId": "weekly.notes",
-      "slug": "weekly-notes",
-      "title": "Weekly: Notes",
-      "period": "weekly",
-      "items": [
-        {
-          "seedId": "weekly.notes.circuit",
-          "title": "Circuit this week",
-          "kind": "info"
-        },
-        {
-          "seedId": "weekly.notes.archimedea",
-          "title": "Archimedea modifiers this week",
-          "kind": "info"
         }
       ]
     },

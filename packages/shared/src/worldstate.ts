@@ -105,6 +105,41 @@ export const Arbitration = z.object({
 export type Arbitration = z.infer<typeof Arbitration>;
 
 /**
+ * The Circuit's weekly choices (from `duviriCycle.choices`). Normal: 3 Warframes;
+ * Steel Path: 5 Incarnon Genesis weapons. Weekly pools reset Monday 00:00 UTC (wiki).
+ */
+export const Circuit = z.object({
+  normal: z.array(z.string()),
+  steelPath: z.array(z.string()),
+  /** The next weekly reset, when the choices change. */
+  expiry: Iso,
+});
+export type Circuit = z.infer<typeof Circuit>;
+
+export const ArchimedeaKind = z.enum(['deep', 'temporal']);
+export type ArchimedeaKind = z.infer<typeof ArchimedeaKind>;
+
+const NamedEffect = z.object({ name: z.string(), description: z.string() });
+
+export const ArchimedeaMission = z.object({
+  missionType: z.string(),
+  faction: z.string(),
+  deviation: NamedEffect.nullable(),
+  /** `elite`: listed by the API as a hard risk (Elite Archimedea). */
+  risks: z.array(NamedEffect.extend({ elite: z.boolean() })),
+});
+
+/** One weekly Archimedea: Deep (Sanctum, The Murmur) or Temporal (Höllvania, Scaldra + Techrot). */
+export const Archimedea = z.object({
+  kind: ArchimedeaKind,
+  activation: Iso,
+  expiry: Iso,
+  missions: z.array(ArchimedeaMission),
+  personalModifiers: z.array(NamedEffect),
+});
+export type Archimedea = z.infer<typeof Archimedea>;
+
+/**
  * Freshness badge (SPEC §8.1):
  * - `live`: the data's own activation/expiry covers now
  * - `estimated`: worked out by us (e.g. Teshin's item from the rotation order)
@@ -134,6 +169,9 @@ export const WorldstateCards = z.object({
   nightwave: card(Nightwave),
   events: card(z.array(WorldEvent)),
   arbitration: card(Arbitration),
+  /** Keyed by the upstream endpoint name, like the other cards. */
+  duviriCycle: card(Circuit),
+  archimedeas: card(z.array(Archimedea)),
 });
 export type WorldstateCards = z.infer<typeof WorldstateCards>;
 export type WorldstateEndpoint = keyof WorldstateCards;

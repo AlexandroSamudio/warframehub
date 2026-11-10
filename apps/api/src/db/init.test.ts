@@ -120,6 +120,84 @@ describe('seed v2 (facts confirmed in game, 10 Nov 2026)', () => {
   });
 });
 
+describe('seed v6: live Circuit/Archimedea cards replace the typed notes', () => {
+  it('upgrading hides the old notes with a notice, but keeps a note the user typed into', () => {
+    const database = openDatabase(':memory:');
+    const v5 = clone(shipped);
+    v5.seedVersion = shipped.seedVersion - 1;
+    v5.sections.push({
+      seedId: 'weekly.notes',
+      slug: 'weekly-notes',
+      title: 'Weekly: Notes',
+      period: 'weekly',
+      items: [
+        {
+          seedId: 'weekly.notes.circuit',
+          title: 'Circuit this week',
+          description: '',
+          verify: false,
+          kind: 'info',
+        },
+        {
+          seedId: 'weekly.notes.archimedea',
+          title: 'Archimedea modifiers this week',
+          description: '',
+          verify: false,
+          kind: 'info',
+        },
+      ],
+    });
+    const { userId } = initDatabase(database.db, v5, NOW);
+    database.db
+      .update(items)
+      .set({ description: 'Nidus / Octavia / Harrow', edited: true })
+      .where(eq(items.seedId, 'weekly.notes.circuit'))
+      .run();
+
+    const result = applySeed(database.db, userId, shipped, LATER);
+    // The section stays visible because it still holds the user's edited note.
+    expect(result.removedTitles).toEqual(['Archimedea modifiers this week']);
+    const row = (id: string) => database.db.select().from(items).where(eq(items.seedId, id)).get()!;
+    expect(row('weekly.notes.archimedea').hidden).toBe(true);
+    expect(row('weekly.notes.circuit')).toMatchObject({
+      hidden: false,
+      description: 'Nidus / Octavia / Harrow',
+    });
+    expect(
+      database.db.select().from(sections).where(eq(sections.seedId, 'weekly.notes')).get()!.hidden,
+    ).toBe(false);
+    database.close();
+  });
+
+  it('without user notes, the whole Notes section is hidden and listed in the notice', () => {
+    const database = openDatabase(':memory:');
+    const v5 = clone(shipped);
+    v5.seedVersion = shipped.seedVersion - 1;
+    v5.sections.push({
+      seedId: 'weekly.notes',
+      slug: 'weekly-notes',
+      title: 'Weekly: Notes',
+      period: 'weekly',
+      items: [
+        {
+          seedId: 'weekly.notes.circuit',
+          title: 'Circuit this week',
+          description: '',
+          verify: false,
+          kind: 'info',
+        },
+      ],
+    });
+    const { userId } = initDatabase(database.db, v5, NOW);
+    const result = applySeed(database.db, userId, shipped, LATER);
+    expect(result.removedTitles).toEqual(['Weekly: Notes', 'Circuit this week']);
+    expect(
+      database.db.select().from(sections).where(eq(sections.seedId, 'weekly.notes')).get()!.hidden,
+    ).toBe(true);
+    database.close();
+  });
+});
+
 describe('database init', () => {
   let database: OpenDatabase;
   beforeEach(() => {
