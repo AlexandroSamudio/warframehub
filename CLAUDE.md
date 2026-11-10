@@ -40,4 +40,10 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
 - Real user data lives outside the repo (`$XDG_DATA_HOME/warframehub/`). Never commit `.db` files.
 - No game-client hooks, no Overwolf, never ask for Warframe credentials. DE's profile endpoint (later) must be called rarely: excessive requests can block the user's IP from logging in.
 - All UI strings go through `t()` in `apps/web/src/lib/i18n/` (Spanish comes later).
+- **Every frontend/UI change or design goes through the Impeccable plugin** (`impeccable:impeccable` skill; docs: https://impeccable.style/docs/). Alex's rule, 10 Nov 2026.
+  - **Context:** `PRODUCT.md` (product truth) and `DESIGN.md` + `.impeccable/design.json` (the visual system, "The Orbiter Console") at the repo root. Follow them, refresh `DESIGN.md` after approved visual changes, and commit them with the code.
+  - **New screens:** `shape` a brief (`.impeccable/surfaces/`) that names an existing screen to follow (usually the Tracker). Build code-first; image generation isn't set up.
+  - **Edit UI files with the Edit/Write tools**, not shell scripts. The plugin's design hook only scans Edit/Write. Fix each finding, or record a deliberate exception with `hooks ignore-value … --reason …`.
+  - **Before a UI PR:** run `critique`, then `audit`, plus a page scan of the running build at desktop and phone widths (`impeccable detect --viewport 390x844 http://127.0.0.1:4399/`). List the results in the PR.
+  - Run Impeccable commands with `IMPECCABLE_NO_TELEMETRY=1`; whether to turn telemetry off permanently is Alex's choice.
 - Keep dependencies minimal; a new runtime dependency needs a reason in the PR.

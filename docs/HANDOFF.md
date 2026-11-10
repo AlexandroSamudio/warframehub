@@ -119,8 +119,8 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phases 0–5 merged.
-- **Branch `phase-6-launcher`:** Phase 6, the last v1 phase (SPEC §11):
+- `main`: v1 (Phases 0–6) merged, plus seeds v2–v6.
+- **Phase 6** (the last v1 phase, SPEC §11), now merged:
   - The API serves the built web app on the same port (`apps/api/src/routes/web.ts`, hand-written, path-traversal tested)
   - `POST /api/shutdown` (Quit), `POST /api/heartbeat`, `GET`/`PATCH /api/settings`; idle shutdown (`apps/api/src/idle.ts`)
   - Settings screen (time zone, data folder, version, idle time, Quit) behind a small hash router (`#/settings`)
@@ -133,4 +133,10 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 - **Seed v5 (10 Nov 2026):** Ergo Glast and Eleanor Nightingale reset on their own every 4 days at 00:00 UTC (new `four_day` period, anchor 2026-11-11 00:00 UTC, checked in game). They no longer need the Clear button, and the top bar has an "Every 4 days" clock.
 - **Seed v6 (10 Nov 2026):** live **Circuit** (normal Warframes, Steel Path Incarnons) and **Deep / Temporal Archimedea** cards (missions, deviation, risks with Elite flag, personal modifiers), from `duviriCycle` and `archimedeas`. They replace the typed notes, which are hidden with the usual notice. A removed default section now stays visible while it holds a user-edited or custom item.
 - **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id or with the Quit endpoint, so Alex's `npm run dev` on 4317/5173 is never touched.
-- **v1 is feature-complete** after this phase. Open items are in SPEC §12; later features are in §13.
+- **v1 is feature-complete.** All of SPEC §12 is answered; later features are in §13.
+- **Design process (Alex's rule, 10 Nov 2026):** every frontend/UI change goes through the Impeccable plugin (see `CLAUDE.md` Rules).
+  - Setup done on 10 Nov 2026: `PRODUCT.md`, and `DESIGN.md` ("The Orbiter Console", recording the existing theme) + `.impeccable/design.json`.
+  - The design hook comes with the plugin (`PostToolUse` on Edit/Write, plus `Stop`), so `hooks status` says "not wired" but it runs; don't run `hooks on`, which would add duplicates.
+  - First scans: the source scan found 23 advisory font sizes off the ramp. 6 were real steps that got documented; 2 one-offs were aligned (Settings title 1.35 → 1.2rem, editor section name 1.1 → 1.05rem). Page scans of the Tracker and Settings at 1280 and 390 px are now 0 findings, after adding `text-wrap: pretty` to body text.
+  - Known for the Goals UI critique: Unicode glyphs (↑ ↓ ⠿ ≈) stand in for drawn icons, and browser parts (selection, scrollbars) aren't themed.
+- **Next: goal planner.** Plan approved 10 Nov 2026: live warframestat.us item data with a cache, Warframes and weapons, parts plus shared resource amounts, shopping list, where to farm, Tracker card, mark as built. Delivered in 3 PRs: data, API, UI (the UI one through Impeccable).
