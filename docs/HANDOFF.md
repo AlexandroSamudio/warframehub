@@ -119,11 +119,11 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
 ## Status (10 Nov 2026)
 
-- `main`: Phases 0–3 merged (scaffold; periods, database, seed; tracker; live rotations).
-- **Branch `phase-4-edit-mode`:** Phase 4 (SPEC §11):
-  - Edit mode (toggle on the Tracker): rename, describe, change kind/slots/verify/link, hide, delete (custom only), add items and sections, change a section's reset period, reorder (drag, ↑/↓ buttons, "Move to section"), restore defaults with an inline confirm
-  - API: `apps/api/src/db/checklist.ts`, `apps/api/src/routes/checklist.ts`, schemas in `packages/shared/src/edit.ts`
-  - New `reordered` flag (migration `0001_reordered.sql`): moving a default keeps the user's order through seed updates without blocking text updates
-  - "Removed from the defaults" notice on the Tracker, with dismiss
-- **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, so Alex's `npm run dev` on 4317/5173 is never touched. Automated mouse drags don't start HTML5 drags in Chrome; drag-and-drop was checked by dispatching the drag events from a script.
-- **Next: Phase 5** (theme and polish).
+- `main`: Phases 0–4 merged (scaffold; periods, database, seed; tracker; live rotations; edit mode).
+- **Branch `phase-5-theme`:** Phase 5 (SPEC §11):
+  - Theme in `apps/web/src/app.css`: colour tokens (contrast measured: text ≥ 5.5:1, control borders ≥ 3:1), `.frame` panels with cut corners, shared button/input/badge styles, focus ring, reduced-motion guard
+  - Fonts: Rajdhani (headings, labels) and Inter (body, and all changing numbers, since Rajdhani has no tabular digits), bundled via `@fontsource`
+  - Layout checked at 360 px, 768 px and desktop: no sideways scrolling; clocks two per row on phones
+  - Keyboard: visible focus everywhere, Tab order follows the page, Space ticks items and counter slots
+- **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id, so Alex's `npm run dev` on 4317/5173 is never touched. Narrow widths are checked by loading the app in iframes of the target width, because the browser window can't be resized from automation.
+- **Next: Phase 6** (launcher, Quit button, idle shutdown).

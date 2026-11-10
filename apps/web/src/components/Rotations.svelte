@@ -78,7 +78,7 @@
 <aside class="rotations" aria-label={t('rotations.label')}>
   <div class="bar">
     <h2>{t('rotations.label')}</h2>
-    <button type="button" onclick={refresh} disabled={refreshing}>
+    <button type="button" class="teal" onclick={refresh} disabled={refreshing}>
       {refreshing ? t('rotations.refreshing') : t('rotations.refresh')}
     </button>
   </div>
@@ -93,7 +93,7 @@
         <p class="lead">
           {a.boss}
           {#if a.shard}
-            <span class="shard {a.shard.toLowerCase()}">
+            <span class="badge shard {a.shard.toLowerCase()}">
               {t('archon.shard', { shard: t(`shard.${a.shard}`) })}
             </span>
           {/if}
@@ -231,29 +231,10 @@
 
   h2 {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     color: var(--muted);
-  }
-
-  button {
-    font: inherit;
-    font-size: 0.8rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--teal);
-    padding: 0.15rem 0.7rem;
-    cursor: pointer;
-  }
-
-  button:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--teal) 15%, transparent);
-  }
-
-  button:disabled {
-    opacity: 0.6;
-    cursor: default;
   }
 
   .notice {
@@ -277,12 +258,13 @@
   }
 
   .when {
-    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
 
   .group {
-    font-size: 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--muted);
@@ -303,10 +285,7 @@
 
   .shard {
     margin-left: 0.4rem;
-    font-size: 0.75rem;
-    font-weight: 400;
-    padding: 0 0.35rem;
-    border: 1px solid currentColor;
+    vertical-align: 0.1em;
   }
 
   .shard.crimson {

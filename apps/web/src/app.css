@@ -1,23 +1,30 @@
 /*
- * Base theme tokens. The full Warframe-inspired theme arrives in Phase 5 (SPEC §8.2);
- * these are the starting values everything else is built from.
+ * WarframeHub theme (SPEC §8.2): dark void, Orokin gold, cool teal.
+ * Original shapes only, no game art. Contrast checked: every text colour is at least
+ * 5.5:1 on every background, and control borders (--line-strong) at least 3:1.
  */
 :root {
-  --bg: #0b0e14;
-  --surface: #131823;
-  --line: #263042;
-  --fg: #e4e8ef;
-  --muted: #8e99ab;
-  --gold: #c9a54b;
-  --teal: #5fc4d4;
-  --ok: #6cc391;
-  --bad: #e07a7a;
-  --shard-crimson: #e0605a;
-  --shard-amber: #e3a646;
-  --shard-azure: #5aa7e8;
+  --bg: #07090d;
+  --surface: #10151e;
+  --surface-2: #171e2a;
+  --line: #2c3749;
+  --line-strong: #5a6b88;
+  --fg: #e6e9ef;
+  --muted: #9ba7ba;
+  --gold: #d6b465;
+  --teal: #66cbd9;
+  --ok: #78cc9d;
+  --bad: #ec8a8a;
+  --shard-crimson: #ec6e66;
+  --shard-amber: #e8ac4c;
+  --shard-azure: #68b2ee;
 
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* Fonts are bundled with the app (no requests to font services). */
+  --font-display: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --cut: 12px;
+  --radius: 0;
 
   color-scheme: dark;
 }
@@ -31,14 +38,248 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background:
+    radial-gradient(
+      60rem 30rem at 85% -10%,
+      color-mix(in srgb, var(--teal) 7%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50rem 25rem at -10% 0%,
+      color-mix(in srgb, var(--gold) 6%, transparent),
+      transparent 70%
+    ),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--fg);
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.5;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/*
+ * Numbers that change (countdowns, counts) line up instead of jumping around.
+ * Rajdhani has no tabular digits (measured: digit widths differ by ~60%), so these use
+ * Inter, whose tabular digits are all the same width.
+ */
+.num {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Small uppercase label used for clock names, badges and group titles. */
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* ---- Frame: a panel with two cut corners and a 1px edge that follows the cut ---- */
+
+.frame {
+  --frame-line: var(--line);
+  --frame-bg: var(--surface);
+  position: relative;
+  isolation: isolate;
+  background: var(--frame-line);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
+.frame::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  background: var(--frame-bg);
+  clip-path: inherit;
+}
+
+/* Gold tick on the top-left corner: a hint of Orokin trim. */
+.frame.accent::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5rem;
+  height: 2px;
+  background: var(--gold);
+}
+
+.frame.accent-teal::after {
+  background: var(--teal);
+}
+
+/* ---- Controls ---- */
+
+button,
+.btn {
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  padding: 0.2rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.primary {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+button.teal {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+button.teal:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
+}
+
+button.danger {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+button.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bad) 12%, transparent);
+}
+
+/* Square icon buttons (↑ ↓) */
+button.icon {
+  padding: 0.1rem 0.5rem;
+  letter-spacing: 0;
+}
+
+input:not([type='checkbox'], [type='radio']),
+select,
+textarea {
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--fg);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  padding: 0.25rem 0.5rem;
+  min-width: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+/* ---- Badges ---- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 0.4rem;
+  border: 1px solid currentColor;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.badge.gold {
+  color: var(--gold);
+}
+
+.badge.teal {
+  color: var(--teal);
+}
+
+.badge.ok {
+  color: var(--ok);
+}
+
+.badge.bad {
+  color: var(--bad);
+}
+
+/* ---- Focus and motion ---- */
+
 :focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: 0;
+  border-color: var(--teal);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  input,
+  select,
+  textarea {
+    transition:
+      border-color 120ms ease,
+      background-color 120ms ease;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

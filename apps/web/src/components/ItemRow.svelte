@@ -29,14 +29,14 @@
       <input type="checkbox" checked={item.checked.includes(0)} onchange={(e) => change(0, e)} />
       <span class="title">{item.title}</span>
       {#if item.verify}
-        <span class="verify" title={t('item.verifyHint')}>{t('item.verify')}</span>
+        <span class="badge gold" title={t('item.verifyHint')}>{t('item.verify')}</span>
       {/if}
     </label>
   {:else}
     <div class="main">
       <span class="title">{item.title}</span>
       {#if item.verify}
-        <span class="verify" title={t('item.verifyHint')}>{t('item.verify')}</span>
+        <span class="badge gold" title={t('item.verifyHint')}>{t('item.verify')}</span>
       {/if}
     </div>
   {/if}
@@ -101,15 +101,6 @@
     color: var(--muted);
   }
 
-  .verify {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--gold);
-    border: 1px solid currentColor;
-    padding: 0 0.3rem;
-  }
-
   .slots {
     display: flex;
     flex-wrap: wrap;
@@ -122,9 +113,11 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.1rem 0.45rem 0.1rem 0.25rem;
-    border: 1px solid var(--line);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
     font-variant-numeric: tabular-nums;
     cursor: pointer;
   }
@@ -132,13 +125,16 @@
   .slot:has(input:checked) {
     border-color: var(--teal);
     color: var(--teal);
+    background: color-mix(in srgb, var(--teal) 10%, var(--surface-2));
   }
 
-  input[type='checkbox'] {
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
-    accent-color: var(--teal);
-    cursor: pointer;
+  .slot:has(input:focus-visible) {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+  }
+
+  .info .title {
+    color: var(--muted);
+    font-style: italic;
   }
 </style>
