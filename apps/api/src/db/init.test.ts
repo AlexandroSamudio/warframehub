@@ -31,9 +31,6 @@ describe('shipped seed (apps/api/seed/checklist.json)', () => {
       [
         // Still to confirm in game (SPEC §12). The rest were confirmed on 10 Nov 2026.
         'daily.quick.todays-special',
-        'eight-hour.grandmother',
-        'eight-hour.loid',
-        'eight-hour.yonta',
       ].sort(),
     );
   });

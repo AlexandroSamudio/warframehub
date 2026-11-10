@@ -19,6 +19,13 @@ const DAY_MS = 24 * HOUR_MS;
  */
 export const SORTIE_FALLBACK_HOUR_UTC = 16;
 
+/**
+ * The 8-hour vendors (Loid, Grandmother, Archimedean Yonta) refresh at 04:00, 12:00 and
+ * 20:00 UTC (01:00, 09:00, 17:00 GMT-3). Checked in game on 10 Nov 2026; the wiki confirms
+ * the 8-hour cycle but gives no times.
+ */
+export const EIGHT_HOUR_FIRST_UTC_HOUR = 4;
+
 /** Live expiries further away than this are treated as bad data. A Sortie lasts about a day. */
 const SORTIE_MAX_AHEAD_MS = 25 * HOUR_MS;
 
@@ -112,10 +119,15 @@ function startOfUtcWeek(d: Date): Date {
   return new Date(startOfUtcDay(d).getTime() - daysSinceMonday * DAY_MS);
 }
 
-/** 00:00, 08:00 or 16:00 UTC, whichever most recently started. */
+/**
+ * 04:00, 12:00 or 20:00 UTC, whichever most recently started. Between 00:00 and 04:00 UTC
+ * that is 20:00 of the previous UTC day, so the key carries that date.
+ */
 function startOfEightHourBlock(d: Date): Date {
-  const blockHour = Math.floor(d.getUTCHours() / 8) * 8;
-  return new Date(startOfUtcDay(d).getTime() + blockHour * HOUR_MS);
+  const offset = EIGHT_HOUR_FIRST_UTC_HOUR * HOUR_MS;
+  const shifted = new Date(d.getTime() - offset);
+  const blockHour = Math.floor(shifted.getUTCHours() / 8) * 8;
+  return new Date(startOfUtcDay(shifted).getTime() + blockHour * HOUR_MS + offset);
 }
 
 function isoDate(d: Date): string {

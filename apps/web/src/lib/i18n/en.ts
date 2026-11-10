@@ -92,7 +92,7 @@ export const en = {
   'edit.period': 'Resets',
   'period.daily': 'Daily (00:00 UTC)',
   'period.weekly': 'Weekly (Monday 00:00 UTC)',
-  'period.eight_hour': 'Every 8 hours',
+  'period.eight_hour': 'Every 8 hours (04:00, 12:00, 20:00 UTC)',
   'period.sortie': 'With the Sortie',
   'period.baro': 'Each Baro visit',
   'period.manual': 'When I press Clear',
