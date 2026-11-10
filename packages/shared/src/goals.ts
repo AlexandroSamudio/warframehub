@@ -83,8 +83,13 @@ export const GoalPart = RecipeComponent.extend({
 export type GoalPart = z.infer<typeof GoalPart>;
 
 export const GoalResource = RecipeComponent.extend({
-  /** The user's shared stock of this resource. */
+  /**
+   * This goal's share of the stock. Active goals get the shared stock in goal order
+   * (the user's priority), so two goals never count the same Orokin Cells.
+   */
   have: z.int().min(0),
+  /** The whole shared stock of this resource (what the amount field edits). */
+  stock: z.int().min(0),
 });
 export type GoalResource = z.infer<typeof GoalResource>;
 

@@ -2,7 +2,9 @@ import {
   ApiError,
   ChecklistResponse,
   ClearSectionResponse,
+  GoalsResponse,
   HealthResponse,
+  ItemSearchResponse,
   PutTickResponse,
   SettingsResponse,
   TrackerResponse,
@@ -139,4 +141,54 @@ export async function heartbeat(): Promise<void> {
 /** Quit button: stops the server. */
 export async function shutdown(): Promise<void> {
   await request({ parse: () => undefined }, '/api/shutdown', json('POST'));
+}
+
+// ---- goal planner -----------------------------------------------------------
+
+export function searchItems(q: string, signal?: AbortSignal): Promise<ItemSearchResponse> {
+  return request(ItemSearchResponse, `/api/goals/search?q=${encodeURIComponent(q)}`, { signal });
+}
+
+export function getGoals(): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/goals');
+}
+
+export function addGoal(uniqueName: string): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/goals', json('POST', { uniqueName }));
+}
+
+export function setPartOwned(
+  goalId: number,
+  componentKey: string,
+  owned: number,
+): Promise<GoalsResponse> {
+  return request(
+    GoalsResponse,
+    `/api/goals/${goalId}/parts`,
+    json('PATCH', { componentKey, owned }),
+  );
+}
+
+export function setStock(key: string, amount: number): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/resources', json('PUT', { key, amount }));
+}
+
+export function markBuilt(goalId: number): Promise<GoalsResponse> {
+  return request(GoalsResponse, `/api/goals/${goalId}/built`, json('POST'));
+}
+
+export function reactivateGoal(goalId: number): Promise<GoalsResponse> {
+  return request(GoalsResponse, `/api/goals/${goalId}/reactivate`, json('POST'));
+}
+
+export function deleteGoal(goalId: number): Promise<GoalsResponse> {
+  return request(GoalsResponse, `/api/goals/${goalId}`, json('DELETE'));
+}
+
+export function reorderGoals(goalIds: number[]): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/goals/reorder', json('POST', { goalIds }));
+}
+
+export function refreshGoal(goalId: number): Promise<GoalsResponse> {
+  return request(GoalsResponse, `/api/goals/${goalId}/refresh`, json('POST'));
 }

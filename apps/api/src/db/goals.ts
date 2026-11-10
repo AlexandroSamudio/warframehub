@@ -6,7 +6,7 @@ import {
   type UpdateGoalPartRequest,
 } from '@warframehub/shared';
 import { and, asc, eq, inArray, max } from 'drizzle-orm';
-import { buildGoal, shoppingList, type GoalInput, type Stock } from '../domain/goals.js';
+import { buildGoals, shoppingList, type GoalInput, type Stock } from '../domain/goals.js';
 import { HttpError } from '../http-error.js';
 import type { ItemCatalog } from '../sources/items.js';
 import type { Db } from './client.js';
@@ -46,18 +46,17 @@ export function loadGoals(db: Db, userId: number): GoalsResponse {
     }
   }
   const stock = stockMap(db, userId);
-  const all = rows.map((r) => {
-    const input: GoalInput = {
-      id: r.id,
-      status: r.status,
-      recipe: parseRecipe(r.recipeJson),
-      owned: ownedByGoal.get(r.id) ?? new Map(),
-      createdAt: r.createdAt,
-      builtAt: r.builtAt,
-      recipeFetchedAt: r.recipeFetchedAt,
-    };
-    return buildGoal(input, stock);
-  });
+  // Rows are in goal order, so the shared stock goes to the higher goal first.
+  const inputs: GoalInput[] = rows.map((r) => ({
+    id: r.id,
+    status: r.status,
+    recipe: parseRecipe(r.recipeJson),
+    owned: ownedByGoal.get(r.id) ?? new Map(),
+    createdAt: r.createdAt,
+    builtAt: r.builtAt,
+    recipeFetchedAt: r.recipeFetchedAt,
+  }));
+  const all = buildGoals(inputs, stock);
 
   const active = all.filter((g) => g.status === 'active');
   // Built goals: most recently built first.

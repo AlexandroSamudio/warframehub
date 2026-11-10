@@ -140,5 +140,15 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
   - First scans: the source scan found 23 advisory font sizes off the ramp. 6 were real steps that got documented; 2 one-offs were aligned (Settings title 1.35 → 1.2rem, editor section name 1.1 → 1.05rem). Page scans of the Tracker and Settings at 1280 and 390 px are now 0 findings, after adding `text-wrap: pretty` to body text.
   - Known for the Goals UI critique: Unicode glyphs (↑ ↓ ⠿ ≈) stand in for drawn icons, and browser parts (selection, scrollbars) aren't themed.
 - **Next: goal planner.** Plan approved 10 Nov 2026: live warframestat.us item data with a cache, Warframes and weapons, parts plus shared resource amounts, shopping list, where to farm, Tracker card, mark as built. Delivered in 3 PRs: data, API, UI (the UI one through Impeccable).
-  - **PR 1, data** (branch `goals-data`): `apps/api/src/sources/items.ts` (normaliser + `ItemCatalog` with the `item_cache` table, migration `0002`), `GET /api/goals/search?q=`, schemas in `packages/shared/src/goals.ts`, real responses in `sources/fixtures/items/`. Live check: "nidus" 0.38 s, repeated from the cache in 1.5 ms.
+  - **PR 1, data** (branch `goals-data`): `apps/api/src/sources/items.ts` (normaliser + `ItemCatalog` with the `item_cache` table, migration `0002`), `GET /api/goals/search?q=`, schemas in `packages/shared/src/goals.ts`, real responses in `sources/fixtures/items/`. Live check: "nidus" 0.38 s, repeated from the cache in 1.5 ms. Merged (#14).
+  - **PR 2, API** (#15, merged): tables `goals`, `goal_parts`, `resource_stock` (migration `0003`), `domain/goals.ts`, and the goal routes.
+  - **PR 3, UI** (branch `goals-ui`): `#/goals` (search, What to farm next, folded goal cards, Completed) and the Tracker goals card. It went through Impeccable:
+    - `shape`: brief in `.impeccable/surfaces/goals.md`;
+    - `critique`: dual-agent, 26/40; Alex chose the fixes;
+    - after the fixes: shared stock split in goal order on the server, Farm now / Vaulted split, relic rows, field feedback, and the small fixes;
+    - `audit`: 18/20, all detector scans 0.
+
+    SPEC §13.1 describes the feature.
+
+  - Impeccable 4.8.2 has no `audit-storage` command (its own reference mentions one), so audit reports go in the PR description.
 - **Impeccable telemetry:** turned off by Alex on 10 Nov 2026 (`impeccable telemetry off`).

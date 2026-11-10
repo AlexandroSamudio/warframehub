@@ -302,6 +302,36 @@ A teal-ticked frame:
 - the body (lead line in bold, details in Dim Readout, long descriptions folded into `<details>`);
 - a footer with the fetch age ("Fetched 3m ago"), or "Offline: showing the copy fetched…" in gold when stale.
 
+### Farm Queue (signature, Goals screen)
+
+A gold-ticked frame titled "What to farm next", with three groups under Label headings:
+
+- **Farm now:** best chance first. The part name is bold, followed by "for Nidus Prime". A Readout White line names the best source (location + chance, or "Best: Axi N12 · up to 10% (Radiant)").
+- **Vaulted: trade or wait:** one explanatory line for the whole group, then compact rows with a single line of relic names.
+- **Resources:** the name, "for X and Y", the missing amount in gold, and an amount field on the right.
+
+### Relic Row
+
+One row per Void relic, with its four refinement chances in tabular digits: "Axi N12 2% / 4% / 6% / 10%". A small legend above reads Intact / Exceptional / Flawless / Radiant. No rarity label (the upstream one flips between refinements). Missions and enemies keep "location · chance".
+
+### Goal Card
+
+A folded frame (10px cut). The header row has:
+
+- an `h3` button with a chevron icon and the name in gold;
+- badges (prime, vaulted, ready to build in green);
+- a 4px progress bar and "x of y".
+
+When open, it gets the gold corner tick and 32px ↑/↓ icon buttons. Parts are checkboxes (or a count field). Resources show this goal's **share** in green when covered and in gold when short ("7 of 10 for this goal · 3 short"), next to the shared amount field. A ready goal's seam turns green.
+
+### Amount Field
+
+A right-aligned tabular input with thousands separators. Under it, a reserved message line: rose "Whole numbers only" (`aria-invalid`, `aria-describedby`), or green "Saved" for 2 seconds (polite live region). Leaving an invalid entry restores the saved amount.
+
+### Icons
+
+Drawn inline SVG only (`Icon.svelte`): 16px box, 1.5px stroke, square caps and miter joins, `currentColor`, decorative (`aria-hidden`); the control carries the label. Never Unicode glyphs as icons.
+
 ## Do's and Don'ts
 
 ### Do:

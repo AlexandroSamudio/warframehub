@@ -387,9 +387,38 @@ Each phase ends with something you can run and check.
 
 ---
 
-## 13. After v1 (not designed in detail yet)
+## 13. After v1
 
-- **Goal planner:** "build a Warframe/weapon" goals using `@wfcd/items` (components, build costs, drop locations) and `warframe-drop-data` (mission rotations, relics, bounties), with manual entry for parts and resources you own.
+### 13.1 Goal planner (built, 10 Nov 2026)
+
+"Build this Warframe or weapon." Screen `#/goals`, plus a goals card on the Tracker.
+
+- **Scope:** Warframes and Primary / Secondary / Melee weapons, Primes included (Alex's choice).
+- **Data:** warframestat.us item search (§7), cached in `item_cache`. Each goal keeps its own copy of the recipe (`goals.recipe_json`), so it works offline. "Update recipe" fetches it again and keeps part counts.
+- **Ownership:**
+  - **Parts** are ticked per goal (`goal_parts`).
+  - **Resources** are one shared stock (`resource_stock`, "I have 12 Orokin Cells"). It is **split in goal order**: the higher goal takes what it needs first, and the next gets what's left. Each card shows its share ("7 of 10 for this goal · 3 short"), and progress and "ready to build" use it. ↑/↓ sets the priority.
+- **What to farm next** (the first thing on the screen):
+  - **Farm now:** missing parts of non-vaulted items, best drop chance first;
+  - **Vaulted: trade or wait:** relics that no longer drop;
+  - **Resources:** total still short across active goals, with an amount field.
+
+  Relic drops show one row per relic with Intact / Exceptional / Flawless / Radiant chances.
+
+- **Mark as built** moves a goal to Completed, from where it can be brought back. Resource amounts are not changed (update them yourself). Remove deletes the goal and its ticks, not the stock.
+- **Known gaps, shown in the UI:** no sub-recipes (the resources to craft a Chassis); "Not in drop tables (quest, market or vendor)" for parts with no drop data.
+- **API:**
+  - `GET /api/goals/search?q=`
+  - `GET` / `POST /api/goals`
+  - `PATCH /api/goals/:id/parts`
+  - `PUT /api/resources`
+  - `POST /api/goals/:id/built`, `/reactivate`, `/refresh`
+  - `DELETE /api/goals/:id`
+  - `POST /api/goals/reorder`
+- **Design:** surface brief `.impeccable/surfaces/goals.md`; components in `DESIGN.md` (Farm Queue, Relic Row, Goal Card, Amount Field, Icons).
+
+### 13.2 Later (not designed in detail yet)
+
 - **Circuit points tracker** and **Search Pulse planner**.
 - **Profile import** from DE's public profile endpoint, by account ID (mastery, star chart, syndicates). Read-only and fetched rarely: too many requests can get your IP temporarily blocked from logging into the game.
 - **Second user and VPS hosting:** login, per-user data (already modelled), HTTPS.
