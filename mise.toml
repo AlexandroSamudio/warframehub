@@ -1,0 +1,5 @@
+# Pins the Node version for everyone working on this repo.
+# EndeavourOS: `sudo pacman -S mise` · Bazzite: `brew install mise`
+# then run `mise install` in this folder.
+[tools]
+node = "24"

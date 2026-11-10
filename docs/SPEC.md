@@ -38,12 +38,12 @@ WarframeHub is a personal Warframe companion that runs on your own computer. The
 
 ## 2. Users and environments
 
-| | Now | Later (designed for, not built) |
-|---|---|---|
-| Users | One (the owner) | Owner + a friend, each with their own ticks |
-| Runs on | **Bazzite** (Fedora Atomic), during play | A VPS |
-| Developed on | **EndeavourOS** (Arch), VS Code + Claude Code CLI | same |
-| Access | `http://127.0.0.1:<port>` only | public URL with login |
+|              | Now                                               | Later (designed for, not built)             |
+| ------------ | ------------------------------------------------- | ------------------------------------------- |
+| Users        | One (the owner)                                   | Owner + a friend, each with their own ticks |
+| Runs on      | **Bazzite** (Fedora Atomic), during play          | A VPS                                       |
+| Developed on | **EndeavourOS** (Arch), VS Code + Claude Code CLI | same                                        |
+| Access       | `http://127.0.0.1:<port>` only                    | public URL with login                       |
 
 Design consequences:
 
@@ -90,22 +90,22 @@ warframehub/
 
 ### 3.3 Toolset
 
-| Area | Choice | Notes |
-|---|---|---|
-| Runtime | **Node.js 24 LTS** | pinned with **mise** (`mise.toml`), same on both OSes |
-| Language | **TypeScript**, `strict` | shared `tsconfig.base.json` |
-| Package manager | **npm** with workspaces | |
-| API | **Fastify** | JSON-schema validation, OpenAPI docs at `/api/docs` in dev |
-| Validation / shared types | **Zod** in `packages/shared` | one source of truth for request/response shapes |
-| Database | **SQLite** via **better-sqlite3** | one file in the data directory |
-| ORM / migrations | **Drizzle ORM + drizzle-kit** | migrations run automatically at startup |
-| Frontend | **Svelte 5 + Vite** (SPA) | a small client-side router |
-| Styling | **Plain CSS + CSS custom properties** | Warframe-inspired theme, no CSS framework |
-| Tests | **Vitest** (both apps) | reset/period logic gets the most coverage |
-| Lint / format | **ESLint + Prettier** | `eslint-plugin-svelte`, `prettier-plugin-svelte` |
-| CI | **GitHub Actions** | install, lint, typecheck, test, build on every push and PR |
-| Editor | VS Code | recommended extensions in `.vscode/extensions.json` |
-| License | **MIT** | |
+| Area                      | Choice                                | Notes                                                                                                   |
+| ------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Runtime                   | **Node.js 24 LTS**                    | pinned with **mise** (`mise.toml`), same on both OSes                                                   |
+| Language                  | **TypeScript 6.0**, `strict`          | shared `tsconfig.base.json`. TypeScript 7 waits until `typescript-eslint` and `svelte-check` support it |
+| Package manager           | **npm** with workspaces               |                                                                                                         |
+| API                       | **Fastify**                           | JSON-schema validation, OpenAPI docs at `/api/docs` in dev                                              |
+| Validation / shared types | **Zod** in `packages/shared`          | one source of truth for request/response shapes                                                         |
+| Database                  | **SQLite** via **better-sqlite3**     | one file in the data directory                                                                          |
+| ORM / migrations          | **Drizzle ORM + drizzle-kit**         | migrations run automatically at startup                                                                 |
+| Frontend                  | **Svelte 5 + Vite** (SPA)             | a small client-side router                                                                              |
+| Styling                   | **Plain CSS + CSS custom properties** | Warframe-inspired theme, no CSS framework                                                               |
+| Tests                     | **Vitest** (both apps)                | reset/period logic gets the most coverage                                                               |
+| Lint / format             | **ESLint + Prettier**                 | `eslint-plugin-svelte`, `prettier-plugin-svelte`                                                        |
+| CI                        | **GitHub Actions**                    | install, lint, typecheck, test, build on every push and PR                                              |
+| Editor                    | VS Code                               | recommended extensions in `.vscode/extensions.json`                                                     |
+| License                   | **MIT**                               |                                                                                                         |
 
 ---
 
@@ -115,14 +115,14 @@ All period logic lives in `apps/api/src/domain/periods.ts` as **pure functions o
 
 ### 4.1 Period types
 
-| Period | Resets at (UTC) | Local (GMT-3) | Source of truth |
-|---|---|---|---|
-| `daily` | every day 00:00 | 21:00 | fixed rule |
-| `weekly` | Monday 00:00 | Sunday 21:00 | fixed rule |
-| `eight_hour` | 00:00, 08:00, 16:00 | 21:00, 05:00, 13:00 | fixed rule ⚠️ verify (see §12) |
-| `sortie` | when the current Sortie expires (≈ 16:00 or 17:00 depending on season) | ≈ 13:00 / 14:00 | **live API `sortie.expiry`**; fallback 16:00 UTC |
-| `baro` | per Baro visit (arrival → departure, every 2 weeks) | — | **live API `voidTrader.activation`** |
-| `manual` | only when the user presses **Clear** | — | user |
+| Period       | Resets at (UTC)                                                        | Local (GMT-3)       | Source of truth                                  |
+| ------------ | ---------------------------------------------------------------------- | ------------------- | ------------------------------------------------ |
+| `daily`      | every day 00:00                                                        | 21:00               | fixed rule                                       |
+| `weekly`     | Monday 00:00                                                           | Sunday 21:00        | fixed rule                                       |
+| `eight_hour` | 00:00, 08:00, 16:00                                                    | 21:00, 05:00, 13:00 | fixed rule ⚠️ verify (see §12)                   |
+| `sortie`     | when the current Sortie expires (≈ 16:00 or 17:00 depending on season) | ≈ 13:00 / 14:00     | **live API `sortie.expiry`**; fallback 16:00 UTC |
+| `baro`       | per Baro visit (arrival → departure, every 2 weeks)                    | —                   | **live API `voidTrader.activation`**             |
+| `manual`     | only when the user presses **Clear**                                   | —                   | user                                             |
 
 Ergo Glast and Eleanor Nightingale (every 4 days) are `manual` in v1, because we don't know the anchor date of their 4-day cycle. If we find a reliable anchor, they become a fixed `four_day` period.
 
@@ -198,22 +198,22 @@ An item's period comes from its **section**. An item's own `period` is not store
 
 ## 6. API (REST, JSON, all under `/api`)
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/api/health` | liveness, app version, data dir |
-| GET | `/api/tracker` | **everything the Tracker screen needs in one call**: sections, items, current period keys, ticks for those keys, next reset times, server time |
-| PUT | `/api/ticks` | set or unset one tick `{itemId, slot, checked}`; the server computes the period key |
-| POST | `/api/sections/:id/clear` | clear a `manual` section (increments its counter) |
-| GET/POST | `/api/sections` | list / create section |
-| PATCH/DELETE | `/api/sections/:id` | edit, hide, delete (custom only) |
-| POST | `/api/items` | create item |
-| PATCH/DELETE | `/api/items/:id` | edit, hide, delete (custom) |
-| POST | `/api/items/reorder` | new order within or across sections |
-| POST | `/api/checklist/restore-defaults` | unhide and reset default items (asks first in the UI) |
-| GET | `/api/worldstate` | cached live rotations, normalised (see §7), with `fetchedAt` and staleness |
-| POST | `/api/worldstate/refresh` | force a refresh (rate-limited) |
-| GET/PATCH | `/api/settings` | display time zone, etc. |
-| POST | `/api/shutdown` | Quit button: stops the server cleanly |
+| Method       | Path                              | Purpose                                                                                                                                        |
+| ------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET          | `/api/health`                     | liveness, app version, data dir                                                                                                                |
+| GET          | `/api/tracker`                    | **everything the Tracker screen needs in one call**: sections, items, current period keys, ticks for those keys, next reset times, server time |
+| PUT          | `/api/ticks`                      | set or unset one tick `{itemId, slot, checked}`; the server computes the period key                                                            |
+| POST         | `/api/sections/:id/clear`         | clear a `manual` section (increments its counter)                                                                                              |
+| GET/POST     | `/api/sections`                   | list / create section                                                                                                                          |
+| PATCH/DELETE | `/api/sections/:id`               | edit, hide, delete (custom only)                                                                                                               |
+| POST         | `/api/items`                      | create item                                                                                                                                    |
+| PATCH/DELETE | `/api/items/:id`                  | edit, hide, delete (custom)                                                                                                                    |
+| POST         | `/api/items/reorder`              | new order within or across sections                                                                                                            |
+| POST         | `/api/checklist/restore-defaults` | unhide and reset default items (asks first in the UI)                                                                                          |
+| GET          | `/api/worldstate`                 | cached live rotations, normalised (see §7), with `fetchedAt` and staleness                                                                     |
+| POST         | `/api/worldstate/refresh`         | force a refresh (rate-limited)                                                                                                                 |
+| GET/PATCH    | `/api/settings`                   | display time zone, etc.                                                                                                                        |
+| POST         | `/api/shutdown`                   | Quit button: stops the server cleanly                                                                                                          |
 
 Rules:
 
@@ -331,15 +331,15 @@ npm run lint && npm run typecheck
 
 Each phase ends with something you can run and check.
 
-| Phase | Delivers | Done when |
-|---|---|---|
-| **0. Scaffold** | workspaces, mise, TypeScript, ESLint/Prettier, Vitest, CI, empty Fastify + Svelte apps that talk to each other | `npm run dev` shows a page that displays `/api/health`; CI is green |
-| **1. Periods & data** | `periods.ts` with tests, Drizzle schema + migrations, seed import | all period tests pass; first start creates the database with the default checklist |
-| **2. Tracker (read + tick)** | `/api/tracker`, `/api/ticks`, the Tracker screen with reset clocks and checklist | ticking survives restart and clears at the right reset (tested with a fake clock) |
-| **3. Live rotations** | warframestat.us client, cache, normaliser, rotations column | rotations show with freshness badges; with the network off, the cached copy shows as stale |
-| **4. Edit mode** | create, edit, hide, delete, reorder, restore defaults | default-item edits survive a seed update (tested) |
-| **5. Theme & polish** | Warframe-inspired theme, responsive layout, keyboard and focus states | looks right at desktop and narrow widths |
-| **6. Launcher** | click-to-start `.desktop` launcher, Quit button, idle shutdown | one click on Bazzite opens a working tracker; Quit stops it |
+| Phase                        | Delivers                                                                                                       | Done when                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **0. Scaffold**              | workspaces, mise, TypeScript, ESLint/Prettier, Vitest, CI, empty Fastify + Svelte apps that talk to each other | `npm run dev` shows a page that displays `/api/health`; CI is green                        |
+| **1. Periods & data**        | `periods.ts` with tests, Drizzle schema + migrations, seed import                                              | all period tests pass; first start creates the database with the default checklist         |
+| **2. Tracker (read + tick)** | `/api/tracker`, `/api/ticks`, the Tracker screen with reset clocks and checklist                               | ticking survives restart and clears at the right reset (tested with a fake clock)          |
+| **3. Live rotations**        | warframestat.us client, cache, normaliser, rotations column                                                    | rotations show with freshness badges; with the network off, the cached copy shows as stale |
+| **4. Edit mode**             | create, edit, hide, delete, reorder, restore defaults                                                          | default-item edits survive a seed update (tested)                                          |
+| **5. Theme & polish**        | Warframe-inspired theme, responsive layout, keyboard and focus states                                          | looks right at desktop and narrow widths                                                   |
+| **6. Launcher**              | click-to-start `.desktop` launcher, Quit button, idle shutdown                                                 | one click on Bazzite opens a working tracker; Quit stops it                                |
 
 ---
 

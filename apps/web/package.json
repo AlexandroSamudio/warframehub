@@ -1,0 +1,23 @@
+{
+  "name": "@warframehub/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WarframeHub web app (UI only; talks to the API over /api).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
+  },
+  "dependencies": {
+    "@warframehub/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "svelte": "5.57.3",
+    "svelte-check": "4.7.7",
+    "vite": "8.3.5"
+  }
+}

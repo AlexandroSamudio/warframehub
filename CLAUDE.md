@@ -14,10 +14,18 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
 - `packages/shared`: Zod schemas + types for every API request/response
 - Vitest, ESLint + Prettier, GitHub Actions CI
 
-## Commands (once scaffolded)
+## Commands
 
 - `npm run dev`: API on :4317 and web on :5173 (Vite proxies `/api`)
 - `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`
+- `npm run format`: Prettier + ESLint autofix
+
+## How the workspaces fit together
+
+- `@warframehub/shared` exports a custom `source` condition pointing at its TypeScript source. Dev (`tsx --conditions=source`), Vite, Vitest and `tsc --noEmit` all use it, so **shared never needs building during development**.
+- Production builds resolve `shared` from `dist/` instead (`apps/api/tsconfig.build.json` clears `customConditions`). `npm run build` builds in workspace order: shared → api → web.
+- Dependencies are pinned to exact versions (`.npmrc` `save-exact`). Pick versions published at least two weeks ago. npm 11 (bundled with Node 24) is required; npm 10 fails to resolve vitest's peer set.
+- npm 11 only runs install scripts listed in `allowScripts` in the root `package.json` (currently esbuild, used by tsx). A new package needing one must be approved with `npm install-scripts approve <pkg>`.
 
 ## Rules
 

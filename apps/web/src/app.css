@@ -1,0 +1,41 @@
+/*
+ * Base theme tokens. The full Warframe-inspired theme arrives in Phase 5 (SPEC §8.2);
+ * these are the starting values everything else is built from.
+ */
+:root {
+  --bg: #0b0e14;
+  --surface: #131823;
+  --line: #263042;
+  --fg: #e4e8ef;
+  --muted: #8e99ab;
+  --gold: #c9a54b;
+  --teal: #5fc4d4;
+  --ok: #6cc391;
+  --bad: #e07a7a;
+
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
