@@ -44,11 +44,10 @@ export function periodKey(period: PeriodType, now: Date, ctx: PeriodContext = {}
       const start = startOfEightHourBlock(now);
       return `eight_hour:${isoDate(start)}T${pad2(start.getUTCHours())}`;
     }
-    case 'sortie': {
-      const expiry = liveSortieExpiry(now, ctx);
-      if (expiry) return `sortie:${expiry.toISOString()}`;
-      return `sortie:${isoDate(lastSortieFallbackReset(now))}`;
-    }
+    case 'sortie':
+      // Keyed by the UTC date the Sortie ends, so live data and the fallback agree
+      // (except between 16:00 and 17:00 UTC when offline) and ticks survive either way.
+      return `sortie:${isoDate(sortieEnd(now, ctx))}`;
     case 'baro':
       return ctx.baroActivation && isValid(ctx.baroActivation)
         ? `baro:${ctx.baroActivation.toISOString()}`
@@ -72,9 +71,7 @@ export function nextReset(period: PeriodType, now: Date, ctx: PeriodContext = {}
     case 'eight_hour':
       return new Date(startOfEightHourBlock(now).getTime() + 8 * HOUR_MS);
     case 'sortie':
-      return (
-        liveSortieExpiry(now, ctx) ?? new Date(lastSortieFallbackReset(now).getTime() + DAY_MS)
-      );
+      return sortieEnd(now, ctx);
     case 'baro': {
       // Ticks clear when the next visit starts. While Baro is here, the API only
       // knows when he leaves, not when he comes back.
@@ -92,6 +89,11 @@ export function liveSortieExpiry(now: Date, ctx: PeriodContext): Date | null {
   if (!expiry || !isValid(expiry)) return null;
   const ahead = expiry.getTime() - now.getTime();
   return ahead > 0 && ahead <= SORTIE_MAX_AHEAD_MS ? expiry : null;
+}
+
+/** When the current Sortie ends: the live expiry if usable, else the next 16:00 UTC. */
+function sortieEnd(now: Date, ctx: PeriodContext): Date {
+  return liveSortieExpiry(now, ctx) ?? new Date(lastSortieFallbackReset(now).getTime() + DAY_MS);
 }
 
 /** The most recent fallback Sortie reset at or before `now`. */

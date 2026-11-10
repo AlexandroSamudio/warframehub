@@ -3,3 +3,4 @@ dist
 coverage
 package-lock.json
 apps/api/drizzle
+apps/api/src/sources/fixtures

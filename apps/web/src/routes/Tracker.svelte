@@ -2,6 +2,7 @@
   import type { TrackerItem, TrackerResponse, TrackerSection } from '@warframehub/shared';
   import { onMount } from 'svelte';
   import ResetClocks from '../components/ResetClocks.svelte';
+  import Rotations from '../components/Rotations.svelte';
   import SectionCard from '../components/SectionCard.svelte';
   import { clearSection, getTracker, putTick } from '../lib/api.ts';
   import { t } from '../lib/i18n/index.ts';
@@ -96,10 +97,13 @@
       </div>
     {/if}
 
-    <div class="sections">
-      {#each data.sections as section (section.id)}
-        <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
-      {/each}
+    <div class="columns">
+      <div class="sections">
+        {#each data.sections as section (section.id)}
+          <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
+        {/each}
+      </div>
+      <Rotations {nowMs} {timeZone} onUpdate={load} />
     </div>
   </div>
 {:else if loadFailed}
@@ -115,6 +119,19 @@
   .tracker {
     display: grid;
     gap: 1rem;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (max-width: 60rem) {
+    .columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .sections {

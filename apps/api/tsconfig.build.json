@@ -4,5 +4,5 @@
     // Build against the compiled shared package (dist), not its TypeScript source.
     "customConditions": []
   },
-  "exclude": ["src/**/*.test.ts"]
+  "exclude": ["src/**/*.test.ts", "src/**/test-*.ts"]
 }

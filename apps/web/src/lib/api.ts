@@ -4,6 +4,7 @@ import {
   HealthResponse,
   PutTickResponse,
   TrackerResponse,
+  WorldstateResponse,
   type PutTickRequest,
 } from '@warframehub/shared';
 
@@ -52,4 +53,12 @@ export function putTick(body: PutTickRequest): Promise<PutTickResponse> {
 
 export function clearSection(sectionId: number): Promise<ClearSectionResponse> {
   return request(ClearSectionResponse, `/api/sections/${sectionId}/clear`, { method: 'POST' });
+}
+
+export function getWorldstate(signal?: AbortSignal): Promise<WorldstateResponse> {
+  return request(WorldstateResponse, '/api/worldstate', { signal });
+}
+
+export function refreshWorldstate(): Promise<WorldstateResponse> {
+  return request(WorldstateResponse, '/api/worldstate/refresh', { method: 'POST' });
 }

@@ -13,7 +13,8 @@ export interface TrackerRouteDeps {
   db: Db;
   userId: number;
   now: () => Date;
-  liveTimes: () => LiveTimes;
+  /** Live Sortie/Baro times; may refresh the world-state cache first. */
+  liveTimes: () => LiveTimes | Promise<LiveTimes>;
 }
 
 const IdParams = z.object({ id: z.coerce.number().int().positive() });
@@ -22,12 +23,14 @@ export function registerTrackerRoutes(app: FastifyInstance, deps: TrackerRouteDe
   const { db, userId, now, liveTimes } = deps;
 
   app.get('/api/tracker', async (): Promise<TrackerResponse> => {
-    return TrackerResponse.parse(loadTracker(db, userId, now(), liveTimes()));
+    const live = await liveTimes();
+    return TrackerResponse.parse(loadTracker(db, userId, now(), live));
   });
 
   app.put('/api/ticks', async (request): Promise<PutTickResponse> => {
     const body = PutTickRequest.parse(request.body);
-    return PutTickResponse.parse(setTick(db, userId, body, now(), liveTimes()));
+    const live = await liveTimes();
+    return PutTickResponse.parse(setTick(db, userId, body, now(), live));
   });
 
   app.post('/api/sections/:id/clear', async (request): Promise<ClearSectionResponse> => {
