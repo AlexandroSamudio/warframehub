@@ -1,5 +1,5 @@
 {
-  "seedVersion": 1,
+  "seedVersion": 2,
   "sections": [
     {
       "seedId": "daily.core",
@@ -7,14 +7,24 @@
       "title": "Daily: Core",
       "period": "daily",
       "items": [
-        { "seedId": "daily.core.login", "title": "Daily login reward", "kind": "check" },
-        { "seedId": "daily.core.first-win", "title": "First Win of the Day", "kind": "check" },
+        {
+          "seedId": "daily.core.login",
+          "title": "Daily login reward",
+          "kind": "check"
+        },
+        {
+          "seedId": "daily.core.first-win",
+          "title": "First Win of the Day",
+          "kind": "check"
+        },
         {
           "seedId": "daily.core.sp-incursions",
           "title": "Steel Path Incursions",
           "description": "5 Steel Essence each",
           "kind": "counter",
-          "slots": { "count": 6 }
+          "slots": {
+            "count": 6
+          }
         },
         {
           "seedId": "daily.core.circuit",
@@ -22,7 +32,11 @@
           "description": "530 points with the daily bonus",
           "kind": "check"
         },
-        { "seedId": "daily.core.simaris", "title": "Simaris daily target", "kind": "check" }
+        {
+          "seedId": "daily.core.simaris",
+          "title": "Simaris daily target",
+          "kind": "check"
+        }
       ]
     },
     {
@@ -36,7 +50,11 @@
           "title": "Spend Syndicate standing if capped",
           "kind": "check"
         },
-        { "seedId": "daily.quick.darvo", "title": "Darvo's Daily Deal", "kind": "check" },
+        {
+          "seedId": "daily.quick.darvo",
+          "title": "Darvo's Daily Deal",
+          "kind": "check"
+        },
         {
           "seedId": "daily.quick.todays-special",
           "title": "\"Today's Special\" vendors",
@@ -125,7 +143,11 @@
       "title": "Weekly: Minor missions",
       "period": "weekly",
       "items": [
-        { "seedId": "weekly.minor.darvo", "title": "Darvo's weekly mission", "kind": "check" },
+        {
+          "seedId": "weekly.minor.darvo",
+          "title": "Darvo's weekly mission",
+          "kind": "check"
+        },
         {
           "seedId": "weekly.minor.maroo",
           "title": "Maroo's weekly mission",
@@ -145,7 +167,11 @@
           "title": "Nightwave weekly missions + shop",
           "kind": "check"
         },
-        { "seedId": "weekly.passes.calendar-1999", "title": "1999 Calendar", "kind": "check" }
+        {
+          "seedId": "weekly.passes.calendar-1999",
+          "title": "1999 Calendar",
+          "kind": "check"
+        }
       ]
     },
     {
@@ -177,7 +203,9 @@
           "title": "Hunhow",
           "description": "17,000 Kuva each",
           "kind": "counter",
-          "slots": { "count": 3 }
+          "slots": {
+            "count": 3
+          }
         },
         {
           "seedId": "weekly.kuva.teshin",
@@ -201,11 +229,13 @@
         {
           "seedId": "weekly.vendors.acrithis",
           "title": "Acrithis weekly rotation",
-          "description": "Reset day to confirm: Sunday or Monday 00:00 UTC",
-          "kind": "check",
-          "verify": true
+          "kind": "check"
         },
-        { "seedId": "weekly.vendors.palladino", "title": "Palladino", "kind": "check" },
+        {
+          "seedId": "weekly.vendors.palladino",
+          "title": "Palladino",
+          "kind": "check"
+        },
         {
           "seedId": "weekly.vendors.teshin",
           "title": "Teshin: spend Steel Essence",
@@ -214,9 +244,11 @@
         {
           "seedId": "weekly.vendors.vosfor",
           "title": "Vosfor arcanes",
+          "description": "Loid, Sanctum Anatomica",
           "kind": "subticks",
-          "slots": { "labels": ["Vendetta", "Radiation", "Ignition"] },
-          "verify": true
+          "slots": {
+            "labels": ["Vendetta", "Radiation", "Ignition"]
+          }
         },
         {
           "seedId": "weekly.vendors.kahl",
@@ -226,10 +258,9 @@
         },
         {
           "seedId": "weekly.vendors.chipper",
-          "title": "Chipper: 1 Archon Shard",
-          "description": "Currency to confirm: Stock or Cavia standing",
-          "kind": "check",
-          "verify": true
+          "title": "Bird 3: 1 Archon Shard",
+          "description": "30,000 Cavia standing",
+          "kind": "check"
         },
         {
           "seedId": "weekly.vendors.cavalero",
@@ -245,14 +276,24 @@
       "title": "Weekly: Endgame",
       "period": "weekly",
       "items": [
-        { "seedId": "weekly.endgame.archon-hunt", "title": "Archon Hunt", "kind": "check" },
+        {
+          "seedId": "weekly.endgame.archon-hunt",
+          "title": "Archon Hunt",
+          "kind": "check"
+        },
         {
           "seedId": "weekly.endgame.search-pulses",
           "title": "Search Pulses",
           "kind": "counter",
-          "slots": { "count": 5 }
+          "slots": {
+            "count": 5
+          }
         },
-        { "seedId": "weekly.endgame.netracells", "title": "Netracell run(s)", "kind": "check" },
+        {
+          "seedId": "weekly.endgame.netracells",
+          "title": "Netracell run(s)",
+          "kind": "check"
+        },
         {
           "seedId": "weekly.endgame.deep-archimedea",
           "title": "Deep Archimedea (Elite)",
@@ -273,9 +314,8 @@
         {
           "seedId": "weekly.endgame.descendia-sp",
           "title": "Descendia: Steel Path",
-          "description": "Floor for 25 Steel Essence to confirm: 18 or 21",
-          "kind": "check",
-          "verify": true
+          "description": "25 Steel Essence at floor 21",
+          "kind": "check"
         },
         {
           "seedId": "weekly.endgame.descendia-infernum",
@@ -296,7 +336,11 @@
       "title": "Weekly: Notes",
       "period": "weekly",
       "items": [
-        { "seedId": "weekly.notes.circuit", "title": "Circuit this week", "kind": "info" },
+        {
+          "seedId": "weekly.notes.circuit",
+          "title": "Circuit this week",
+          "kind": "info"
+        },
         {
           "seedId": "weekly.notes.archimedea",
           "title": "Archimedea modifiers this week",

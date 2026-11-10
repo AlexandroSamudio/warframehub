@@ -359,11 +359,11 @@ Each phase ends with something you can run and check.
 
 **In game (owner):**
 
-- [ ] Chipper's currency: Stock (wiki) or Cavia standing (video)
-- [ ] Which NPC sells Arcane Vendetta / Radiation / Ignition for 5 Vosfor each
-- [ ] Acrithis' weekly reset: Sunday 00:00 UTC or Monday 00:00 UTC
-- [ ] Steel Path Descendia: 25 Steel Essence at floor 18 or 21
-- [ ] 8-hour vendors: confirm Loid, Grandmother and Archimedean Yonta refresh at 00:00 / 08:00 / 16:00 UTC (taken from the community Task Checklist, not yet confirmed by us)
+- [x] Archon Shard vendor: it's **Bird 3**, not Chipper, for **30,000 Cavia standing** (in game, 10 Nov 2026)
+- [x] Arcane Vendetta / Radiation / Ignition are sold by **Loid in the Sanctum Anatomica** (in game, 10 Nov 2026; the price wasn't checked)
+- [x] Acrithis' weekly rotation resets with the **weekly reset**, Monday 00:00 UTC (in game, 10 Nov 2026)
+- [x] Steel Path Descendia: 25 Steel Essence at **floor 21** (in game, 10 Nov 2026)
+- [ ] 8-hour vendors: confirm Loid, Grandmother and Archimedean Yonta refresh at 00:00 / 08:00 / 16:00 UTC (taken from the community Task Checklist, not yet confirmed by us). The answer on 10 Nov 2026 was unclear ("correct" but also "every day at 16:00 UTC"); still to check from each vendor's in-game refresh timer
 
 **Technical (Claude):**
 
@@ -384,7 +384,7 @@ Each phase ends with something you can run and check.
 
 ---
 
-## Appendix A. Default checklist (seed v1)
+## Appendix A. Default checklist (seed v2)
 
 `⚠️` = shipped with the "verify" badge.
 
@@ -434,12 +434,12 @@ Each phase ends with something you can run and check.
   - Teshin: Kuva for Steel Essence
   - Nightwave / Arbitrations Kuva
 - Big vendors
-  - Acrithis weekly rotation ⚠️ reset day
+  - Acrithis weekly rotation
   - Palladino
   - Teshin: spend Steel Essence
-  - Vosfor arcanes: sub-ticks Vendetta · Radiation · Ignition ⚠️
+  - Vosfor arcanes (Loid, Sanctum Anatomica): sub-ticks Vendetta · Radiation · Ignition
   - Kahl-175 weekly mission (Stock)
-  - Chipper: 1 Archon Shard ⚠️ currency
+  - Bird 3: 1 Archon Shard (30,000 Cavia standing)
   - Cavalero: this week's Incarnon adapters (Platinum)
 - Endgame
   - Archon Hunt
@@ -448,7 +448,7 @@ Each phase ends with something you can run and check.
   - Deep Archimedea (Elite): aim for 34 points
   - Temporal Archimedea: go for all 37 points
   - Descendia: normal
-  - Descendia: Steel Path ⚠️ floor for 25 Steel Essence
+  - Descendia: Steel Path (25 Steel Essence at floor 21)
   - Descendia: Infernum 21 (Roathe)
   - Helminth: apply 3 Invigorations
 - Notes (info rows, user-edited)

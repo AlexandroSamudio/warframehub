@@ -126,6 +126,7 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
   - Settings screen (time zone, data folder, version, idle time, Quit) behind a small hash router (`#/settings`)
   - `scripts/warframehub-launcher.sh` and `npm run install-launcher` (`.desktop` file + icon)
   - Checked end to end on EndeavourOS: launcher start (~0.6 s), second launch, Quit from the page, idle shutdown after 1 idle minute (stopped at 120 s), `.desktop` file valid (`desktop-file-validate`)
-- **Not yet tested on Bazzite.** The launcher looks for mise on PATH, in `~/.local/bin`, and in Homebrew's `/home/linuxbrew/.linuxbrew/bin`.
+- **Tested on Bazzite by Alex (10 Nov 2026): runs perfectly**, including the app-menu launcher.
+- **Seed v2 (10 Nov 2026):** four facts confirmed in game (Bird 3 sells the Archon Shard for 30,000 Cavia standing; Loid in the Sanctum Anatomica sells the Vosfor arcanes; Acrithis resets with the weekly reset; Descendia Steel Path pays 25 Steel Essence at floor 21). Still `verify`: "Today's Special" vendors and the three 8-hour vendors (their refresh time is still unclear).
 - **Dev servers:** when checking work in the browser, Claude runs its own copy on ports 4399 (API) and 5199 (web) with a throwaway data folder, and stops it by session id or with the Quit endpoint, so Alex's `npm run dev` on 4317/5173 is never touched.
 - **v1 is feature-complete** after this phase. Open items are in SPEC §12; later features are in §13.
