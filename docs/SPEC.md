@@ -256,6 +256,12 @@ Rules:
   - `archimedeas` has one entry per Archimedea: type `CT_LAB` = **Deep** (Albrecht's Laboratories, The Murmur, which warframestat.us calls "Man in the Wall") and `CT_HEX` = **Temporal** (Höllvania, Scaldra and Techrot), checked against the wiki. Each has 3 missions with a deviation and risks (`isHard` = Elite), plus personal modifiers.
   - These replaced the typed "Circuit this week" / "Archimedea modifiers this week" notes (seed v6).
 - **Not available from the API:** vendor stock (Palladino, Acrithis and similar).
+- **Goal planner item data** (§13, checked 10 Nov 2026): `https://api.warframestat.us/warframes/search/{q}` and `/weapons/search/{q}` (not under `/pc`).
+  - Each item has `components[]` with counts and drop locations (rotation, rarity, chance). Component `category: "Components"` is a part; anything else (`"Misc"`) is a resource. `buildPrice` becomes a Credits resource.
+  - Only Warframes (category `Warframes` **and** type `Warframe`; Necramechs and Archwings come back under `Warframes` or `Archwing`) and Primary / Secondary / Melee weapons are kept.
+  - Prime parts drop from relics, and `vaulted` is on the item.
+  - The data has **no sub-recipes** (e.g. the resources to craft a Chassis). Some parts have no drops (quest, market, vendor), and vaulted relics have none either.
+  - Search is cached for 24 hours per query in `item_cache`; items are cached by `uniqueName`, so adding a goal needs no second request. At most one upstream search per second. Offline, cached results are served as stale.
 - **Normalising:** the API converts the raw responses into small shapes defined in `packages/shared` (e.g. `Sortie { boss, faction, expiry, missions[] }`). If warframestat.us changes, only `apps/api/src/sources/` changes.
 - Requests send a descriptive `User-Agent` (`warframehub/<version> (+repo URL)`).
 
