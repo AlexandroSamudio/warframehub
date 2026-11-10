@@ -191,6 +191,8 @@ export const goalParts = sqliteTable(
       .references(() => goals.id, { onDelete: 'cascade' }),
     componentKey: text('component_key').notNull(),
     owned: integer('owned').notNull().default(0),
+    /** The user's own note, e.g. where a part with no drop data comes from. */
+    note: text('note').notNull().default(''),
   },
   (t) => [primaryKey({ columns: [t.goalId, t.componentKey] })],
 );

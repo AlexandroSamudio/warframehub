@@ -12,18 +12,26 @@
   import { t } from '../lib/i18n/index.ts';
   import AmountField from './AmountField.svelte';
   import DropList from './DropList.svelte';
+  import PartNote from './PartNote.svelte';
 
   interface Props {
     queue: FarmQueue;
     onSetStock: (key: string, amount: number) => Promise<boolean>;
+    onNote: (goalId: number, key: string, note: string) => Promise<boolean>;
   }
 
-  let { queue, onSetStock }: Props = $props();
+  let { queue, onSetStock, onNote }: Props = $props();
 
   const empty = $derived(
-    queue.farmNow.length === 0 && queue.vaulted.length === 0 && queue.resources.length === 0,
+    queue.farmNow.length === 0 &&
+      queue.other.length === 0 &&
+      queue.vaulted.length === 0 &&
+      queue.resources.length === 0,
   );
   const MAX_RELICS = 4;
+  // Most-missing first (the server's order); the long tail is one click away.
+  const MAX_RESOURCES = 5;
+  let showAllResources = $state(false);
 
   function best(sources: DropSource[]): string {
     const top = sources[0];
@@ -70,6 +78,28 @@
       </ul>
     {/if}
 
+    {#if queue.other.length > 0}
+      <h3 class="group">{t('farm.otherTitle')}</h3>
+      <p class="note">{t('farm.otherHint')}</p>
+      <ul class="rows">
+        {#each queue.other as p (`${p.goalId}:${p.key}`)}
+          <li class="row">
+            <div class="what">
+              <span class="lead">{p.name}</span>
+              <span class="for">{t('farm.for', { goal: p.goalName })}</span>
+            </div>
+            {#if p.note === ''}<p class="relics">{t('farm.noDrops')}</p>{/if}
+            <span class="note-label">{t('part.noteLabel')}</span>
+            <PartNote
+              value={p.note}
+              label={`${t('part.noteLabel')} ${p.name} ${p.goalName}`}
+              onSave={(note) => onNote(p.goalId, p.key, note)}
+            />
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
     {#if queue.vaulted.length > 0}
       <h3 class="group">{t('farm.vaultedTitle')}</h3>
       <p class="note">{t('farm.vaultedOnce')}</p>
@@ -95,7 +125,7 @@
     {#if queue.resources.length > 0}
       <h3 class="group">{t('farm.resources')}</h3>
       <ul class="rows">
-        {#each queue.resources as r (r.key)}
+        {#each showAllResources ? queue.resources : queue.resources.slice(0, MAX_RESOURCES) as r (r.key)}
           <li class="row resource">
             <div class="what">
               <span class="lead">{r.name}</span>
@@ -116,6 +146,13 @@
           </li>
         {/each}
       </ul>
+      {#if queue.resources.length > MAX_RESOURCES}
+        <button type="button" class="more" onclick={() => (showAllResources = !showAllResources)}>
+          {showAllResources
+            ? t('farm.showFewer')
+            : t('farm.showAllResources', { count: queue.resources.length })}
+        </button>
+      {/if}
     {/if}
   {/if}
 </section>
@@ -192,6 +229,17 @@
 
   .relics {
     margin: 0;
+  }
+
+  .note-label {
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .more {
+    justify-self: start;
+    margin-top: 0.4rem;
   }
 
   .best {

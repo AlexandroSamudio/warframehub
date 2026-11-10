@@ -1,4 +1,11 @@
-import type { Goal, GoalsResponse, ItemDrop, ShoppingRow } from '@warframehub/shared';
+import type {
+  Goal,
+  GoalResource,
+  GoalsResponse,
+  ItemDrop,
+  PartCraft,
+  ShoppingRow,
+} from '@warframehub/shared';
 
 /** One missing part in the "What to farm next" list. Parts belong to one goal. */
 export interface MissingPart {
@@ -9,11 +16,15 @@ export interface MissingPart {
   /** How many more are needed (count − owned). */
   missing: number;
   drops: ItemDrop[];
+  /** Your own note on where this part comes from. */
+  note: string;
 }
 
 export interface FarmQueue {
-  /** Parts you can farm (or buy) now, best chance first; no drop data last. */
+  /** Parts you can farm now, best chance first. */
   farmNow: MissingPart[];
+  /** Parts no drop table lists (quest, Market, vendor): you keep a note on where. */
+  other: MissingPart[];
   /** Parts of vaulted items: their relics no longer drop. In goal order. */
   vaulted: MissingPart[];
   /** Resources still short across active goals, most missing first (server order). */
@@ -32,6 +43,7 @@ function bestChance(p: MissingPart): number {
  */
 export function farmQueue(data: GoalsResponse): FarmQueue {
   const farmNow: MissingPart[] = [];
+  const other: MissingPart[] = [];
   const vaulted: MissingPart[] = [];
   for (const goal of data.active) {
     for (const p of goal.parts) {
@@ -43,12 +55,13 @@ export function farmQueue(data: GoalsResponse): FarmQueue {
         name: p.name,
         missing: p.count - p.owned,
         drops: p.drops,
+        note: p.note,
       };
-      (goal.vaulted === true ? vaulted : farmNow).push(part);
+      (p.drops.length === 0 ? other : goal.vaulted === true ? vaulted : farmNow).push(part);
     }
   }
   farmNow.sort((a, b) => bestChance(b) - bestChance(a));
-  return { farmNow, vaulted, resources: data.shoppingList.filter((r) => r.missing > 0) };
+  return { farmNow, other, vaulted, resources: data.shoppingList.filter((r) => r.missing > 0) };
 }
 
 // ---- drops -----------------------------------------------------------------
@@ -124,6 +137,39 @@ export function relicNames(drops: ItemDrop[]): string[] {
 // ---- formatting --------------------------------------------------------------
 
 const integer = new Intl.NumberFormat('en-US');
+
+/** The materials of a craft as quantity + name pairs: Credits first, then A–Z. */
+export function materialList(craft: PartCraft): { count: number; name: string }[] {
+  const lines = craft.ingredients
+    .map((i) => ({ count: i.count, name: i.name }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (craft.credits > 0) lines.unshift({ count: craft.credits, name: 'Credits' });
+  return lines;
+}
+
+/** "15,000 Credits · 1,425 Polymer Bundle · 5,500 Alloy Plate" (plain text). */
+export function formatMaterials(craft: PartCraft): string {
+  return materialList(craft)
+    .map((l) => `${formatAmount(l.count)} ${l.name}`)
+    .join(' · ');
+}
+
+/**
+ * A goal card's resources in two groups: what the item's own recipe needs (a row may
+ * also include materials for parts), and materials only parts need until you have them.
+ * Each group shows what's most missing first, then A–Z, like the farm queue.
+ */
+export function splitResources(resources: GoalResource[]): {
+  forItem: GoalResource[];
+  forPartsOnly: GoalResource[];
+} {
+  const byMissing = (a: GoalResource, b: GoalResource) =>
+    b.count - b.have - (a.count - a.have) || a.name.localeCompare(b.name);
+  return {
+    forItem: resources.filter((r) => r.forParts < r.count).sort(byMissing),
+    forPartsOnly: resources.filter((r) => r.forParts === r.count).sort(byMissing),
+  };
+}
 
 /** 25000 → "25,000". */
 export function formatAmount(n: number): string {

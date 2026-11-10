@@ -9,13 +9,22 @@ import { and, asc, eq, inArray, max } from 'drizzle-orm';
 import { buildGoals, shoppingList, type GoalInput, type Stock } from '../domain/goals.js';
 import { HttpError } from '../http-error.js';
 import type { ItemCatalog } from '../sources/items.js';
+import { partCraft } from '../sources/part-recipes.js';
 import type { Db } from './client.js';
 import { goalParts, goals, resourceStock } from './schema.js';
 
 /** Goal planner storage (SPEC §13). Every change answers with the full `GoalsResponse`. */
 
+/**
+ * A saved recipe, with each part's crafting materials filled in from the bundled DE data.
+ * Goals saved before that data existed get them too, and it's always the current file.
+ */
 function parseRecipe(json: string): ItemRecipe {
-  return ItemRecipe.parse(JSON.parse(json));
+  const recipe = ItemRecipe.parse(JSON.parse(json));
+  return {
+    ...recipe,
+    parts: recipe.parts.map((p) => ({ ...p, craft: partCraft(p.key) ?? p.craft })),
+  };
 }
 
 function stockMap(db: Db, userId: number): Stock {
@@ -38,11 +47,15 @@ export function loadGoals(db: Db, userId: number): GoalsResponse {
     .all();
   const ids = rows.map((r) => r.id);
   const ownedByGoal = new Map<number, Map<string, number>>();
+  const notesByGoal = new Map<number, Map<string, string>>();
   if (ids.length > 0) {
     for (const p of db.select().from(goalParts).where(inArray(goalParts.goalId, ids)).all()) {
-      const m = ownedByGoal.get(p.goalId) ?? new Map<string, number>();
-      m.set(p.componentKey, p.owned);
-      ownedByGoal.set(p.goalId, m);
+      const owned = ownedByGoal.get(p.goalId) ?? new Map<string, number>();
+      owned.set(p.componentKey, p.owned);
+      ownedByGoal.set(p.goalId, owned);
+      const notes = notesByGoal.get(p.goalId) ?? new Map<string, string>();
+      notes.set(p.componentKey, p.note);
+      notesByGoal.set(p.goalId, notes);
     }
   }
   const stock = stockMap(db, userId);
@@ -52,6 +65,7 @@ export function loadGoals(db: Db, userId: number): GoalsResponse {
     status: r.status,
     recipe: parseRecipe(r.recipeJson),
     owned: ownedByGoal.get(r.id) ?? new Map(),
+    notes: notesByGoal.get(r.id) ?? new Map(),
     createdAt: r.createdAt,
     builtAt: r.builtAt,
     recipeFetchedAt: r.recipeFetchedAt,
@@ -134,7 +148,8 @@ export function createGoal(
     .run();
 }
 
-export function setPartOwned(
+/** Changes how many of a part you have, your note on it, or both. */
+export function updatePart(
   db: Db,
   userId: number,
   goalId: number,
@@ -144,14 +159,22 @@ export function setPartOwned(
   const part = parseRecipe(row.recipeJson).parts.find((p) => p.key === body.componentKey);
   if (!part)
     throw new HttpError(404, 'unknown_part', `${row.name} has no part ${body.componentKey}`);
-  if (body.owned > part.count) {
+  if (body.owned !== undefined && body.owned > part.count) {
     throw new HttpError(400, 'bad_count', `${row.name} needs only ${part.count} × ${part.name}`);
   }
   db.insert(goalParts)
-    .values({ goalId, componentKey: body.componentKey, owned: body.owned })
+    .values({
+      goalId,
+      componentKey: body.componentKey,
+      owned: body.owned ?? 0,
+      note: body.note ?? '',
+    })
     .onConflictDoUpdate({
       target: [goalParts.goalId, goalParts.componentKey],
-      set: { owned: body.owned },
+      set: {
+        ...(body.owned !== undefined ? { owned: body.owned } : {}),
+        ...(body.note !== undefined ? { note: body.note } : {}),
+      },
     })
     .run();
 }
@@ -166,7 +189,11 @@ export function setStock(db: Db, userId: number, body: SetStockRequest): void {
   let name = existing?.name;
   if (!name) {
     for (const g of db.select().from(goals).where(eq(goals.userId, userId)).all()) {
-      const r = parseRecipe(g.recipeJson).resources.find((x) => x.key === body.key);
+      const recipe = parseRecipe(g.recipeJson);
+      // The item's own resources, or a material that one of its parts needs to craft.
+      const r =
+        recipe.resources.find((x) => x.key === body.key) ??
+        recipe.parts.flatMap((p) => p.craft?.ingredients ?? []).find((x) => x.key === body.key);
       if (r) {
         name = r.name;
         break;

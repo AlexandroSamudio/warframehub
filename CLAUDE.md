@@ -21,6 +21,7 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
 - `npm run format`: Prettier + ESLint autofix
 - `npm start`: the built app (API + web) on :4317. `npm run install-launcher` adds the app-menu launcher (`scripts/warframehub-launcher.sh`)
 - Idle shutdown: `WFHUB_IDLE_MINUTES` (default 30, `0` = off; `npm run dev` turns it off)
+- `npm run update-part-recipes`: refreshes `apps/api/data/part-recipes.json` (part crafting materials) from DE's public export; needs `xz`. Run when new Warframes come out and commit the file. The app never calls DE.
 - `npm run db:generate -w @warframehub/api`: after changing `apps/api/src/db/schema.ts`, writes a new SQL migration to `apps/api/drizzle/` (commit it; never edit applied migrations)
 
 ## How the workspaces fit together

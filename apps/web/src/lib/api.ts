@@ -169,6 +169,18 @@ export function setPartOwned(
   );
 }
 
+export function setPartNote(
+  goalId: number,
+  componentKey: string,
+  note: string,
+): Promise<GoalsResponse> {
+  return request(
+    GoalsResponse,
+    `/api/goals/${goalId}/parts`,
+    json('PATCH', { componentKey, note }),
+  );
+}
+
 export function setStock(key: string, amount: number): Promise<GoalsResponse> {
   return request(GoalsResponse, '/api/resources', json('PUT', { key, amount }));
 }

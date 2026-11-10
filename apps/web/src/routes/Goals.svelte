@@ -93,7 +93,11 @@
     {#if data.active.length === 0}
       <p class="muted">{t('goals.empty')}</p>
     {:else}
-      <FarmQueue {queue} onSetStock={(key, amount) => run(() => api.setStock(key, amount))} />
+      <FarmQueue
+        {queue}
+        onSetStock={(key, amount) => run(() => api.setStock(key, amount))}
+        onNote={(id, key, note) => run(() => api.setPartNote(id, key, note))}
+      />
 
       <ul class="cards">
         {#each data.active as goal, i (goal.id)}
@@ -103,6 +107,7 @@
               isFirst={i === 0}
               isLast={i === data.active.length - 1}
               onPart={changePart}
+              onNote={(id, key, note) => run(() => api.setPartNote(id, key, note))}
               onStock={(key, amount) => run(() => api.setStock(key, amount))}
               onBuilt={(id) => run(() => api.markBuilt(id))}
               onRemove={(id) => run(() => api.deleteGoal(id))}

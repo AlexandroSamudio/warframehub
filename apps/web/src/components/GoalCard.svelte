@@ -1,8 +1,9 @@
 <script lang="ts">
-  import type { Goal } from '@warframehub/shared';
-  import { formatAmount, progressPercent } from '../lib/goals.ts';
+  import type { Goal, GoalResource } from '@warframehub/shared';
+  import { formatAmount, materialList, progressPercent, splitResources } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
   import AmountField from './AmountField.svelte';
+  import PartNote from './PartNote.svelte';
   import Icon from './Icon.svelte';
 
   interface Props {
@@ -10,6 +11,7 @@
     isFirst: boolean;
     isLast: boolean;
     onPart: (goalId: number, key: string, owned: number) => void;
+    onNote: (goalId: number, key: string, note: string) => Promise<boolean>;
     onStock: (key: string, amount: number) => Promise<boolean>;
     onBuilt: (goalId: number) => void;
     onRemove: (goalId: number) => void;
@@ -17,8 +19,18 @@
     onMove: (goalId: number, by: -1 | 1) => void;
   }
 
-  let { goal, isFirst, isLast, onPart, onStock, onBuilt, onRemove, onRefresh, onMove }: Props =
-    $props();
+  let {
+    goal,
+    isFirst,
+    isLast,
+    onPart,
+    onNote,
+    onStock,
+    onBuilt,
+    onRemove,
+    onRefresh,
+    onMove,
+  }: Props = $props();
 
   let open = $state(false);
   let confirm = $state<'built' | 'remove' | null>(null);
@@ -26,6 +38,7 @@
 
   const bodyId = $derived(`goal-${goal.id}-body`);
   const percent = $derived(progressPercent(goal));
+  const resourceGroups = $derived(splitResources(goal.resources));
   const recipeDate = $derived(
     new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(
       new Date(goal.recipeFetchedAt),
@@ -51,6 +64,33 @@
     }
   }
 </script>
+
+{#snippet resourceRow(r: GoalResource)}
+  {@const enough = r.have >= r.count}
+  <li class="line resource">
+    <span class="res-name">{r.name}</span>
+    <span class="share num" class:enough>
+      {enough
+        ? t('goal.shareEnough', { count: formatAmount(r.count) })
+        : t('goal.shareShort', {
+            have: formatAmount(r.have),
+            count: formatAmount(r.count),
+            short: formatAmount(r.count - r.have),
+          })}
+      {#if r.forParts > 0 && r.forParts < r.count}
+        <span class="incl">· {t('goal.inclParts', { count: formatAmount(r.forParts) })}</span>
+      {/if}
+    </span>
+    <span class="stock">
+      <span class="have-label">{t('goal.stock')}</span>
+      <AmountField
+        value={r.stock}
+        label={`${t('goal.stock')} ${r.name}`}
+        onSave={(amount) => onStock(r.key, amount)}
+      />
+    </span>
+  </li>
+{/snippet}
 
 <article class="goal frame" class:accent={open} class:ready={goal.ready}>
   <header>
@@ -137,45 +177,52 @@
                     </span>
                   </label>
                 {/if}
+                {#if p.craft}
+                  <div class="craft">
+                    <span class="craft-label">{t('part.craftLabel')}</span>
+                    <ul class="materials" aria-label={t('part.craftList', { name: p.name })}>
+                      {#each materialList(p.craft) as m (m.name)}
+                        <li><b class="num">{formatAmount(m.count)}</b> {m.name}</li>
+                      {/each}
+                    </ul>
+                  </div>
+                {:else if goal.category === 'warframe' && p.name !== 'Blueprint'}
+                  <p class="craft-none">{t('part.craftMissing')}</p>
+                {/if}
+                {#if p.drops.length === 0 || p.note !== ''}
+                  <div class="part-note">
+                    <span class="note-label">{t('part.noteLabel')}</span>
+                    <PartNote
+                      value={p.note}
+                      label={`${t('part.noteLabel')} ${p.name}`}
+                      onSave={(note) => onNote(goal.id, p.key, note)}
+                    />
+                  </div>
+                {/if}
               </li>
             {/each}
           </ul>
         </div>
 
         <div>
-          <h4 class="group">{t('goal.resources')}</h4>
+          <h4 class="group">{t('goal.resourcesFor', { name: goal.name })}</h4>
           <ul>
-            {#each goal.resources as r (r.key)}
-              {@const enough = r.have >= r.count}
-              <li class="line resource">
-                <span class="res-name">{r.name}</span>
-                <span class="share num" class:enough>
-                  {enough
-                    ? t('goal.shareEnough', { count: formatAmount(r.count) })
-                    : t('goal.shareShort', {
-                        have: formatAmount(r.have),
-                        count: formatAmount(r.count),
-                        short: formatAmount(r.count - r.have),
-                      })}
-                </span>
-                <span class="stock">
-                  <span class="have-label">{t('goal.stock')}</span>
-                  <AmountField
-                    value={r.stock}
-                    label={`${t('goal.stock')} ${r.name}`}
-                    onSave={(amount) => onStock(r.key, amount)}
-                  />
-                </span>
-              </li>
+            {#each resourceGroups.forItem as r (r.key)}
+              {@render resourceRow(r)}
             {/each}
           </ul>
+          {#if resourceGroups.forPartsOnly.length > 0}
+            <h4 class="group second">{t('goal.resourcesForParts')}</h4>
+            <ul>
+              {#each resourceGroups.forPartsOnly as r (r.key)}
+                {@render resourceRow(r)}
+              {/each}
+            </ul>
+          {/if}
         </div>
       </div>
 
-      <p class="note">
-        {#if goal.category === 'warframe'}{t('goal.subRecipes')}{/if}
-        {t('goal.recipeDate', { date: recipeDate })}
-      </p>
+      <p class="note">{t('goal.recipeDate', { date: recipeDate })}</p>
 
       <div class="actions">
         {#if confirm === 'built'}
@@ -341,6 +388,10 @@
     gap: 0.6rem 1.5rem;
   }
 
+  .group.second {
+    margin-top: 0.8rem;
+  }
+
   .group {
     margin: 0 0 0.25rem;
     font-family: var(--font-display);
@@ -369,6 +420,65 @@
 
   .count {
     width: 3.5rem;
+  }
+
+  /* "To craft" + quantity/name pairs: the quantity is the readout, the name is dim. */
+  .craft {
+    margin: 0.15rem 0 0 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .craft-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .materials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.9rem;
+  }
+
+  .materials li {
+    white-space: nowrap; /* a quantity never gets separated from its name */
+  }
+
+  .materials b {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .craft-none {
+    margin: 0.15rem 0 0 1.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .part-note {
+    margin: 0.25rem 0 0 1.5rem;
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .note-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .incl {
+    color: var(--muted);
   }
 
   .done {

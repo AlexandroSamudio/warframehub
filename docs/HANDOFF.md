@@ -150,5 +150,6 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
     SPEC §13.1 describes the feature.
 
+  - **Follow-up** (branch `goals-part-recipes`, Alex's requests): per-part crafting materials (DE public export, saved in `apps/api/data/part-recipes.json`, refresh with `npm run update-part-recipes`), a note per part for parts with no drop data ("Get another way"), and those materials counting in the shopping list until the part is owned. Migration `0004`. UI went through Impeccable again (brief addendum, dual-agent critique, audit).
   - Impeccable 4.8.2 has no `audit-storage` command (its own reference mentions one), so audit reports go in the PR description.
 - **Impeccable telemetry:** turned off by Alex on 10 Nov 2026 (`impeccable telemetry off`).

@@ -80,6 +80,14 @@ Inside the established world. No new visual identity.
   - the Tracker card's names link to Goals and its bar matches the cards.
 - **The Tracker card** stays name + progress (Alex's choice).
 
+## Addendum: part materials and parts with no drop data (10 Nov 2026, Alex's requests)
+
+- **Every part mentions its crafting materials** (from DE's public export, bundled in the repo): a muted line under the part in the goal card, e.g. "To craft: 15,000 Credits · 1,425 Polymer Bundle · 5,500 Alloy Plate". Parts that aren't crafted (the Blueprint, Prime weapon parts) show nothing. A non-Blueprint Warframe part with no recipe says "Crafting materials not in the data".
+- **They count until you own the part:** the goal's resources include them (shared stock, goal order), and the card says "incl. 45,000 for parts" where it applies. Owning the part removes them. Progress keeps a stable total.
+- **Parts with no drop data** (quest, Market, vendor) leave "Farm now" for a **Get another way** group with one explanation and, per part, **your own note** (inline field, "Where do you get this?", saved with a polite "Saved"). A part with a note shows the note instead of "Not in drop tables". The same note field appears on the part in its goal card.
+- Anti-goals unchanged: no modal, no new nesting; the note field reuses `AmountField`'s save/feedback pattern.
+- **After the critique of this change (27/40; Alex chose all fixes):** materials as unbreakable quantity + name pairs; the card's resources split into "For {item}" and "Only for parts, until you have them", most missing first; the queue's Resources group shows the top 5 with "Show all"; the queue's note field has a visible label and a 200-character limit; "Recipe not found. Check in game."; "Digital Extremes'" instead of "DE".
+
 ## Direction contract
 
 THESIS: a farming queue first, the goals second. It refuses the default "grid of goal cards with progress rings".

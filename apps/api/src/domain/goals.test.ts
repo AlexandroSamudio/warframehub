@@ -18,7 +18,13 @@ function recipe(
     vaulted: false,
     masteryReq: 0,
     buildTime: 259200,
-    parts: parts.map(([n, count]) => ({ key: `${name}/${n}`, name: n, count, drops: [] })),
+    parts: parts.map(([n, count]) => ({
+      key: `${name}/${n}`,
+      name: n,
+      count,
+      drops: [],
+      craft: null,
+    })),
     resources: resources.map(([n, count]) => ({ key: n.toLowerCase(), name: n, count, drops: [] })),
   };
 }
@@ -134,6 +140,129 @@ describe('buildGoals (shared stock in goal order)', () => {
     );
     expect(active!.resources.find((r) => r.name === 'Orokin Cell')!.have).toBe(5);
     expect(built!.resources.find((r) => r.name === 'Orokin Cell')!.stock).toBe(5);
+  });
+});
+
+/** A Warframe with two crafted parts, like Nidus Prime's Chassis and Systems. */
+function crafted(): ItemRecipe {
+  const base = recipe(
+    'Crafted Prime',
+    [
+      ['Blueprint', 1],
+      ['Chassis', 1],
+      ['Systems', 1],
+    ],
+    [
+      ['Credits', 25000],
+      ['Orokin Cell', 5],
+    ],
+  );
+  const part = (name: string) => base.parts.find((p) => p.name === name)!;
+  part('Chassis').craft = {
+    credits: 15000,
+    ingredients: [
+      { key: 'plastids', name: 'Plastids', count: 450 },
+      { key: 'alloy plate', name: 'Alloy Plate', count: 5500 },
+    ],
+  };
+  part('Systems').craft = {
+    credits: 15000,
+    ingredients: [
+      { key: 'orokin cell', name: 'Orokin Cell', count: 1 },
+      { key: 'rubedo', name: 'Rubedo', count: 1250 },
+    ],
+  };
+  return base;
+}
+
+describe('part crafting materials', () => {
+  it("count as the goal's resources until you own the part, with the part share named", () => {
+    const g = buildGoal(input(1, crafted()), new Map());
+    const by = (n: string) => g.resources.find((r) => r.name === n)!;
+    // Own recipe first (Credits, Orokin Cell), then part-only materials A-Z.
+    expect(g.resources.map((r) => r.name)).toEqual([
+      'Credits',
+      'Orokin Cell',
+      'Alloy Plate',
+      'Plastids',
+      'Rubedo',
+    ]);
+    expect(by('Credits')).toMatchObject({ count: 55000, forParts: 30000 });
+    expect(by('Orokin Cell')).toMatchObject({ count: 6, forParts: 1 });
+    expect(by('Alloy Plate')).toMatchObject({ count: 5500, forParts: 5500 });
+  });
+
+  it('owning a part removes its materials, and progress keeps the same total', () => {
+    const none = buildGoal(input(1, crafted()), new Map());
+    const chassis = buildGoal(input(1, crafted(), [['Chassis', 1]]), new Map());
+    expect(chassis.resources.map((r) => r.name)).toEqual(['Credits', 'Orokin Cell', 'Rubedo']);
+    expect(chassis.resources.find((r) => r.name === 'Credits')).toMatchObject({
+      count: 40000,
+      forParts: 15000,
+    });
+    expect(chassis.progress.total).toBe(none.progress.total);
+    expect(chassis.progress.done).toBe(none.progress.done + 1);
+
+    const all = buildGoal(
+      input(1, crafted(), [
+        ['Blueprint', 1],
+        ['Chassis', 1],
+        ['Systems', 1],
+      ]),
+      new Map([
+        ['credits', 25000],
+        ['orokin cell', 5],
+      ]),
+    );
+    expect(all.resources.map((r) => [r.name, r.forParts])).toEqual([
+      ['Credits', 0],
+      ['Orokin Cell', 0],
+    ]);
+    expect(all.ready).toBe(true);
+  });
+
+  it("is not ready while a part is missing, even if the item's own resources are covered", () => {
+    const stock = new Map([
+      ['credits', 100000],
+      ['orokin cell', 10],
+      ['alloy plate', 9999],
+      ['plastids', 9999],
+      ['rubedo', 9999],
+    ]);
+    const g = buildGoal(
+      input(1, crafted(), [
+        ['Blueprint', 1],
+        ['Systems', 1],
+      ]),
+      stock,
+    );
+    expect(g.ready).toBe(false);
+  });
+
+  it('are handed out in goal order with everything else, and reach the shopping list', () => {
+    const stock = new Map([['plastids', 600]]);
+    const goals = buildGoals([input(1, crafted()), input(2, crafted())], stock);
+    expect(goals[0]!.resources.find((r) => r.name === 'Plastids')).toMatchObject({
+      have: 450,
+      stock: 600,
+    });
+    expect(goals[1]!.resources.find((r) => r.name === 'Plastids')).toMatchObject({ have: 150 });
+    const list = shoppingList(goals, stock);
+    expect(list.find((r) => r.name === 'Plastids')).toMatchObject({
+      needed: 900,
+      have: 600,
+      missing: 300,
+    });
+  });
+
+  it("carry the user's note for each part", () => {
+    const r = crafted();
+    const g = buildGoal(
+      { ...input(1, r), notes: new Map([['Crafted Prime/Blueprint', 'Quest reward']]) },
+      new Map(),
+    );
+    expect(g.parts.find((p) => p.name === 'Blueprint')!.note).toBe('Quest reward');
+    expect(g.parts.find((p) => p.name === 'Chassis')!.note).toBe('');
   });
 });
 
