@@ -9,6 +9,8 @@ import {
   PutTickResponse,
   SettingsResponse,
   TrackerResponse,
+  WarframeDetail,
+  WarframesResponse,
   WorldstateResponse,
   type CreateItemRequest,
   type CreateSectionRequest,
@@ -228,4 +230,23 @@ export function craftPart(key: string): Promise<GoalsResponse> {
 /** Puts back the last craft or build. */
 export function undoLast(): Promise<GoalsResponse> {
   return request(GoalsResponse, '/api/undo', json('POST'));
+}
+
+/** Every Warframe, A–Z (fetched from warframestat.us at most weekly by the server). */
+export function getWarframes(): Promise<WarframesResponse> {
+  return request(WarframesResponse, '/api/warframes');
+}
+
+export function getWarframe(slug: string): Promise<WarframeDetail> {
+  return request(WarframeDetail, `/api/warframes/${encodeURIComponent(slug)}`);
+}
+
+/** Fetches the list again now (the server allows it once an hour). */
+export function refreshWarframes(): Promise<WarframesResponse> {
+  return request(WarframesResponse, '/api/warframes/refresh', json('POST'));
+}
+
+/** Where a Warframe image is served from (downloaded once, then local). */
+export function imageUrl(file: string): string {
+  return `/api/images/${encodeURIComponent(file)}`;
 }
