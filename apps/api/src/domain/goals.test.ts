@@ -24,6 +24,7 @@ function recipe(
       count,
       drops: [],
       craft: null,
+      sources: [],
     })),
     resources: resources.map(([n, count]) => ({ key: n.toLowerCase(), name: n, count, drops: [] })),
   };

@@ -266,6 +266,32 @@ describe('goals', () => {
     expect(after.progress.total).toBe(g.progress.total);
   });
 
+  it('names the quest the wiki says a Blueprint comes from, and keeps the part note separate', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus');
+    const blueprint = part(g, 'Blueprint');
+    expect(blueprint.drops).toEqual([]);
+    expect(blueprint.sources).toEqual([
+      {
+        kind: 'quest',
+        title: 'The Glast Gambit',
+        url: 'https://wiki.warframe.com/wiki/The_Glast_Gambit',
+      },
+    ]);
+    expect(part(g, 'Chassis').sources).toEqual([]);
+
+    // A note doesn't remove the wiki source; the screen shows the note instead.
+    const noted = GoalsResponse.parse(
+      (
+        await call(ctx, 'PATCH', `/api/goals/${g.id}/parts`, {
+          componentKey: blueprint.key,
+          note: 'Done',
+        })
+      ).json(),
+    ).active[0]!;
+    expect(part(noted, 'Blueprint')).toMatchObject({ note: 'Done' });
+    expect(part(noted, 'Blueprint').sources).toHaveLength(1);
+  });
+
   it('can set the stock of a material only a part needs', async () => {
     const g = await add(ctx, 'nidus', 'Nidus Prime');
     const plastids = resource(g, 'Plastids');

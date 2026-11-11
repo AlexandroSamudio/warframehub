@@ -88,6 +88,14 @@ Inside the established world. No new visual identity.
 - Anti-goals unchanged: no modal, no new nesting; the note field reuses `AmountField`'s save/feedback pattern.
 - **After the critique of this change (27/40; Alex chose all fixes):** materials as unbreakable quantity + name pairs; the card's resources split into "For {item}" and "Only for parts, until you have them", most missing first; the queue's Resources group shows the top 5 with "Show all"; the queue's note field has a visible label and a 200-character limit; "Recipe not found. Check in game."; "Digital Extremes'" instead of "DE".
 
+## Addendum: where no-drop parts come from (10 Nov 2026, Alex's request)
+
+- Alex found by hand that the Nidus Blueprint comes from The Glast Gambit (quest) and asked for this to be filled in from the wiki where it can be, without guessing. **Mix (his choice):** a script reads quest reward fields on the Warframe wiki into a committed file; **his own note always wins**; what the wiki doesn't state stays manual.
+- A part with no drop data and a wiki quest source shows one line, **"Quest: The Glast Gambit · Warframe wiki"**, the quest name as an external link (opens in a new tab), instead of "Not in drop tables". Where Alex has typed a note, **only the note shows**.
+- The note field stays under it. Its label is "Where do you get this?" when the part has no source, and "Your own note (shown instead of the wiki)" when it has one.
+- The line appears in both places the part appears (the farm queue's "Get another way" and the part in its goal card), through one shared component.
+- Anti-goals unchanged: no modal, no new colour (the link follows the existing link style), no icon for the link.
+
 ## Direction contract
 
 THESIS: a farming queue first, the goals second. It refuses the default "grid of goal cards with progress rings".

@@ -4,6 +4,7 @@ import type {
   GoalsResponse,
   ItemDrop,
   PartCraft,
+  PartSource,
   ShoppingRow,
 } from '@warframehub/shared';
 
@@ -18,6 +19,8 @@ export interface MissingPart {
   drops: ItemDrop[];
   /** Your own note on where this part comes from. */
   note: string;
+  /** Quest rewards the Warframe wiki names for this part. */
+  sources: PartSource[];
 }
 
 export interface FarmQueue {
@@ -56,6 +59,7 @@ export function farmQueue(data: GoalsResponse): FarmQueue {
         missing: p.count - p.owned,
         drops: p.drops,
         note: p.note,
+        sources: p.sources,
       };
       (p.drops.length === 0 ? other : goal.vaulted === true ? vaulted : farmNow).push(part);
     }

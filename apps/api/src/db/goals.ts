@@ -10,6 +10,7 @@ import { buildGoals, shoppingList, type GoalInput, type Stock } from '../domain/
 import { HttpError } from '../http-error.js';
 import type { ItemCatalog } from '../sources/items.js';
 import { partCraft } from '../sources/part-recipes.js';
+import { partSources } from '../sources/part-sources.js';
 import type { Db } from './client.js';
 import { goalParts, goals, resourceStock } from './schema.js';
 
@@ -23,7 +24,11 @@ function parseRecipe(json: string): ItemRecipe {
   const recipe = ItemRecipe.parse(JSON.parse(json));
   return {
     ...recipe,
-    parts: recipe.parts.map((p) => ({ ...p, craft: partCraft(p.key) ?? p.craft })),
+    parts: recipe.parts.map((p) => ({
+      ...p,
+      craft: partCraft(p.key) ?? p.craft,
+      sources: partSources(recipe.name, p.name),
+    })),
   };
 }
 

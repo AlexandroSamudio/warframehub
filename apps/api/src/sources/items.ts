@@ -111,8 +111,9 @@ export function normaliseItem(raw: unknown): ItemRecipe | null {
       count: c.itemCount,
       drops: drops(c.drops),
     };
-    if (c.category === 'Components') parts.push({ ...component, craft: partCraft(c.uniqueName) });
-    else resources.push(component);
+    if (c.category === 'Components') {
+      parts.push({ ...component, craft: partCraft(c.uniqueName), sources: [] });
+    } else resources.push(component);
   }
   if (item.buildPrice && item.buildPrice > 0) {
     resources.push({ key: 'credits', name: 'Credits', count: item.buildPrice, drops: [] });

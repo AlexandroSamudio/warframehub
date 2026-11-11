@@ -191,7 +191,7 @@ export const en = {
   'farm.farmNow': 'Farm now',
   'farm.otherTitle': 'Get another way',
   'farm.otherHint':
-    'No drop table lists these (quest, Market, vendor…). Add a note so you remember where.',
+    'No drop table lists these (quest, Market, vendor…). Where the wiki names a quest it shows here; add your own note for the rest.',
   'farm.vaultedTitle': 'Vaulted: trade or wait',
   'farm.vaultedOnce':
     'These relics no longer drop. Trade for the parts, or wait until the item is unvaulted.',
@@ -230,6 +230,11 @@ export const en = {
   'part.craftList': 'Materials to craft {name}',
   'part.craftMissing': 'Recipe not found. Check in game.',
   'part.noteLabel': 'Where do you get this?',
+  'part.noteLabelOwn': 'Your note (replaces the wiki)',
+  'part.noteLabelReplaces': 'Your note (replaces the wiki: {quests})',
+  'part.opensNewTab': '(opens in a new tab)',
+  'part.sourceQuest': 'Quest:',
+  'part.sourceWiki': 'Warframe wiki',
   'part.notePlaceholder': 'e.g. Quest reward',
   'part.noteSaved': 'Saved',
   'part.noteTooLong': 'Up to 200 characters',
