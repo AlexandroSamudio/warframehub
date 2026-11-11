@@ -52,6 +52,7 @@ function goal(
     resources: [],
     progress: { done: 0, total: 1 },
     ready: false,
+    mastered: false,
     createdAt: T,
     builtAt: null,
     recipeFetchedAt: T,

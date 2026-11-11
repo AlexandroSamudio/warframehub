@@ -7,11 +7,13 @@ import {
 } from '@warframehub/shared';
 import { and, asc, eq, inArray, max } from 'drizzle-orm';
 import { buildGoals, shoppingList, type GoalInput, type Stock } from '../domain/goals.js';
+import { isMastered } from '../domain/mastery.js';
 import { HttpError } from '../http-error.js';
 import type { ItemCatalog } from '../sources/items.js';
 import { partCraft } from '../sources/part-recipes.js';
 import { partSources } from '../sources/part-sources.js';
 import type { Db } from './client.js';
+import { profileXp } from './profile.js';
 import { goalParts, goals, resourceStock } from './schema.js';
 
 /** Goal planner storage (SPEC §13). Every change answers with the full `GoalsResponse`. */
@@ -64,17 +66,22 @@ export function loadGoals(db: Db, userId: number): GoalsResponse {
     }
   }
   const stock = stockMap(db, userId);
+  const xp = profileXp(db, userId);
   // Rows are in goal order, so the shared stock goes to the higher goal first.
-  const inputs: GoalInput[] = rows.map((r) => ({
-    id: r.id,
-    status: r.status,
-    recipe: parseRecipe(r.recipeJson),
-    owned: ownedByGoal.get(r.id) ?? new Map(),
-    notes: notesByGoal.get(r.id) ?? new Map(),
-    createdAt: r.createdAt,
-    builtAt: r.builtAt,
-    recipeFetchedAt: r.recipeFetchedAt,
-  }));
+  const inputs: GoalInput[] = rows.map((r) => {
+    const recipe = parseRecipe(r.recipeJson);
+    return {
+      id: r.id,
+      status: r.status,
+      recipe,
+      mastered: isMastered(recipe.category, xp.get(recipe.uniqueName)),
+      owned: ownedByGoal.get(r.id) ?? new Map(),
+      notes: notesByGoal.get(r.id) ?? new Map(),
+      createdAt: r.createdAt,
+      builtAt: r.builtAt,
+      recipeFetchedAt: r.recipeFetchedAt,
+    };
+  });
   const all = buildGoals(inputs, stock);
 
   const active = all.filter((g) => g.status === 'active');

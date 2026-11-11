@@ -7,8 +7,9 @@ import { buildApp } from '../app.js';
 import { openDatabase } from '../db/client.js';
 import { initDatabase } from '../db/init.js';
 import { loadSeed } from '../domain/seed.js';
+import { ItemCatalog } from './items.js';
 import { MIN_REFRESH_GAP_MS, normaliseProfile, ProfileService } from './profile.js';
-import { fixture } from './test-fixtures.js';
+import { fakeItemsApi, fixture } from './test-fixtures.js';
 import { UnexpectedDataError } from './warframestat.js';
 import type { FetchFn } from './worldstate.js';
 
@@ -203,5 +204,58 @@ describe('restart', () => {
     expect(second.de.state.calls).toHaveLength(0);
     await second.app.close();
     second.database.close();
+  });
+});
+
+describe('goals and the imported profile', () => {
+  it('marks a goal mastered once the profile shows rank 30 XP for it', async () => {
+    const database = openDatabase(':memory:');
+    const { userId } = initDatabase(database.db, loadSeed(), START);
+    const de = fakeDe();
+    const raw = structuredClone(profileFixture()) as {
+      Results: { LoadOutInventory: { XPInfo: { ItemType: string; XP: number }[] } }[];
+    };
+    raw.Results[0]!.LoadOutInventory.XPInfo.push(
+      { ItemType: '/Lotus/Powersuits/Infestation/InfestationPrime', XP: 900_000 }, // Nidus Prime
+      { ItemType: '/Lotus/Weapons/Tenno/Shotgun/PrimeBoar', XP: 449_999 }, // Boar Prime, one short
+    );
+    de.state.body = raw;
+    const items = fakeItemsApi();
+    const now = () => START;
+    const app = await buildApp({
+      db: database.db,
+      userId,
+      now,
+      liveTimes: () => ({}),
+      items: new ItemCatalog(database.db, { fetch: items.fetchFn, now, sleep: async () => {} }),
+      profile: new ProfileService(database.db, userId, { fetch: de.fetchFn, now }),
+    });
+    const add = async (q: string, name: string) => {
+      const found = (await app.inject({ method: 'GET', url: `/api/goals/search?q=${q}` })).json();
+      const hit = found.results.find((r: { name: string }) => r.name === name);
+      await app.inject({
+        method: 'POST',
+        url: '/api/goals',
+        payload: { uniqueName: hit.uniqueName },
+      });
+    };
+    await add('nidus', 'Nidus Prime');
+    await add('boar', 'Boar Prime');
+    const mastered = async () =>
+      Object.fromEntries(
+        (await app.inject({ method: 'GET', url: '/api/goals' }))
+          .json()
+          .active.map((g: { name: string; mastered: boolean }) => [g.name, g.mastered]),
+      );
+    expect(await mastered()).toEqual({ 'Nidus Prime': false, 'Boar Prime': false }); // nothing imported
+
+    await app.inject({ method: 'PUT', url: '/api/profile/account', payload: { accountId: ID } });
+    await app.inject({ method: 'POST', url: '/api/profile/refresh' });
+    expect(await mastered()).toEqual({ 'Nidus Prime': true, 'Boar Prime': false });
+
+    await app.inject({ method: 'DELETE', url: '/api/profile' });
+    expect(await mastered()).toEqual({ 'Nidus Prime': false, 'Boar Prime': false });
+    await app.close();
+    database.close();
   });
 });
