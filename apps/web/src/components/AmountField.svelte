@@ -50,6 +50,8 @@
       return;
     }
     if (await onSave(amount)) flash('saved');
+    // Not saved (the page shows why): show the saved amount again, not the rejected one.
+    else input.value = formatAmount(value);
   }
 
   function reset(e: Event) {

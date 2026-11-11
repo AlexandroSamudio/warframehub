@@ -515,6 +515,19 @@ describe('inventory: parts as entities, craft, build, undo', () => {
     expect(partRow(await goals(ctx), key)?.crafted).toBe(0);
   });
 
+  it('a part with saved amounts stays editable after its goal is removed', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const key = part(g, 'Systems').key;
+    await call(ctx, 'PUT', '/api/parts', { key, crafted: 1 });
+    await call(ctx, 'DELETE', `/api/goals/${g.id}`);
+    const res = await call(ctx, 'PUT', '/api/parts', { key, crafted: 0 });
+    expect(res.statusCode).toBe(200);
+    expect(partRow(GoalsResponse.parse(res.json()), key)).toMatchObject({
+      name: 'Nidus Prime Systems',
+      crafted: 0,
+    });
+  });
+
   it('rejects a part no goal needs', async () => {
     const res = await call(ctx, 'PUT', '/api/parts', { key: '/Nope', crafted: 1 });
     expect(res.statusCode).toBe(404);

@@ -5,6 +5,7 @@
   import { t } from './lib/i18n/index.ts';
   import { hrefFor, router, type Route } from './lib/route.svelte.ts';
   import Goals from './routes/Goals.svelte';
+  import Inventory from './routes/Inventory.svelte';
   import Profile from './routes/Profile.svelte';
   import Settings from './routes/Settings.svelte';
   import Tracker from './routes/Tracker.svelte';
@@ -12,7 +13,7 @@
   let health = $state<HealthResponse | null>(null);
   let stopped = $state(false);
 
-  const NAV: Route[] = ['tracker', 'goals', 'profile', 'settings'];
+  const NAV: Route[] = ['tracker', 'goals', 'inventory', 'profile', 'settings'];
   // The server stops after a while with no open page; this tells it we're here (SPEC §9.2).
   const HEARTBEAT_MS = 60_000;
 
@@ -58,6 +59,8 @@
       </section>
     {:else if router.route === 'goals'}
       <Goals />
+    {:else if router.route === 'inventory'}
+      <Inventory />
     {:else if router.route === 'profile'}
       <Profile />
     {:else if router.route === 'settings'}
@@ -116,8 +119,23 @@
 
   nav {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.25rem;
     margin-left: auto;
+  }
+
+  /* Phone: five items don't fit beside the title; the menu takes its own row. */
+  @media (max-width: 36rem) {
+    nav {
+      margin-left: 0;
+      width: 100%;
+      gap: 0;
+    }
+
+    nav a {
+      padding: 0.3rem 0.5rem;
+      letter-spacing: 0.06em;
+    }
   }
 
   nav a {

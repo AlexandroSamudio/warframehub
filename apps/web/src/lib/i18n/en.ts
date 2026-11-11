@@ -151,6 +151,7 @@ export const en = {
   'nav.label': 'Main',
   'nav.tracker': 'Tracker',
   'nav.goals': 'Goals',
+  'nav.inventory': 'Inventory',
   'nav.profile': 'Profile',
   'nav.settings': 'Settings',
 
@@ -208,6 +209,7 @@ export const en = {
   'farm.tooMany': 'At most {max}',
   'farm.entryHint': 'Type a total, or +250 to add and -30 to take away.',
   'farm.saved': 'Saved',
+  'farm.haveLabel': 'Have {name}',
   'farm.have': 'Have',
   'farm.haveOf': 'of {needed}',
   'farm.missing': '{missing} missing',
@@ -347,6 +349,25 @@ export const en = {
   'undo.crafted': 'Crafted {name}.',
   'undo.built': 'Built {name}.',
   'undo.hint': 'You can undo this until {time}.',
+
+  'inventory.title': 'Inventory',
+  'inventory.loading': 'Loading your inventory…',
+  'inventory.filterLabel': 'Find a resource or part',
+  'inventory.filterPlaceholder': 'Find a resource or part',
+  'inventory.empty': 'Nothing here yet. Add a goal, and what it needs shows up here.',
+  'inventory.emptyLink': 'Go to Goals',
+  'inventory.noMatch': 'Nothing matches "{query}".',
+  'inventory.resources': 'Resources',
+  'inventory.parts': 'Parts',
+  'inventory.idle': 'Not needed right now ({count})',
+  'inventory.idleHint': 'Amounts you saved that no active goal uses.',
+  'inventory.of': 'of {needed}',
+  'inventory.short': '{short} short',
+  'inventory.enough': 'enough',
+  'inventory.partToGo': '{n} to go',
+  'inventory.partCraft': 'craft it',
+  'inventory.partDone': 'done',
+  'inventory.times': '× {count}',
 } as const;
 
 export type MessageKey = keyof typeof en;

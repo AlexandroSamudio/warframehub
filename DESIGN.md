@@ -360,6 +360,14 @@ A right-aligned tabular input with thousands separators (7.5rem; **compact** 3.5
 
 The Settings pattern: one `.frame.accent` panel, 44rem wide, a gold `h2`, a definition list (Readout-grey labels in the display face, tabular values) that goes to one column under 36rem. Two states: setup (a labelled Account ID field with Save, three numbered steps, a muted privacy line) and loaded (an "Updated {time} ({UTC} UTC)" line with the primary Refresh button on the right, a muted status line under it, the list, intrinsics as wrapped "name level" pairs in two groups, and a footer with "Change account ID" and a danger "Forget profile" that confirms inline). Refresh is disabled, not hidden, while locked, and the line under it says when it works again. The account ID is never shown after saving. The goal card's "already mastered" is the plain muted `.badge`, like "vaulted".
 
+### Inventory screen
+
+The Goals screen's language on one column (≤ 60rem): a header row with the gold title and a `type="search"` filter, one muted hint about `+250 / -30`, then two frame panels. **Resources** (gold corner tick): rows with the name (600) and "for {goals}" (muted), a Have Amount Field in fixed columns (`auto auto 6.5rem`, so every field lines up), "of 70,000", and "1,250 short" in gold or "enough" in green. **Parts**: a small uppercase Label per goal, then rows with the part's full name, its compact amounts, and what's next: "craft it" or "1 to go" (gold), or "done" (green, name struck through). Saved amounts no active goal uses sit in a closed `<details>` ("Not needed right now (n)") that opens when filtering starts and otherwise stays as you left it. Changing an amount keeps its row in place on screen (`lib/keep-place.ts`, shared with Goals). Rows are A–Z and never re-sort while you type. On phones the amounts drop under the name and the state moves to the top right.
+
+### Navigation on phones
+
+Under 36rem the menu takes its own row under the title and may wrap; links keep their style with tighter padding.
+
 ### Icons
 
 Drawn inline SVG only (`Icon.svelte`): 16px box, 1.5px stroke, square caps and miter joins, `currentColor`, decorative (`aria-hidden`); the control carries the label. Never Unicode glyphs as icons.

@@ -443,7 +443,7 @@ Each phase ends with something you can run and check.
 - **Undo** (`POST /api/undo`): the last craft or build, within 15 minutes, as exact amount changes (never below 0), plus the goal's status. `GoalsResponse.undo` says what can be undone.
 - **Direct amounts:** `PUT /api/parts {key, blueprints?, crafted?}` and `PUT /api/resources`. Each goal part carries `craftShort`, each goal `buildShort`.
 - **UI** (goal card, 11 Nov 2026): Part Rows with Blueprints/Crafted (or Have) amounts and Craft, materials as have / need, build confirm with what it uses (or "Already built in game"), the Undo bar, `+250`/`-30` in every amount field, and a "Blueprints you have" group at the top of the farm queue. `GoalsResponse.undo` is `{kind, name, expiresAt}`; the screen words it. See DESIGN.md.
-- **Next:** an Inventory screen listing every resource and part.
+- **Inventory screen** (`#/inventory`, brief `.impeccable/surfaces/inventory.md`): every entity once, A–Z, from `GET /api/goals` (no new API): needed resources with have / of / short, parts grouped by goal (Blueprints + Crafted, or Have), and a folded "Not needed right now" group for saved amounts no active goal uses. A filter matches names. Editing here changes the same shared amounts the goal cards show.
 
 ### 13.2 Later (not designed in detail yet)
 
