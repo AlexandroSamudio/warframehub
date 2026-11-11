@@ -151,6 +151,23 @@ describe('Warframes routes', () => {
     expect((await ctx.get('/api/warframes/nope')).statusCode).toBe(404);
   });
 
+  it('adds the wiki numbers, passive, augment shops and rank-30 stats', async () => {
+    const d = WarframeDetail.parse((await ctx.get('/api/warframes/nidus')).json());
+    const nidus = d.variants[0]!;
+    const virulence = nidus.abilities[0]!.numbers!;
+    expect(virulence.cost).toBe(40);
+    expect(virulence.range).toEqual(['10 / 11 / 13 / 16 m']);
+    expect(virulence.page).toBe('https://wiki.warframe.com/wiki/Virulence');
+    expect(nidus.passive).not.toMatch(/\|[A-Z]+\|/); // no placeholders
+    expect(nidus.rank30.armor).toBeGreaterThan(nidus.stats.armor);
+    expect(d.augmentShops.length).toBeGreaterThan(0);
+    // Excalibur Umbra's abilities aren't in the wiki data: no numbers, not a guess.
+    const umbra = WarframeDetail.parse((await ctx.get('/api/warframes/excalibur')).json())
+      .variants[2]!;
+    expect(umbra.kind).toBe('umbra');
+    expect(umbra.abilities.some((a) => a.numbers === null)).toBe(true);
+  });
+
   it('lets you add a Warframe as a goal without searching first', async () => {
     const d = WarframeDetail.parse((await ctx.get('/api/warframes/mesa')).json());
     const res = await ctx.app.inject({

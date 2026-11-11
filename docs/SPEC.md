@@ -460,6 +460,7 @@ Each phase ends with something you can run and check.
 - **Versions** are grouped by base name ("Nidus Prime", "Excalibur Umbra" → "Nidus", "Excalibur"); the page address is a slug (`nidus`).
 - **Images** (`apps/api/src/sources/images.ts`, `GET /api/images/:file`): only file names the cached data lists; downloaded once from `cdn.warframestat.us/img/`, kept in `$DATA/images/` (never in the repo), served with a long cache header, also offline.
 - **API:** `GET /api/warframes`, `GET /api/warframes/:slug`, `POST /api/warframes/refresh`, `GET /api/images/:file`.
+- **Wiki data** (`npm run update-ability-stats` → `apps/api/data/ability-stats.json`, committed; the app never calls the wiki): `Module:Ability/data` (energy cost and cost type, augments, Helminth, channeled; matched to warframestat.us by `InternalName`: 264 of 268 Warframe abilities, the rest are Excalibur Umbra's and one of Kullervo's), each ability page's infobox (strength, duration, range and misc lines by rank, e.g. "10 / 11 / 13 / 16 m"), and `Module:Warframes/data` (the passive with its numbers, the syndicates that sell the augments, and rank-30 stats where they differ). The Lua tables are read by a strict reader (`sources/wiki-lua.ts`); wikitext becomes plain lines, and any line with markup the reader doesn't know is dropped, never shown half-parsed (35 of 334 abilities end up without numbers, mostly Railjack, Drifter and Helminth ones). Wiki content is CC BY-SA: the page credits and links it.
 
 ---
 
