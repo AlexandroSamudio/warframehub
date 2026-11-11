@@ -6,6 +6,8 @@
   import { hrefFor, router, type Route } from './lib/route.svelte.ts';
   import Goals from './routes/Goals.svelte';
   import Inventory from './routes/Inventory.svelte';
+  import WarframePage from './routes/WarframePage.svelte';
+  import Warframes from './routes/Warframes.svelte';
   import Profile from './routes/Profile.svelte';
   import Settings from './routes/Settings.svelte';
   import Tracker from './routes/Tracker.svelte';
@@ -13,7 +15,7 @@
   let health = $state<HealthResponse | null>(null);
   let stopped = $state(false);
 
-  const NAV: Route[] = ['tracker', 'goals', 'inventory', 'profile', 'settings'];
+  const NAV: Route[] = ['tracker', 'goals', 'warframes', 'inventory', 'profile', 'settings'];
   // The server stops after a while with no open page; this tells it we're here (SPEC §9.2).
   const HEARTBEAT_MS = 60_000;
 
@@ -59,6 +61,10 @@
       </section>
     {:else if router.route === 'goals'}
       <Goals />
+    {:else if router.route === 'warframes' && router.param}
+      <WarframePage slug={router.param} />
+    {:else if router.route === 'warframes'}
+      <Warframes />
     {:else if router.route === 'inventory'}
       <Inventory />
     {:else if router.route === 'profile'}

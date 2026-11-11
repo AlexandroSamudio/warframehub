@@ -368,6 +368,18 @@ The Goals screen's language on one column (≤ 60rem): a header row with the gol
 
 Under 36rem the menu takes its own row under the title and may wrap; links keep their style with tighter padding.
 
+### Warframes list
+
+The Inventory header row (gold title, `type="search"` filter), a muted meta line ("65 Warframes · Updated 11 Nov 2026 · Refresh" — Refresh is a small teal text action that explains its hourly lock only when pressed), then a grid of **portrait tiles** (`auto-fill`, ~9rem; 3 columns on phones). The filter matches names (and the words "prime"/"umbra" for versions) and is remembered when you come back; focus returns to the tile you opened. A tile is one link: a square portrait cropped from the top (`object-fit: cover`, lazy), the name in the display face, and small badges (prime, umbra, and mastered only when every version is). Tiles use the surface colour, a thin line border that turns gold on hover, and a 10px cut corner; the focus ring is drawn inside the tile because `clip-path` would cut an outside ring off.
+
+### Warframe page
+
+One column (≤ 56rem) of frame panels: a header panel (gold accent) with the portrait in a cut-corner frame (10rem; 8rem and stacked on phones), the name (gold, 1.5rem), the **version switch** (a segmented radio group in the button style: the chosen version gold on a gold-tinted fill; others brighten with a gold line on hover), badges, the release line, the description and the passive ("Passive" in gold display face). Opening a page focuses the name; prose is held to 60ch. Then **Abilities** (rows: a 40px icon in a small cut-corner frame, the key number in gold, the name, the description, and a two-column numbers list: Cost, Strength, Duration, Range, Other; tabular digits; one column on phones), **Augments**, **Stats and polarities** (definition list; "(450 at rank 30)" in Dim Readout where the wiki differs), **How to get it** (the goal planner's best drop/relic per part, "To craft" materials, "To build" resources, then **Add as goal** or "In your goals"/"Built") and **Your progress**. A small muted credit line closes the page (wiki CC BY-SA, warframestat.us, Digital Extremes).
+
+### DE images
+
+Portraits and ability icons are **content**, never decoration: always inside a thin frame on the surface colour, with fixed width and height (no layout shift), no filters, tints or glows, never as a background. A portrait has alt text with the Warframe's name; an ability icon next to its name is decorative (`alt=""`). A failed image leaves its frame empty at the same size.
+
 ### Icons
 
 Drawn inline SVG only (`Icon.svelte`): 16px box, 1.5px stroke, square caps and miter joins, `currentColor`, decorative (`aria-hidden`); the control carries the label. Never Unicode glyphs as icons.
