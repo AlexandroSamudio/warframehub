@@ -7,3 +7,4 @@ export * from './edit.js';
 export * from './settings.js';
 export * from './goals.js';
 export * from './profile.js';
+export * from './warframes.js';

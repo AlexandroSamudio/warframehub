@@ -137,7 +137,7 @@ components:
 
 WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.
 
-Most visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No game art, logos or copied UI.
+Most visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits and ability icons appear only as content in the Warframes section.
 
 **Key Characteristics:**
 
@@ -388,6 +388,6 @@ Drawn inline SVG only (`Icon.svelte`): 16px box, 1.5px stroke, square caps and m
 - **Don't** add shadows, glows on components, rounded corners or solid-filled buttons.
 - **Don't** use Rajdhani for changing numbers (it has no tabular digits).
 - **Don't** use gold and teal on the same element, or green and rose for anything but status.
-- **Don't** use DE logos, game art or copied UI assets; decoration is original CSS or SVG geometry.
+- **Don't** use DE logos or copied UI assets; decoration is original CSS or SVG geometry. DE images are content (Warframes section only), never decoration.
 - **Don't** add a light theme; the console is dark by design.
 - **Don't** show cosmetic content (decorations, furniture, skins).
