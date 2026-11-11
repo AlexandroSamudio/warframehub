@@ -14,6 +14,7 @@ function recipe(
     name,
     category: 'warframe',
     type: 'Warframe',
+    blueprintReusable: false,
     isPrime: true,
     vaulted: false,
     masteryReq: 0,

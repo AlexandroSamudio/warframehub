@@ -199,12 +199,41 @@ export const goalParts = sqliteTable(
       .notNull()
       .references(() => goals.id, { onDelete: 'cascade' }),
     componentKey: text('component_key').notNull(),
+    /** Unused since migration 0006 (moved to `part_stock.crafted`); kept, never edited. */
     owned: integer('owned').notNull().default(0),
     /** The user's own note, e.g. where a part with no drop data comes from. */
     note: text('note').notNull().default(''),
   },
   (t) => [primaryKey({ columns: [t.goalId, t.componentKey] })],
 );
+
+/**
+ * A part as an entity (SPEC §13.4), shared by all goals: blueprints you hold and finished
+ * parts. Keyed by the part's `uniqueName` (the key `part-recipes.json` uses). Parts that
+ * aren't crafted (the main blueprint, Prime weapon parts) only use `crafted`.
+ */
+export const partStock = sqliteTable(
+  'part_stock',
+  {
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    partKey: text('part_key').notNull(),
+    name: text('name').notNull(),
+    blueprints: integer('blueprints').notNull().default(0),
+    crafted: integer('crafted').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.partKey] })],
+);
+
+/** The last craft or build, as exact amount changes, so it can be undone. One per user. */
+export const undoLog = sqliteTable('undo_log', {
+  userId: integer('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  actionJson: text('action_json').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
 
 /** How much of a resource the user has. Shared by all goals ("I have 12 Orokin Cells"). */
 export const resourceStock = sqliteTable(

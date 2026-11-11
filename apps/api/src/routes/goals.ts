@@ -1,8 +1,11 @@
 import {
+  BuildGoalRequest,
+  CraftPartRequest,
   CreateGoalRequest,
   GoalsResponse,
   ItemSearchResponse,
   ReorderGoalsRequest,
+  SetPartStockRequest,
   SetStockRequest,
   UpdateGoalPartRequest,
 } from '@warframehub/shared';
@@ -10,6 +13,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
 import {
+  craftPart,
   createGoal,
   deleteGoal,
   loadGoals,
@@ -18,7 +22,9 @@ import {
   refreshRecipe,
   reorderGoals,
   updatePart,
+  setPartStock,
   setStock,
+  undoLast,
 } from '../db/goals.js';
 import type { ItemCatalog } from '../sources/items.js';
 
@@ -35,7 +41,7 @@ const IdParams = z.object({ id: z.coerce.number().int().positive() });
 /** Goal planner routes (SPEC §13). Every change answers with the full `GoalsResponse`. */
 export function registerGoalRoutes(app: FastifyInstance, deps: GoalRouteDeps): void {
   const { db, userId, now, items } = deps;
-  const current = (): GoalsResponse => GoalsResponse.parse(loadGoals(db, userId));
+  const current = (): GoalsResponse => GoalsResponse.parse(loadGoals(db, userId, now()));
 
   /** Warframes and weapons matching `q`, from warframestat.us (cached for a day). */
   app.get('/api/goals/search', async (request): Promise<ItemSearchResponse> => {
@@ -62,9 +68,28 @@ export function registerGoalRoutes(app: FastifyInstance, deps: GoalRouteDeps): v
     return current();
   });
 
+  /** Part amounts: blueprints held and finished parts (SPEC §13.4). */
+  app.put('/api/parts', async (request) => {
+    setPartStock(db, userId, SetPartStockRequest.parse(request.body));
+    return current();
+  });
+
+  /** One Craft: uses the blueprint and materials, adds a finished part. 409 when short. */
+  app.post('/api/parts/craft', async (request) => {
+    craftPart(db, userId, CraftPartRequest.parse(request.body).key, now());
+    return current();
+  });
+
+  /** Puts back the last craft or build. */
+  app.post('/api/undo', async () => {
+    undoLast(db, userId, now());
+    return current();
+  });
+
   app.post('/api/goals/:id/built', async (request) => {
     const { id } = IdParams.parse(request.params);
-    markBuilt(db, userId, id, now());
+    const { useStock } = BuildGoalRequest.parse(request.body ?? undefined);
+    markBuilt(db, userId, id, now(), useStock);
     return current();
   });
 

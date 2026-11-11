@@ -1,8 +1,16 @@
 import type { Goal, GoalResource, GoalStatus, ItemRecipe, ShoppingRow } from '@warframehub/shared';
+import {
+  buildDeltas,
+  craftDeltas,
+  partStockName,
+  shortfalls,
+  type Inventory,
+} from './inventory.js';
 
 /**
  * Goal planner logic (SPEC §13), as pure functions:
- * - parts are owned per goal (a Nidus Chassis only counts for that Nidus);
+ * - parts are shared entities like resources (blueprints and finished parts); `owned` is
+ *   this goal's share of the finished parts (see `sharePartStock` in ./inventory.ts);
  * - a part you don't have yet needs its own crafting materials (Foundry), which count
  *   as resources for the goal until you own the part;
  * - resources are one shared stock ("I have 12 Orokin Cells"), handed out to active goals
@@ -13,8 +21,10 @@ export interface GoalInput {
   id: number;
   status: GoalStatus;
   recipe: ItemRecipe;
-  /** componentKey → how many the user has. Missing keys mean 0. */
+  /** componentKey → this goal's share of the finished parts. Missing keys mean 0. */
   owned: Map<string, number>;
+  /** The whole shared inventory, for the part amounts and what Craft/Build would need. */
+  inventory?: Inventory;
   /** componentKey → the user's note. Missing keys mean no note. */
   notes?: Map<string, string>;
   createdAt: Date;
@@ -77,10 +87,23 @@ export function demands(input: GoalInput): Demand[] {
  */
 export function buildGoal(input: GoalInput, stock: Stock, share: Stock = stock): Goal {
   const { recipe } = input;
+  const inv: Inventory = input.inventory ?? {
+    resources: stock,
+    blueprints: new Map(),
+    crafted: new Map(),
+  };
   const parts = recipe.parts.map((p) => ({
     ...p,
     owned: ownedOf(input, p.key, p.count),
     note: input.notes?.get(p.key) ?? '',
+    blueprints: inv.blueprints.get(p.key) ?? 0,
+    crafted: inv.crafted.get(p.key) ?? 0,
+    craftShort: p.craft
+      ? shortfalls(
+          craftDeltas({ key: p.key, name: partStockName(recipe.name, p.name) }, p.craft),
+          inv,
+        )
+      : [],
   }));
   const needs = demands(input);
   const resources: GoalResource[] = needs.map((d) => ({
@@ -118,6 +141,7 @@ export function buildGoal(input: GoalInput, stock: Stock, share: Stock = stock):
     progress: { done, total },
     ready: done === total,
     mastered: input.mastered ?? false,
+    buildShort: input.status === 'active' ? shortfalls(buildDeltas(recipe), inv) : [],
     createdAt: input.createdAt.toISOString(),
     builtAt: input.builtAt ? input.builtAt.toISOString() : null,
     recipeFetchedAt: input.recipeFetchedAt.toISOString(),

@@ -48,11 +48,15 @@ function goal(
       craft: null,
       note: '',
       sources: [],
+      blueprints: 0,
+      crafted: owned,
+      craftShort: [],
     })),
     resources: [],
     progress: { done: 0, total: 1 },
     ready: false,
     mastered: false,
+    buildShort: [],
     createdAt: T,
     builtAt: null,
     recipeFetchedAt: T,
@@ -77,6 +81,8 @@ describe('farmQueue', () => {
         { key: 'orokin', name: 'Orokin Cell', needed: 5, have: 5, missing: 0, goals: [] },
       ],
       stock: [],
+      partStock: [],
+      undo: null,
     };
     const q = farmQueue(data);
     expect(q.farmNow.map((p) => `${p.goalName} ${p.name}`)).toEqual([

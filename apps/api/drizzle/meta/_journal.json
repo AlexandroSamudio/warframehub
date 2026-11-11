@@ -43,6 +43,13 @@
       "when": 1794400973606,
       "tag": "0005_late_namorita",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794411869162,
+      "tag": "0006_giant_sabra",
+      "breakpoints": true
     }
   ]
 }

@@ -64,7 +64,14 @@ describe('goals', () => {
   });
 
   it('starts empty', async () => {
-    expect(await goals(ctx)).toEqual({ active: [], built: [], shoppingList: [], stock: [] });
+    expect(await goals(ctx)).toEqual({
+      active: [],
+      built: [],
+      shoppingList: [],
+      stock: [],
+      partStock: [],
+      undo: null,
+    });
   });
 
   it('adds a goal from search results, without a second request', async () => {
@@ -147,7 +154,9 @@ describe('goals', () => {
   it('marks a goal built, keeps it in "built", and can bring it back', async () => {
     const g = await add(ctx, 'boar', 'Boar');
     ctx.clock.now = new Date('2026-11-11T10:00:00.000Z');
-    const built = GoalsResponse.parse((await call(ctx, 'POST', `/api/goals/${g.id}/built`)).json());
+    const built = GoalsResponse.parse(
+      (await call(ctx, 'POST', `/api/goals/${g.id}/built`, { useStock: false })).json(),
+    );
     expect(built.active).toEqual([]);
     expect(built.built[0]).toMatchObject({
       name: 'Boar',
@@ -156,7 +165,7 @@ describe('goals', () => {
     });
     expect(built.shoppingList).toEqual([]); // built goals need nothing
 
-    const again = await call(ctx, 'POST', `/api/goals/${g.id}/built`);
+    const again = await call(ctx, 'POST', `/api/goals/${g.id}/built`, { useStock: false });
     expect(ApiError.parse(again.json()).error.code).toBe('already_built');
 
     const back = GoalsResponse.parse(
@@ -167,7 +176,7 @@ describe('goals', () => {
 
   it('will not reactivate a goal that is already active again', async () => {
     const first = await add(ctx, 'boar', 'Boar');
-    await call(ctx, 'POST', `/api/goals/${first.id}/built`);
+    await call(ctx, 'POST', `/api/goals/${first.id}/built`, { useStock: false });
     await add(ctx, 'boar', 'Boar'); // building a second one
     const res = await call(ctx, 'POST', `/api/goals/${first.id}/reactivate`);
     expect(res.statusCode).toBe(409);
@@ -383,5 +392,131 @@ describe('restart', () => {
     ]);
     await second.app.close();
     second.database.close();
+  });
+});
+
+describe('inventory: parts as entities, craft, build, undo', () => {
+  let ctx: Ctx;
+  beforeEach(async () => {
+    ctx = await setup();
+  });
+  afterEach(async () => {
+    await ctx.app.close();
+    ctx.database.close();
+  });
+
+  /** Sets every resource a list of costs needs to exactly that amount. */
+  async function give(costs: { key: string; amount: number }[]) {
+    for (const c of costs) await call(ctx, 'PUT', '/api/resources', c);
+  }
+  const amount = (b: GoalsResponse, key: string) => b.stock.find((s) => s.key === key)?.amount ?? 0;
+  const partRow = (b: GoalsResponse, key: string) => b.partStock.find((p) => p.key === key);
+
+  it('crafts a part with exactly enough, and undo puts it all back', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const chassis = part(g, 'Chassis');
+    const craft = chassis.craft!;
+    expect(craft.ingredients.length).toBeGreaterThan(0);
+    await call(ctx, 'PUT', '/api/parts', { key: chassis.key, blueprints: 1 });
+    const costs = [
+      { key: 'credits', amount: craft.credits },
+      ...craft.ingredients.map((i) => ({ key: i.key, amount: i.count })),
+    ];
+    await give(costs);
+    expect(part((await goals(ctx)).active[0]!, 'Chassis').craftShort).toEqual([]);
+
+    ctx.clock.now = new Date(START.getTime() + 60_000);
+    const res = await call(ctx, 'POST', '/api/parts/craft', { key: chassis.key });
+    expect(res.statusCode).toBe(200);
+    const after = GoalsResponse.parse(res.json());
+    expect(partRow(after, chassis.key)).toMatchObject({
+      name: 'Nidus Prime Chassis',
+      blueprints: 0,
+      crafted: 1,
+    });
+    for (const c of costs) expect(amount(after, c.key)).toBe(0);
+    expect(part(after.active[0]!, 'Chassis').owned).toBe(1);
+    expect(after.undo?.label).toBe('Crafted Nidus Prime Chassis');
+
+    const undone = GoalsResponse.parse((await call(ctx, 'POST', '/api/undo')).json());
+    expect(partRow(undone, chassis.key)).toMatchObject({ blueprints: 1, crafted: 0 });
+    for (const c of costs) expect(amount(undone, c.key)).toBe(c.amount);
+    expect(undone.undo).toBeNull();
+    expect((await call(ctx, 'POST', '/api/undo')).statusCode).toBe(409);
+  });
+
+  it('blocks a craft when one thing is short, and says what', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const chassis = part(g, 'Chassis');
+    const craft = chassis.craft!;
+    await call(ctx, 'PUT', '/api/parts', { key: chassis.key, blueprints: 1 });
+    const [first, ...rest] = craft.ingredients;
+    await give([
+      { key: 'credits', amount: craft.credits },
+      { key: first!.key, amount: first!.count - 1 },
+      ...rest.map((i) => ({ key: i.key, amount: i.count })),
+    ]);
+    const res = await call(ctx, 'POST', '/api/parts/craft', { key: chassis.key });
+    expect(res.statusCode).toBe(409);
+    const err = ApiError.parse(res.json()).error;
+    expect(err.code).toBe('not_enough');
+    expect(err.message).toContain(`Missing: 1 ${first!.name}`);
+    expect(part((await goals(ctx)).active[0]!, 'Chassis').craftShort).toEqual([
+      { kind: 'resource', key: first!.key, name: first!.name, missing: 1 },
+    ]);
+    expect(partRow(await goals(ctx), chassis.key)).toMatchObject({ blueprints: 1, crafted: 0 });
+  });
+
+  it('a part that is not crafted cannot be crafted', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const res = await call(ctx, 'POST', '/api/parts/craft', { key: part(g, 'Blueprint').key });
+    expect(ApiError.parse(res.json()).error.code).toBe('not_crafted');
+  });
+
+  it('building uses up every part and resource; undo brings the goal back', async () => {
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    const blocked = await call(ctx, 'POST', `/api/goals/${g.id}/built`);
+    expect(blocked.statusCode).toBe(409);
+    expect(g.buildShort.map((s) => s.kind)).toContain('part');
+
+    for (const p of g.parts) await call(ctx, 'PUT', '/api/parts', { key: p.key, crafted: p.count });
+    const own = g.resources.filter((r) => r.forParts < r.count); // the item's own recipe
+    await give(own.map((r) => ({ key: r.key, amount: r.count - r.forParts })));
+    expect((await goals(ctx)).active[0]!.buildShort).toEqual([]);
+
+    const built = GoalsResponse.parse((await call(ctx, 'POST', `/api/goals/${g.id}/built`)).json());
+    expect(built.built.map((x) => x.name)).toEqual(['Nidus Prime']);
+    for (const p of g.parts) expect(partRow(built, p.key)?.crafted).toBe(0);
+    for (const r of own) expect(amount(built, r.key)).toBe(0);
+
+    const back = GoalsResponse.parse((await call(ctx, 'POST', '/api/undo')).json());
+    expect(back.active.map((x) => x.name)).toEqual(['Nidus Prime']);
+    for (const p of g.parts) expect(partRow(back, p.key)?.crafted).toBe(p.count);
+  });
+
+  it('undo expires after 15 minutes', async () => {
+    const g = await add(ctx, 'boar', 'Boar');
+    await call(ctx, 'POST', `/api/goals/${g.id}/built`, { useStock: false });
+    ctx.clock.now = new Date(START.getTime() + 15 * 60_000);
+    expect((await goals(ctx)).undo).toBeNull();
+    expect((await call(ctx, 'POST', '/api/undo')).statusCode).toBe(409);
+  });
+
+  it('finished parts are shared in goal order, like resources', async () => {
+    const first = await add(ctx, 'nidus', 'Nidus Prime');
+    await call(ctx, 'DELETE', `/api/goals/${first.id}`);
+    const a = await add(ctx, 'nidus', 'Nidus Prime');
+    const key = part(a, 'Systems').key;
+    // A second goal for the same item can't be active, so check the share on one goal
+    // and that ticking moves the shared stock.
+    await call(ctx, 'PATCH', `/api/goals/${a.id}/parts`, { componentKey: key, owned: 1 });
+    expect(partRow(await goals(ctx), key)?.crafted).toBe(1);
+    await call(ctx, 'PATCH', `/api/goals/${a.id}/parts`, { componentKey: key, owned: 0 });
+    expect(partRow(await goals(ctx), key)?.crafted).toBe(0);
+  });
+
+  it('rejects a part no goal needs', async () => {
+    const res = await call(ctx, 'PUT', '/api/parts', { key: '/Nope', crafted: 1 });
+    expect(res.statusCode).toBe(404);
   });
 });
