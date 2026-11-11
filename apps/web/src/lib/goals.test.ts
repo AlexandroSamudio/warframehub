@@ -10,6 +10,8 @@ import {
   splitResources,
   joinNames,
   parseAmount,
+  parseEntry,
+  materialsWithStock,
   progressPercent,
   relicNames,
 } from './goals.ts';
@@ -222,5 +224,62 @@ describe('formatting', () => {
     expect(joinNames(['Nidus Prime'])).toBe('Nidus Prime');
     expect(joinNames(['Nidus Prime', 'Boar Prime'])).toBe('Nidus Prime and Boar Prime');
     expect(joinNames(['A', 'B', 'C'])).toBe('A, B and C');
+  });
+});
+
+describe('parseEntry', () => {
+  it('sets, adds and subtracts', () => {
+    expect(parseEntry('1,200', 50)).toEqual({ amount: 1200 });
+    expect(parseEntry('+250', 50)).toEqual({ amount: 300 });
+    expect(parseEntry('-30', 50)).toEqual({ amount: 20 });
+    expect(parseEntry(' + 1 000 ', 0)).toEqual({ amount: 1000 });
+    expect(parseEntry('-50', 50)).toEqual({ amount: 0 });
+  });
+
+  it('refuses junk and going below 0', () => {
+    expect(parseEntry('-51', 50)).toEqual({ error: 'belowZero' });
+    expect(parseEntry('abc', 50)).toEqual({ error: 'invalid' });
+    expect(parseEntry('', 50)).toEqual({ error: 'invalid' });
+    expect(parseEntry('+-3', 50)).toEqual({ error: 'invalid' });
+    expect(parseEntry('1.5', 50)).toEqual({ error: 'invalid' });
+  });
+});
+
+describe('materialsWithStock', () => {
+  it('pairs each material with the shared stock, Credits first', () => {
+    const craft = {
+      credits: 15_000,
+      ingredients: [
+        { key: 'r', name: 'Rubedo', count: 50 },
+        { key: 'a', name: 'Alloy Plate', count: 100 },
+      ],
+    };
+    expect(materialsWithStock(craft, [{ key: 'r', amount: 32 }])).toEqual([
+      { key: 'credits', name: 'Credits', need: 15_000, have: 0 },
+      { key: 'a', name: 'Alloy Plate', need: 100, have: 0 },
+      { key: 'r', name: 'Rubedo', need: 50, have: 32 },
+    ]);
+  });
+});
+
+describe('farmQueue: ready to craft', () => {
+  it('moves a part whose blueprint you hold out of Farm now', () => {
+    const g = goal(1, 'Nidus', [['Chassis', 1, 0, [drop('Somewhere', 10)]]]);
+    g.parts[0] = {
+      ...g.parts[0]!,
+      craft: { credits: 0, ingredients: [] },
+      blueprints: 1,
+      craftShort: [],
+    };
+    const q = farmQueue({
+      active: [g],
+      built: [],
+      shoppingList: [],
+      stock: [],
+      partStock: [],
+      undo: null,
+    });
+    expect(q.craftNow.map((p) => p.name)).toEqual(['Chassis']);
+    expect(q.farmNow).toEqual([]);
   });
 });

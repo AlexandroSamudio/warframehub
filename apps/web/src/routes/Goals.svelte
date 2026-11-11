@@ -7,6 +7,7 @@
   import * as api from '../lib/api.ts';
   import { farmQueue } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
+  import { formatLocal, formatUtc } from '../lib/time.ts';
   import { shift } from '../lib/reorder.ts';
 
   let data = $state<GoalsResponse | null>(null);
@@ -37,21 +38,47 @@
   }
 
   /**
-   * Ticking a part removes its row from "What to farm next" above, which would pull the
-   * page up under the pointer. Keep the control that was used where it was on screen.
+   * Getting or crafting a part moves rows in "What to farm next" above, which would pull
+   * the page up under the pointer. Keep the control that was used where it was on screen.
    */
-  async function changePart(id: number, key: string, owned: number) {
+  async function keepPlace(call: () => Promise<GoalsResponse>): Promise<boolean> {
     const el = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const anchorId = el?.id;
-    const before = el?.getBoundingClientRect().top;
-    await run(() => api.setPartOwned(id, key, owned));
+    // Anchor on the row (a part row stays mounted even when its Craft button goes away).
+    const anchor = el?.closest('li') ?? el;
+    const before = anchor?.getBoundingClientRect().top;
+    const ok = await run(call);
     await tick();
-    const after = anchorId ? document.getElementById(anchorId) : null;
-    if (after && before !== undefined) {
-      window.scrollBy({ top: after.getBoundingClientRect().top - before, behavior: 'instant' });
-      after.focus({ preventScroll: true });
+    if (anchor?.isConnected && before !== undefined) {
+      window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: 'instant' });
+    }
+    if (el?.isConnected) el.focus({ preventScroll: true });
+    return ok;
+  }
+
+  async function build(goalId: number, useStock: boolean) {
+    if (await run(() => api.markBuilt(goalId, useStock))) {
+      // The card leaves the list; the Undo button is the natural next step.
+      await tick();
+      undoButton?.focus();
     }
   }
+
+  // The undo bar hides itself when its 15 minutes are up.
+  let now = $state(Date.now());
+  const undo = $derived(data?.undo && Date.parse(data.undo.expiresAt) > now ? data.undo : null);
+  let undoing = $state(false);
+  let undoButton = $state<HTMLButtonElement | null>(null);
+
+  async function undoLast() {
+    if (undoing) return;
+    undoing = true;
+    await run(() => api.undoLast());
+    undoing = false;
+    // The bar (and its button) goes away: put focus on the page title, not on nothing.
+    await tick();
+    titleEl?.focus();
+  }
+  let titleEl = $state<HTMLHeadingElement | null>(null);
 
   function move(goalId: number, by: -1 | 1) {
     if (!data) return;
@@ -78,16 +105,44 @@
       .getGoals()
       .then((d) => (data = d))
       .catch(() => (loadFailed = true));
+    const timer = setInterval(() => (now = Date.now()), 30_000);
+    return () => clearInterval(timer);
   });
 </script>
 
 <div class="goals">
   <div class="top">
-    <h2>{t('goals.title')}</h2>
+    <h2 bind:this={titleEl} tabindex="-1">{t('goals.title')}</h2>
     <GoalSearch active={activeNames} onAdd={(u) => run(() => api.addGoal(u))} />
   </div>
 
   {#if error}<p class="alert frame" role="alert">{error}</p>{/if}
+
+  <!-- Always in the page, so screen readers announce it when it fills. Sticky, so a
+       craft far down the page still shows its Undo. -->
+  <div class="undo" class:shown={undo !== null} role="status">
+    {#if undo}
+      <span
+        >{undo.kind === 'craft'
+          ? t('undo.crafted', { name: undo.name })
+          : t('undo.built', { name: undo.name })}</span
+      >
+      <button
+        type="button"
+        class="teal"
+        bind:this={undoButton}
+        aria-disabled={undoing}
+        onclick={undoLast}
+      >
+        {t('undo.button')}
+      </button>
+      <span class="hint"
+        >{t('undo.hint', {
+          time: `${formatLocal(undo.expiresAt)} (${formatUtc(undo.expiresAt)} UTC)`,
+        })}</span
+      >
+    {/if}
+  </div>
 
   {#if data && queue}
     {#if data.active.length === 0}
@@ -106,10 +161,12 @@
               {goal}
               isFirst={i === 0}
               isLast={i === data.active.length - 1}
-              onPart={changePart}
+              stock={data.stock}
+              onPartStock={(key, amounts) => keepPlace(() => api.setPartStock(key, amounts))}
+              onCraft={(key) => keepPlace(() => api.craftPart(key))}
               onNote={(id, key, note) => run(() => api.setPartNote(id, key, note))}
               onStock={(key, amount) => run(() => api.setStock(key, amount))}
-              onBuilt={(id) => run(() => api.markBuilt(id))}
+              onBuilt={build}
               onRemove={(id) => run(() => api.deleteGoal(id))}
               onRefresh={(id) => run(() => api.refreshGoal(id))}
               onMove={move}
@@ -174,6 +231,37 @@
     margin: 0;
     padding: 0.6rem 0.9rem;
     color: var(--bad);
+  }
+
+  /* Empty: visually hidden but still in the accessibility tree (never display: none). */
+  .undo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .undo.shown {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.7rem;
+    padding: 0.45rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .undo .hint {
+    font-size: 0.8rem;
+    color: var(--muted);
   }
 
   .cards {
