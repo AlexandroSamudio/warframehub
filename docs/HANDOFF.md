@@ -80,7 +80,7 @@ Context from the planning conversation (13 Oct – 10 Nov 2026) that is **not** 
   - Endpoint: `https://api.warframe.com/cdn/getProfileViewingData.php?playerId=<accountId>`. No login needed. **Tested and working from Alex's connection.**
   - **Name lookup was removed in Update 38.0.8.** `?n=<name>` returns "No account or guild ID specified", and warframestat.us `/profile/<name>` returns 404.
   - **Getting the account ID:** log in at warframe.com, then open `https://www.warframe.com/api/user-data` and copy the `user_id` value. That page also shows the email, so never screenshot or log it. Alex's EE.log on Proton does **not** contain the ID.
-  - **What it contains:** Mastery Rank, XP per item ever ranked, star-chart completion, syndicates, intrinsics, loadout and stats.
+  - **What it contains** (real field names seen 11 Nov 2026): `Results[0].PlayerLevel` (Mastery Rank), `LoadOutInventory.XPInfo` (`ItemType` + `XP`), `Missions` (per node), `Affiliations` (syndicates), `PlayerSkills` (`LPS_*` intrinsic levels), top-level `Stats`, loadouts. See SPEC §13.3 (data side built).
   - **What it doesn't:** resources, blueprints, parts or counts. Those need manual entry.
   - **Rate limit:** too many or invalid requests can temporarily block the user's IP from **logging into the game**. Call it rarely (a few times a day at most), cache the result, never retry in a loop.
 - **Inventory:** there is no official inventory API. Reading game memory or network traffic, or using the user's login token, is off-limits.

@@ -7,7 +7,9 @@ import { HttpError } from './http-error.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerGoalRoutes } from './routes/goals.js';
+import { registerProfileRoutes } from './routes/profile.js';
 import { ItemCatalog } from './sources/items.js';
+import { ProfileService } from './sources/profile.js';
 import { registerSystemRoutes } from './routes/system.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
 import { registerWebApp } from './routes/web.js';
@@ -28,6 +30,8 @@ export interface AppOptions {
   worldstate?: WorldstateService;
   /** Goal planner item search (warframestat.us + cache). Created with defaults if not given. */
   items?: ItemCatalog;
+  /** DE public profile import. Created with defaults if not given. */
+  profile?: ProfileService;
   /** The default checklist, for "Restore defaults". Read from disk when not given. */
   seed?: SeedFile;
   /** Overrides the live Sortie/Baro times taken from `worldstate` (tests). */
@@ -132,6 +136,15 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
       }),
   });
+
+  registerProfileRoutes(
+    app,
+    options.profile ??
+      new ProfileService(options.db, options.userId, {
+        now,
+        onError: (reason) => app.log.warn({ reason }, 'profile fetch failed'),
+      }),
+  );
 
   registerSystemRoutes(app, {
     db: options.db,
