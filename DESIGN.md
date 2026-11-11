@@ -322,11 +322,27 @@ A folded frame (10px cut). The header row has:
 - badges (prime, vaulted, ready to build in green);
 - a 4px progress bar and "x of y".
 
-When open, it gets the gold corner tick and 32px ↑/↓ icon buttons. Parts are checkboxes (or a count field). Resources show this goal's **share** in green when covered and in gold when short ("7 of 10 for this goal · 3 short"), next to the shared amount field. A ready goal's seam turns green.
+When open, it gets the gold corner tick and 32px ↑/↓ icon buttons. Parts are **Part Rows** (below). Resources show this goal's **share** in green when covered and in gold when short ("7 of 10 for this goal · 3 short"), next to the shared amount field. A ready goal's seam turns green.
+
+### Part Row
+
+A part as an inventory entity, one row per part with a thin divider. The name (600 weight; "× 2" in Dim Readout when the item needs more than one) sits left, the amounts right, wrapping under it on a phone:
+
+- a part with a recipe has two compact Amount Fields, **Blueprints** and **Crafted**; any other part (the main blueprint, Prime weapon parts) has one, **Have**;
+- until the goal has the part, the **Materials Line** and a primary **Craft** button follow. When Craft can't run it keeps focus (`aria-disabled`, 0.45 opacity like disabled buttons) and a gold reason sits next to it: "No blueprint yet" or "Missing: 1 Tellurium". After a craft that completes the part, focus moves to its Crafted field;
+- once the goal has the part, the name takes the done style (muted, struck through) and the materials and Craft go away.
 
 ### Materials Line
 
-Under a crafted part in a goal card: a small "TO CRAFT" label (Rajdhani, uppercase), then the materials as **quantity + name pairs** (quantity 600 weight in Readout White with tabular digits, name in Dim Readout, 0.85rem). Each pair is one unbreakable unit (`nowrap`), so it never splits across lines, and the list is a real `<ul>` with a label for screen readers. Credits come first, then A–Z.
+Under a part with a recipe: the materials as **have / need + name pairs** ("32 / 50 Rubedo"), the numbers 600 weight with tabular digits in **green when covered and gold when short**, the name in Dim Readout, 0.85rem. Each pair is one unbreakable unit (`nowrap`), and the list is a real `<ul>` labelled for screen readers. Credits come first, then A–Z. "Have" is the whole shared stock (what one Craft would use).
+
+### Undo bar
+
+Under the Goals title, **sticky** at the top of the viewport while shown (surface background, thin line border), so a craft far down the page still shows it: "Crafted Nidus Prime Chassis." + a teal **Undo** button + a muted "You can undo this until Wed 13:18 (16:18 UTC)." It's a `role="status"` region that's always in the page, visually hidden (never `display: none`) when empty. After a build, focus goes to Undo; after Undo, to the page title.
+
+### Build confirm
+
+"Mark as built" confirms inline in gold: "Build Nidus Prime? It uses up its parts, 25,000 Credits and 5 Orokin Cell, then moves to Completed." with a primary "Yes, build it". When something is short it stays gold ("Can't build … Missing: …") and offers "Already built in game (don't change my amounts)" instead. Opening a confirm focuses its first button (described by the question); Cancel returns focus to the button that opened it.
 
 ### Goal Card resources
 
@@ -338,7 +354,7 @@ A single-line text field (200 characters) with a visible label above it, saved o
 
 ### Amount Field
 
-A right-aligned tabular input with thousands separators. Under it, a reserved message line: rose "Whole numbers only" (`aria-invalid`, `aria-describedby`), or green "Saved" for 2 seconds (polite live region). Leaving an invalid entry restores the saved amount.
+A right-aligned tabular input with thousands separators (7.5rem; **compact** 3.5rem for part counts). It takes a total ("1,200") or a change: "+250" adds to what's saved, "-30" takes away; there's no numeric `inputmode`, because phone number pads have no + or −. Under it, a reserved message line: rose "Whole numbers, or +250 / -30" or "Can't go below 0" (`aria-invalid`, `aria-describedby`), or "At most 1,000" (part counts), or green "Saved" for 2 seconds (polite live region). Leaving a bad entry restores the saved amount and keeps the message 3 seconds. A compact field's message hangs below it in reserved space, so the row never shifts. One muted hint per surface explains it: "Type a total, or +250 to add and -30 to take away."
 
 ### Profile panel
 

@@ -5,6 +5,7 @@ import type {
   ItemDrop,
   PartCraft,
   PartSource,
+  Shortfall,
   ShoppingRow,
 } from '@warframehub/shared';
 
@@ -21,9 +22,13 @@ export interface MissingPart {
   note: string;
   /** Quest rewards the Warframe wiki names for this part. */
   sources: PartSource[];
+  /** What stops one Craft (empty when it can be crafted now). */
+  craftShort: Shortfall[];
 }
 
 export interface FarmQueue {
+  /** Parts whose blueprint you hold: craft them in the Foundry (or see what's missing). */
+  craftNow: MissingPart[];
   /** Parts you can farm now, best chance first. */
   farmNow: MissingPart[];
   /** Parts no drop table lists (quest, Market, vendor): you keep a note on where. */
@@ -45,6 +50,7 @@ function bestChance(p: MissingPart): number {
  * worth running this mission is on top. Vaulted parts are listed separately.
  */
 export function farmQueue(data: GoalsResponse): FarmQueue {
+  const craftNow: MissingPart[] = [];
   const farmNow: MissingPart[] = [];
   const other: MissingPart[] = [];
   const vaulted: MissingPart[] = [];
@@ -60,12 +66,25 @@ export function farmQueue(data: GoalsResponse): FarmQueue {
         drops: p.drops,
         note: p.note,
         sources: p.sources,
+        craftShort: p.craftShort,
       };
+      if (p.craft && p.blueprints > 0) {
+        craftNow.push(part);
+        continue;
+      }
       (p.drops.length === 0 ? other : goal.vaulted === true ? vaulted : farmNow).push(part);
     }
   }
   farmNow.sort((a, b) => bestChance(b) - bestChance(a));
-  return { farmNow, other, vaulted, resources: data.shoppingList.filter((r) => r.missing > 0) };
+  // Ready ones first, then the fewest things missing.
+  craftNow.sort((a, b) => a.craftShort.length - b.craftShort.length);
+  return {
+    craftNow,
+    farmNow,
+    other,
+    vaulted,
+    resources: data.shoppingList.filter((r) => r.missing > 0),
+  };
 }
 
 // ---- drops -----------------------------------------------------------------
@@ -151,6 +170,38 @@ export function materialList(craft: PartCraft): { count: number; name: string }[
   return lines;
 }
 
+export interface MaterialStock {
+  key: string;
+  name: string;
+  need: number;
+  have: number;
+}
+
+/** A part's materials with what the shared stock holds of each (Credits first, then A–Z). */
+export function materialsWithStock(
+  craft: PartCraft,
+  stock: { key: string; amount: number }[],
+): MaterialStock[] {
+  const have = new Map(stock.map((s) => [s.key, s.amount]));
+  const lines = craft.ingredients
+    .map((i) => ({ key: i.key, name: i.name, need: i.count, have: have.get(i.key) ?? 0 }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (craft.credits > 0) {
+    lines.unshift({
+      key: 'credits',
+      name: 'Credits',
+      need: craft.credits,
+      have: have.get('credits') ?? 0,
+    });
+  }
+  return lines;
+}
+
+/** "18 Rubedo, 1 blueprint" for a Craft or Build that can't run yet. */
+export function shortList(short: Shortfall[]): string {
+  return short.map((s) => `${formatAmount(s.missing)} ${s.name}`).join(', ');
+}
+
 /** "15,000 Credits · 1,425 Polymer Bundle · 5,500 Alloy Plate" (plain text). */
 export function formatMaterials(craft: PartCraft): string {
   return materialList(craft)
@@ -181,6 +232,21 @@ export function formatAmount(n: number): string {
 }
 
 /** "25,000" or "25000" → 25000; anything that isn't a whole number ≥ 0 → null. */
+export type Entry = { amount: number } | { error: 'invalid' | 'belowZero' };
+
+/**
+ * What the user typed into an amount field: "1,200" sets it, "+250" adds to what's saved,
+ * "-30" takes away. Thousands separators and spaces are fine.
+ */
+export function parseEntry(text: string, current: number): Entry {
+  const m = /^\s*([+-])?\s*([\d,\s]+)$/.exec(text);
+  const n = m ? parseAmount(m[2]!) : null;
+  if (!m || n === null) return { error: 'invalid' };
+  const amount = m[1] === '+' ? current + n : m[1] === '-' ? current - n : n;
+  if (amount < 0) return { error: 'belowZero' };
+  return Number.isSafeInteger(amount) ? { amount } : { error: 'invalid' };
+}
+
 export function parseAmount(text: string): number | null {
   const cleaned = text.replace(/[,\s]/g, '');
   if (!/^\d+$/.test(cleaned)) return null;

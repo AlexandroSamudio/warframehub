@@ -436,7 +436,7 @@ describe('inventory: parts as entities, craft, build, undo', () => {
     });
     for (const c of costs) expect(amount(after, c.key)).toBe(0);
     expect(part(after.active[0]!, 'Chassis').owned).toBe(1);
-    expect(after.undo?.label).toBe('Crafted Nidus Prime Chassis');
+    expect(after.undo).toMatchObject({ kind: 'craft', name: 'Nidus Prime Chassis' });
 
     const undone = GoalsResponse.parse((await call(ctx, 'POST', '/api/undo')).json());
     expect(partRow(undone, chassis.key)).toMatchObject({ blueprints: 1, crafted: 0 });

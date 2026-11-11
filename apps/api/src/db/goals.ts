@@ -63,7 +63,9 @@ function stockMap(db: Db, userId: number): Stock {
 export const UNDO_MS = 15 * 60 * 1000;
 
 interface UndoAction {
-  label: string;
+  kind: 'craft' | 'build';
+  /** What was crafted or built (the screen words it, through t()). */
+  name: string;
   deltas: Delta[];
   /** Set when the action marked a goal as built. */
   builtGoalId?: number;
@@ -152,7 +154,7 @@ export function loadGoals(db: Db, userId: number, now: Date = new Date()): Goals
     .map((p) => ({ key: p.partKey, name: p.name, blueprints: p.blueprints, crafted: p.crafted }));
   const undo = lastUndo(db, userId, now);
   const undoInfo: UndoInfo | null = undo
-    ? { label: undo.label, expiresAt: undo.expiresAt.toISOString() }
+    ? { kind: undo.kind, name: undo.name, expiresAt: undo.expiresAt.toISOString() }
     : null;
 
   return {
@@ -347,7 +349,7 @@ export function craftPart(db: Db, userId: number, key: string, now: Date): void 
   const deltas = craftDeltas({ key, name }, part.craft);
   const short = shortfalls(deltas, inventory(db, userId));
   if (short.length > 0) throw notEnough(`craft ${name}`, short);
-  commit(db, userId, { label: `Crafted ${name}`, deltas }, now);
+  commit(db, userId, { kind: 'craft', name, deltas }, now);
 }
 
 /** Puts back the last craft or build (within {@link UNDO_MS}). */
@@ -420,7 +422,7 @@ export function markBuilt(
   const deltas = useStock ? buildDeltas(parseRecipe(row.recipeJson)) : [];
   const short = shortfalls(deltas, inventory(db, userId));
   if (short.length > 0) throw notEnough(`build ${row.name}`, short);
-  commit(db, userId, { label: `Built ${row.name}`, deltas, builtGoalId: goalId }, now, (tx) =>
+  commit(db, userId, { kind: 'build', name: row.name, deltas, builtGoalId: goalId }, now, (tx) =>
     tx.update(goals).set({ status: 'built', builtAt: now }).where(eq(goals.id, goalId)).run(),
   );
 }

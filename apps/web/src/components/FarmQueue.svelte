@@ -5,6 +5,7 @@
     groupDrops,
     joinNames,
     relicNames,
+    shortList,
     type DropSource,
     type FarmQueue,
     type MissingPart,
@@ -23,7 +24,8 @@
   let { queue, onSetStock, onNote }: Props = $props();
 
   const empty = $derived(
-    queue.farmNow.length === 0 &&
+    queue.craftNow.length === 0 &&
+      queue.farmNow.length === 0 &&
       queue.other.length === 0 &&
       queue.vaulted.length === 0 &&
       queue.resources.length === 0,
@@ -57,6 +59,25 @@
   {#if empty}
     <p class="muted">{t('farm.nothing')}</p>
   {:else}
+    {#if queue.craftNow.length > 0}
+      <h3 class="group">{t('farm.craftNow')}</h3>
+      <ul class="rows">
+        {#each queue.craftNow as p (`${p.goalId}:${p.key}`)}
+          <li class="row">
+            <div class="what">
+              <span class="lead">{p.name}</span>
+              <span class="for">{t('farm.for', { goal: p.goalName })}</span>
+            </div>
+            <p class="best" class:short={p.craftShort.length > 0}>
+              {p.craftShort.length === 0
+                ? t('farm.craftReady')
+                : t('farm.craftMissing', { list: shortList(p.craftShort) })}
+            </p>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
     {#if queue.farmNow.length > 0}
       <h3 class="group">{t('farm.farmNow')}</h3>
       <ul class="rows">
@@ -124,6 +145,7 @@
 
     {#if queue.resources.length > 0}
       <h3 class="group">{t('farm.resources')}</h3>
+      <p class="note">{t('farm.entryHint')}</p>
       <ul class="rows">
         {#each showAllResources ? queue.resources : queue.resources.slice(0, MAX_RESOURCES) as r (r.key)}
           <li class="row resource">
@@ -246,6 +268,12 @@
   .best.none {
     font-weight: 400;
     color: var(--muted);
+  }
+
+  /* Short = gold, as everywhere else in the goal planner. */
+  .best.short {
+    font-weight: 400;
+    color: var(--gold);
   }
 
   .resource {

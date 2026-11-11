@@ -158,18 +158,6 @@ export function addGoal(uniqueName: string): Promise<GoalsResponse> {
   return request(GoalsResponse, '/api/goals', json('POST', { uniqueName }));
 }
 
-export function setPartOwned(
-  goalId: number,
-  componentKey: string,
-  owned: number,
-): Promise<GoalsResponse> {
-  return request(
-    GoalsResponse,
-    `/api/goals/${goalId}/parts`,
-    json('PATCH', { componentKey, owned }),
-  );
-}
-
 export function setPartNote(
   goalId: number,
   componentKey: string,
@@ -186,9 +174,9 @@ export function setStock(key: string, amount: number): Promise<GoalsResponse> {
   return request(GoalsResponse, '/api/resources', json('PUT', { key, amount }));
 }
 
-/** Until the build-with-stock UI lands, marking built leaves amounts alone (as before). */
-export function markBuilt(goalId: number): Promise<GoalsResponse> {
-  return request(GoalsResponse, `/api/goals/${goalId}/built`, json('POST', { useStock: false }));
+/** Uses up the parts and resources (blocked when short); `useStock: false` only marks it. */
+export function markBuilt(goalId: number, useStock = true): Promise<GoalsResponse> {
+  return request(GoalsResponse, `/api/goals/${goalId}/built`, json('POST', { useStock }));
 }
 
 export function reactivateGoal(goalId: number): Promise<GoalsResponse> {
@@ -222,4 +210,22 @@ export function refreshProfile(): Promise<ProfileResponse> {
 
 export function forgetProfile(): Promise<ProfileResponse> {
   return request(ProfileResponse, '/api/profile', json('DELETE'));
+}
+
+/** Sets a part's shared amounts: blueprints held, finished parts. */
+export function setPartStock(
+  key: string,
+  amounts: { blueprints?: number; crafted?: number },
+): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/parts', json('PUT', { key, ...amounts }));
+}
+
+/** One Craft: uses the blueprint and materials, adds a finished part. */
+export function craftPart(key: string): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/parts/craft', json('POST', { key }));
+}
+
+/** Puts back the last craft or build. */
+export function undoLast(): Promise<GoalsResponse> {
+  return request(GoalsResponse, '/api/undo', json('POST'));
 }

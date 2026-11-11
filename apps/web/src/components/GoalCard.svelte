@@ -1,19 +1,32 @@
 <script lang="ts">
-  import type { Goal, GoalResource } from '@warframehub/shared';
-  import { formatAmount, materialList, progressPercent, splitResources } from '../lib/goals.ts';
+  import type { Goal, GoalResource, StockRow } from '@warframehub/shared';
+  import { tick } from 'svelte';
+  import {
+    formatAmount,
+    joinNames,
+    progressPercent,
+    shortList,
+    splitResources,
+  } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
   import AmountField from './AmountField.svelte';
-  import PartWhere from './PartWhere.svelte';
+  import PartRow from './PartRow.svelte';
   import Icon from './Icon.svelte';
 
   interface Props {
     goal: Goal;
     isFirst: boolean;
     isLast: boolean;
-    onPart: (goalId: number, key: string, owned: number) => void;
+    /** The shared resource stock (what each material line compares against). */
+    stock: StockRow[];
+    onPartStock: (
+      key: string,
+      amounts: { blueprints?: number; crafted?: number },
+    ) => Promise<boolean>;
+    onCraft: (key: string) => Promise<boolean>;
     onNote: (goalId: number, key: string, note: string) => Promise<boolean>;
     onStock: (key: string, amount: number) => Promise<boolean>;
-    onBuilt: (goalId: number) => void;
+    onBuilt: (goalId: number, useStock: boolean) => void;
     onRemove: (goalId: number) => void;
     onRefresh: (goalId: number) => Promise<boolean>;
     onMove: (goalId: number, by: -1 | 1) => void;
@@ -23,7 +36,9 @@
     goal,
     isFirst,
     isLast,
-    onPart,
+    stock,
+    onPartStock,
+    onCraft,
     onNote,
     onStock,
     onBuilt,
@@ -34,6 +49,19 @@
 
   let open = $state(false);
   let confirm = $state<'built' | 'remove' | null>(null);
+  let actionsEl = $state<HTMLDivElement | null>(null);
+
+  async function ask(kind: 'built' | 'remove') {
+    confirm = kind;
+    await tick();
+    actionsEl?.querySelector('button')?.focus();
+  }
+
+  async function cancel(kind: 'built' | 'remove') {
+    confirm = null;
+    await tick();
+    actionsEl?.querySelector<HTMLButtonElement>(`[data-act="${kind}"]`)?.focus();
+  }
   let refreshing = $state(false);
 
   const bodyId = $derived(`goal-${goal.id}-body`);
@@ -45,15 +73,14 @@
     ),
   );
 
-  function saveCount(key: string, current: number, max: number, e: Event) {
-    const input = e.currentTarget as HTMLInputElement;
-    const value = Number(input.value);
-    if (!Number.isInteger(value) || value < 0 || value > max) {
-      input.value = String(current);
-      return;
-    }
-    if (value !== current) onPart(goal.id, key, value);
-  }
+  /** "25,000 Credits and 5 Orokin Cell": the item's own resources that building uses up. */
+  const buildResources = $derived(
+    joinNames(
+      goal.resources
+        .filter((r) => r.count > r.forParts)
+        .map((r) => `${formatAmount(r.count - r.forParts)} ${r.name}`),
+    ),
+  );
 
   async function refresh() {
     refreshing = true;
@@ -142,71 +169,24 @@
       <div class="lists">
         <div>
           <h4 class="group">{t('goal.parts')}</h4>
-          <ul>
-            {#each goal.parts as p, i (p.key)}
-              <li class="line">
-                {#if p.count === 1}
-                  <label class="check">
-                    <input
-                      id={`part-${goal.id}-${i}`}
-                      type="checkbox"
-                      checked={p.owned >= 1}
-                      onchange={(e) =>
-                        onPart(
-                          goal.id,
-                          p.key,
-                          (e.currentTarget as HTMLInputElement).checked ? 1 : 0,
-                        )}
-                    />
-                    <span class:done={p.owned >= 1}>{p.name}</span>
-                  </label>
-                {:else}
-                  <label class="check">
-                    <input
-                      id={`part-${goal.id}-${i}`}
-                      type="number"
-                      class="num count"
-                      min="0"
-                      max={p.count}
-                      value={p.owned}
-                      onchange={(e) => saveCount(p.key, p.owned, p.count, e)}
-                      aria-label={t('goal.partLabel', { name: p.name, goal: goal.name })}
-                    />
-                    <span class:done={p.owned >= p.count}>
-                      <span class="num">/ {p.count}</span>
-                      {p.name}
-                    </span>
-                  </label>
-                {/if}
-                {#if p.craft}
-                  <div class="craft">
-                    <span class="craft-label">{t('part.craftLabel')}</span>
-                    <ul class="materials" aria-label={t('part.craftList', { name: p.name })}>
-                      {#each materialList(p.craft) as m (m.name)}
-                        <li><b class="num">{formatAmount(m.count)}</b> {m.name}</li>
-                      {/each}
-                    </ul>
-                  </div>
-                {:else if goal.category === 'warframe' && p.name !== 'Blueprint'}
-                  <p class="craft-none">{t('part.craftMissing')}</p>
-                {/if}
-                {#if p.drops.length === 0 || p.note !== ''}
-                  <div class="part-note">
-                    <PartWhere
-                      note={p.note}
-                      sources={p.sources}
-                      context={p.name}
-                      onSave={(note) => onNote(goal.id, p.key, note)}
-                    />
-                  </div>
-                {/if}
-              </li>
+          <ul class="parts">
+            {#each goal.parts as p (p.key)}
+              <PartRow
+                part={p}
+                goalName={goal.name}
+                category={goal.category}
+                {stock}
+                {onPartStock}
+                {onCraft}
+                onNote={(key, note) => onNote(goal.id, key, note)}
+              />
             {/each}
           </ul>
         </div>
 
         <div>
           <h4 class="group">{t('goal.resourcesFor', { name: goal.name })}</h4>
+          <p class="note entry-hint">{t('farm.entryHint')}</p>
           <ul>
             {#each resourceGroups.forItem as r (r.key)}
               {@render resourceRow(r)}
@@ -225,28 +205,52 @@
 
       <p class="note">{t('goal.recipeDate', { date: recipeDate })}</p>
 
-      <div class="actions">
-        {#if confirm === 'built'}
-          <span class="confirm">{t('goal.builtConfirm', { name: goal.name })}</span>
-          <button type="button" class="primary" onclick={() => onBuilt(goal.id)}
-            >{t('goal.builtYes')}</button
+      <div class="actions" bind:this={actionsEl}>
+        <!-- Each confirm takes focus on its first button, described by the question;
+             Cancel gives focus back to the button that opened it. -->
+        {#if confirm === 'built' && goal.buildShort.length > 0}
+          <span class="confirm" id={`${bodyId}-confirm`}
+            >{t('goal.buildShort', { name: goal.name, list: shortList(goal.buildShort) })}</span
           >
-          <button type="button" onclick={() => (confirm = null)}>{t('goal.cancel')}</button>
+          <button
+            type="button"
+            aria-describedby={`${bodyId}-confirm`}
+            onclick={() => onBuilt(goal.id, false)}>{t('goal.builtInGame')}</button
+          >
+          <button type="button" onclick={() => cancel('built')}>{t('goal.cancel')}</button>
+        {:else if confirm === 'built'}
+          <span class="confirm" id={`${bodyId}-confirm`}
+            >{buildResources
+              ? t('goal.builtConfirm', { name: goal.name, resources: buildResources })
+              : t('goal.builtConfirmParts', { name: goal.name })}</span
+          >
+          <button
+            type="button"
+            class="primary"
+            aria-describedby={`${bodyId}-confirm`}
+            onclick={() => onBuilt(goal.id, true)}>{t('goal.builtYes')}</button
+          >
+          <button type="button" onclick={() => cancel('built')}>{t('goal.cancel')}</button>
         {:else if confirm === 'remove'}
-          <span class="confirm bad">{t('goal.removeConfirm', { name: goal.name })}</span>
-          <button type="button" class="danger" onclick={() => onRemove(goal.id)}
-            >{t('goal.removeYes')}</button
+          <span class="confirm bad" id={`${bodyId}-confirm`}
+            >{t('goal.removeConfirm', { name: goal.name })}</span
           >
-          <button type="button" onclick={() => (confirm = null)}>{t('goal.cancel')}</button>
+          <button
+            type="button"
+            class="danger"
+            aria-describedby={`${bodyId}-confirm`}
+            onclick={() => onRemove(goal.id)}>{t('goal.removeYes')}</button
+          >
+          <button type="button" onclick={() => cancel('remove')}>{t('goal.cancel')}</button>
         {:else}
-          <button type="button" class="primary" onclick={() => (confirm = 'built')}>
+          <button type="button" class="primary" data-act="built" onclick={() => ask('built')}>
             {t('goal.builtButton')}
           </button>
           <button type="button" class="teal with-icon" disabled={refreshing} onclick={refresh}>
             <Icon name="refresh" size={14} />
             {refreshing ? t('goal.refreshing') : t('goal.refresh')}
           </button>
-          <button type="button" class="danger" onclick={() => (confirm = 'remove')}>
+          <button type="button" class="danger" data-act="remove" onclick={() => ask('remove')}>
             {t('goal.remove')}
           </button>
         {/if}
@@ -411,74 +415,17 @@
     gap: 0.35rem;
   }
 
-  .check {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 1.75rem;
-    cursor: pointer;
+  .entry-hint {
+    margin-bottom: 0.35rem;
   }
 
-  .count {
-    width: 3.5rem;
-  }
-
-  /* "To craft" + quantity/name pairs: the quantity is the readout, the name is dim. */
-  .craft {
-    margin: 0.15rem 0 0 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.1rem 0.6rem;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-
-  .craft-label {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .materials {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.1rem 0.9rem;
-  }
-
-  .materials li {
-    white-space: nowrap; /* a quantity never gets separated from its name */
-  }
-
-  .materials b {
-    font-weight: 600;
-    color: var(--fg);
-  }
-
-  .craft-none {
-    margin: 0.15rem 0 0 1.5rem;
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .part-note {
-    margin: 0.25rem 0 0 1.5rem;
+  /* Part rows draw their own dividers. */
+  .parts {
+    gap: 0;
   }
 
   .incl {
     color: var(--muted);
-  }
-
-  .done {
-    color: var(--muted);
-    text-decoration: line-through;
-    text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
   }
 
   .resource {

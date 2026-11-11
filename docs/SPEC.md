@@ -442,7 +442,8 @@ Each phase ends with something you can run and check.
 - **Craft** (`POST /api/parts/craft {key}`): blueprint −1, finished part +1, Credits and materials out. Blocked (409 `not_enough`, listing what's missing) unless everything is there. **Build** (`POST /api/goals/:id/built`): uses up every part (the main blueprint unless `blueprintReusable`, from the data's `consumeOnBuild: false`) and the item's own resources, blocked the same way; `{useStock: false}` only marks it built. Warframe wiki, "Foundry" (checked 11 Nov 2026): most blueprints are used up when crafting; reusable ones are marked in game.
 - **Undo** (`POST /api/undo`): the last craft or build, within 15 minutes, as exact amount changes (never below 0), plus the goal's status. `GoalsResponse.undo` says what can be undone.
 - **Direct amounts:** `PUT /api/parts {key, blueprints?, crafted?}` and `PUT /api/resources`. Each goal part carries `craftShort`, each goal `buildShort`.
-- **Next:** the goal card UI (counts, Craft, build with stock, Undo, `+250`/`-30` entry), then an Inventory screen.
+- **UI** (goal card, 11 Nov 2026): Part Rows with Blueprints/Crafted (or Have) amounts and Craft, materials as have / need, build confirm with what it uses (or "Already built in game"), the Undo bar, `+250`/`-30` in every amount field, and a "Blueprints you have" group at the top of the farm queue. `GoalsResponse.undo` is `{kind, name, expiresAt}`; the screen words it. See DESIGN.md.
+- **Next:** an Inventory screen listing every resource and part.
 
 ### 13.2 Later (not designed in detail yet)
 

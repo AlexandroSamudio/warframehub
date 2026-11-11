@@ -207,7 +207,12 @@ export const PartStockRow = z.object({
 export type PartStockRow = z.infer<typeof PartStockRow>;
 
 /** The last craft or build, which can still be undone. */
-export const UndoInfo = z.object({ label: z.string(), expiresAt: z.iso.datetime() });
+export const UndoInfo = z.object({
+  kind: z.enum(['craft', 'build']),
+  /** What was crafted or built, e.g. "Nidus Prime Chassis". */
+  name: z.string(),
+  expiresAt: z.iso.datetime(),
+});
 export type UndoInfo = z.infer<typeof UndoInfo>;
 
 /** Response of `GET /api/goals` and of every goal change. */

@@ -96,6 +96,20 @@ Inside the established world. No new visual identity.
 - The line appears in both places the part appears (the farm queue's "Get another way" and the part in its goal card), through one shared component.
 - Anti-goals unchanged: no modal, no new colour (the link follows the existing link style), no icon for the link.
 
+## Addendum: parts and resources as inventory (11 Nov 2026, Alex's request)
+
+- Alex's model: **every resource and every part is an entity with an amount**, shared by all goals, and **crafting or building uses stock up**. There is no inventory API, so amounts are typed in; the app keeps them consistent (SPEC §13.4).
+- **Part rows on the goal card** replace the tick boxes:
+  - parts with a recipe: the part name, then two small amount fields, **Blueprints** and **Crafted**, and a **Craft** button. Under it, the materials as "32 / 50 Rubedo" pairs (have / need from the shared stock); a short pair is gold. When Craft can't run, it stays focusable (`aria-disabled`) and the line under it says why ("Missing: 18 Rubedo" or "No blueprint yet").
+  - parts with no recipe (the main Blueprint, Prime weapon parts): the part name and one **Have** field.
+  - once the goal has the part, the name gets the existing done style and the materials and Craft go away.
+- **Mark as built** confirms inline with what it uses up ("Uses its parts, 25,000 Credits and 5 Orokin Cell."). If something is short it says what, and offers **"Already built in game"** (marks it built, amounts untouched) next to Cancel.
+- **Undo:** one bar under the page title, "Crafted Nidus Prime Chassis. **Undo**", for 15 minutes or until the next craft or build. Polite status; no toast stack, no modal.
+- **Amount fields** accept `+250` and `-30` (add to or take from what's saved); "Can't go below 0" when it would. The part fields are the same component, narrower.
+- **Farm queue:** a part whose blueprint you hold leaves "Farm now" for a small **Blueprints you have** group at the top ("Craft it in the Foundry", or "Missing: 18 Rubedo" in gold).
+- **After the critique of this change (27/40):** the undo bar is sticky and says until when; focus is kept through craft, build confirm, build and undo; bad entries keep their message after leaving the field; "+250 / -30" gets one hint per surface; the undo text is worded on the screen (translatable).
+- Anti-goals unchanged: no modal, no new colour (short = gold, enough = ok, as the resources already use), no new nesting.
+
 ## Direction contract
 
 THESIS: a farming queue first, the goals second. It refuses the default "grid of goal cards with progress rings".
