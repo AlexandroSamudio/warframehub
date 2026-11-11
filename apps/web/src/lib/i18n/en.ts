@@ -1,7 +1,6 @@
 /** English UI strings. Every visible string goes through t() (SPEC §8.3). */
 export const en = {
   'app.title': 'WarframeHub',
-  'app.tagline': 'Weekly Tracker',
 
   'tracker.loading': 'Loading your checklist…',
   'tracker.error': "Can't reach the API. Is it running? Start everything with npm run dev.",
