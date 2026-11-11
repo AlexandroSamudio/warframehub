@@ -431,12 +431,13 @@ Each phase ends with something you can run and check.
 - **Rate limit:** too many or invalid requests can block the IP from logging into the game. So: only when the user presses Refresh, never automatic, never retried, at least one hour between calls (failed ones count, and the wait survives a restart or a new ID), always show the cached copy.
 - **Storage:** the ID in `settings` (`profile.account_id`, local only, never returned by the API or logged); the normalised profile in `profile_cache`.
 - **API:** `GET /api/profile`, `PUT /api/profile/account {accountId}`, `POST /api/profile/refresh` (409 without an ID, 429 inside the hour, 502 if DE fails or answers oddly, old copy kept), `DELETE /api/profile`.
-- **Open:** "mastered" needs each item's max-rank XP (verify on the wiki before using it); some mastery items (Archwings, Sentinels, Kitguns) may use other paths.
+- **Mastered** (Warframe wiki, "Affinity", checked 11 Nov 2026): rank 30 needs 1000 × rank² affinity for a Warframe or companion (900,000) and half of that for a weapon (450,000). `GET /api/goals` sets `mastered` on a goal when the profile's XP for its `uniqueName` reaches that (`domain/mastery.ts`). The profile keeps counting XP past rank 30. Archwings, Sentinels and Kitguns aren't goals, so their paths aren't checked.
+- **UI** (`#/profile`, brief `.impeccable/surfaces/profile.md`): setup (ID field, steps), then Mastery Rank, items ranked, missions, star-chart nodes, time played, intrinsics, Refresh (locked for an hour), Change ID, Forget. Goal cards show a "mastered (rank 30)" badge.
 
 ### 13.2 Later (not designed in detail yet)
 
 - **Circuit points tracker** and **Search Pulse planner**.
-- **Profile screen and goal hints** ("you already mastered this"): the data is imported (§13.3); the screen is next.
+- **Syndicates on the Profile screen:** needs a verified map from DE's tags (e.g. `CetusSyndicate`) to names and ranks.
 - **Second user and VPS hosting:** login, per-user data (already modelled), HTTPS.
 - **Spanish** translation.
 - **Phone access** on the home network (LAN binding setting).

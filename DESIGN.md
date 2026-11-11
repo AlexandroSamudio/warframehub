@@ -334,11 +334,15 @@ Two groups under Label headings: **For {item}** (the item's own recipe; a row th
 
 ### Part Note
 
-A single-line text field (200 characters) with a visible label above it, saved on change with a polite "Saved" (same pattern as the Amount Field). It appears for parts no drop table lists ("Get another way" in the farm queue, and on the part in its card). Above it, when the Warframe wiki names a quest, one line: **"Quest:"** (600 weight, Readout White), the quest's name as a teal external link (new tab, `noopener noreferrer`), and "· Warframe wiki" in Dim Readout. The label then reads "Your own note (shown instead of the wiki)"; without a source it reads "Where do you get this?". A typed note replaces the wiki line.
+A single-line text field (200 characters) with a visible label above it, saved on change with a polite "Saved" (same pattern as the Amount Field). It appears for parts no drop table lists ("Get another way" in the farm queue, and on the part in its card). The field's accessible name starts with the visible label, then the part and goal. Above it, when the Warframe wiki names a quest, one muted line: "Quest:" in Dim Readout, the quest's name as a teal external link (new tab, `noopener noreferrer`, hidden "(opens in a new tab)" text, padded to a taller target) and "· Warframe wiki". The label then reads "Your note (replaces the wiki)"; without a source it reads "Where do you get this?". A typed note replaces the wiki line, and the label then names what it replaces: "Your note (replaces the wiki: The Glast Gambit)".
 
 ### Amount Field
 
 A right-aligned tabular input with thousands separators. Under it, a reserved message line: rose "Whole numbers only" (`aria-invalid`, `aria-describedby`), or green "Saved" for 2 seconds (polite live region). Leaving an invalid entry restores the saved amount.
+
+### Profile panel
+
+The Settings pattern: one `.frame.accent` panel, 44rem wide, a gold `h2`, a definition list (Readout-grey labels in the display face, tabular values) that goes to one column under 36rem. Two states: setup (a labelled Account ID field with Save, three numbered steps, a muted privacy line) and loaded (an "Updated {time} ({UTC} UTC)" line with the primary Refresh button on the right, a muted status line under it, the list, intrinsics as wrapped "name level" pairs in two groups, and a footer with "Change account ID" and a danger "Forget profile" that confirms inline). Refresh is disabled, not hidden, while locked, and the line under it says when it works again. The account ID is never shown after saving. The goal card's "already mastered" is the plain muted `.badge`, like "vaulted".
 
 ### Icons
 

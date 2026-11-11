@@ -109,6 +109,7 @@
     <span class="badges">
       {#if goal.isPrime}<span class="badge gold">{t('goals.prime')}</span>{/if}
       {#if goal.vaulted}<span class="badge">{t('goals.vaulted')}</span>{/if}
+      {#if goal.mastered}<span class="badge">{t('goals.mastered')}</span>{/if}
       {#if goal.ready}<span class="badge ok">{t('goals.ready')}</span>{/if}
     </span>
     <div class="progress">

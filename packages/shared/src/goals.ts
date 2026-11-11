@@ -151,6 +151,8 @@ export const Goal = z.object({
   progress: z.object({ done: z.int().min(0), total: z.int().min(0) }),
   /** Every part owned and enough of every resource for this goal on its own. */
   ready: z.boolean(),
+  /** The imported profile shows this item at rank 30 already (false when nothing was imported). */
+  mastered: z.boolean(),
   createdAt: z.iso.datetime(),
   builtAt: z.iso.datetime().nullable(),
   recipeFetchedAt: z.iso.datetime(),

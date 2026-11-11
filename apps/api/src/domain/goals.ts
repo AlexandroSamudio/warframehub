@@ -20,6 +20,8 @@ export interface GoalInput {
   createdAt: Date;
   builtAt: Date | null;
   recipeFetchedAt: Date;
+  /** From the imported profile; false when there is none. */
+  mastered?: boolean;
 }
 
 /** resourceKey → amount. Missing keys mean 0. */
@@ -115,6 +117,7 @@ export function buildGoal(input: GoalInput, stock: Stock, share: Stock = stock):
     resources,
     progress: { done, total },
     ready: done === total,
+    mastered: input.mastered ?? false,
     createdAt: input.createdAt.toISOString(),
     builtAt: input.builtAt ? input.builtAt.toISOString() : null,
     recipeFetchedAt: input.recipeFetchedAt.toISOString(),

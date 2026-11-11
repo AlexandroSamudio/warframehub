@@ -5,6 +5,7 @@ import {
   GoalsResponse,
   HealthResponse,
   ItemSearchResponse,
+  ProfileResponse,
   PutTickResponse,
   SettingsResponse,
   TrackerResponse,
@@ -203,4 +204,21 @@ export function reorderGoals(goalIds: number[]): Promise<GoalsResponse> {
 
 export function refreshGoal(goalId: number): Promise<GoalsResponse> {
   return request(GoalsResponse, `/api/goals/${goalId}/refresh`, json('POST'));
+}
+
+export function getProfile(): Promise<ProfileResponse> {
+  return request(ProfileResponse, '/api/profile');
+}
+
+export function setProfileAccount(accountId: string): Promise<ProfileResponse> {
+  return request(ProfileResponse, '/api/profile/account', json('PUT', { accountId }));
+}
+
+/** One call to DE. The server refuses a second one inside the hour. */
+export function refreshProfile(): Promise<ProfileResponse> {
+  return request(ProfileResponse, '/api/profile/refresh', json('POST'));
+}
+
+export function forgetProfile(): Promise<ProfileResponse> {
+  return request(ProfileResponse, '/api/profile', json('DELETE'));
 }
