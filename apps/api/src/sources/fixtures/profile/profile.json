@@ -1,0 +1,409 @@
+{
+ "Results": [
+  {
+   "AccountId": {
+    "$oid": "000000000000000000000000"
+   },
+   "DisplayName": "Tenno",
+   "PlayerLevel": 17,
+   "LoadOutInventory": {
+    "XPInfo": [
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Rifle/StartingRifle",
+      "XP": 8574283
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Pistol/Pistol",
+      "XP": 2044733
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Excalibur/Excalibur",
+      "XP": 2691015
+     },
+     {
+      "ItemType": "/Lotus/Weapons/MK1Series/MK1Bo",
+      "XP": 489593
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Archwing/StandardJetPack/StandardJetPack",
+      "XP": 1479403
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Archwing/Primary/FoldingMachineGun/ArchMachineGun",
+      "XP": 176549
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Rifle/BoltoRifle",
+      "XP": 674314
+     },
+     {
+      "ItemType": "/Lotus/Types/Game/KubrowPet/HunterKubrowPetPowerSuit",
+      "XP": 4064081
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/Swords/HeatSword/HeatLongSword",
+      "XP": 406890
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Archwing/Melee/Archsword/ArchSwordWeapon",
+      "XP": 1396787
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Rifle/TennoSniperRifle",
+      "XP": 1610396
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/Scythe/EtherScytheWeapon",
+      "XP": 2100734
+     },
+     {
+      "ItemType": "/Lotus/Types/Sentinels/SentinelPowersuits/TnSentinelCrossPowerSuit",
+      "XP": 21335188
+     },
+     {
+      "ItemType": "/Lotus/Types/Sentinels/SentinelWeapons/Gremlin",
+      "XP": 65401800
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Frost/Frost",
+      "XP": 2467094
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/GreatSword/GreatSword",
+      "XP": 615251
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Akimbo/AkimboPistol",
+      "XP": 3305815
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Berserker/Berserker",
+      "XP": 862121
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/Hammer/GlassHammer/GlassHammer",
+      "XP": 598182
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/Polearms/PrimePolearmWeapon",
+      "XP": 115863316
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Rhino/Rhino",
+      "XP": 21123720
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Tenno/Melee/Swords/StalkerTwo/StalkerTwoSmallSword",
+      "XP": 3014363
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Grineer/LongGuns/GrineerFlakCannon/FlakCannon",
+      "XP": 914044
+     },
+     {
+      "ItemType": "/Lotus/Weapons/Grineer/Melee/GrnQueenSceptre/GrnQueenSceptreWeapon",
+      "XP": 4969356
+     },
+     {
+      "ItemType": "/Lotus/Powersuits/Cowgirl/MesaPrime",
+      "XP": 98548038
+     }
+    ]
+   },
+   "Missions": [
+    {
+     "Completes": 19,
+     "Tier": 1,
+     "Tag": "SolNode27"
+    },
+    {
+     "Completes": 20,
+     "Tier": 1,
+     "Tag": "SolNode89"
+    },
+    {
+     "Completes": 20,
+     "Tier": 1,
+     "Tag": "SolNode63"
+    },
+    {
+     "Completes": 5,
+     "Tag": "SolNode85"
+    },
+    {
+     "Completes": 9,
+     "Tag": "SolNode15"
+    },
+    {
+     "Completes": 20,
+     "Tier": 1,
+     "Tag": "SolNode79"
+    },
+    {
+     "Completes": 447,
+     "Tier": 1,
+     "Tag": "SolNode228"
+    },
+    {
+     "Completes": 5,
+     "Tier": 1,
+     "Tag": "SolNode59"
+    },
+    {
+     "Completes": 15,
+     "Tier": 1,
+     "Tag": "SolNode26"
+    },
+    {
+     "Completes": 9,
+     "Tag": "SolNode39"
+    },
+    {
+     "Completes": 2,
+     "Tier": 1,
+     "Tag": "EarthToVenusJunction"
+    },
+    {
+     "Completes": 12,
+     "Tag": "SolNode75"
+    },
+    {
+     "Completes": 4,
+     "Tag": "EventNode2"
+    },
+    {
+     "Completes": 156,
+     "Tag": "CetusHub4"
+    },
+    {
+     "Completes": 23,
+     "Tier": 1,
+     "Tag": "SolNode128"
+    }
+   ],
+   "Affiliations": [
+    {
+     "Tag": "CetusSyndicate",
+     "Standing": 319307,
+     "Title": 5
+    },
+    {
+     "Tag": "EventSyndicate",
+     "Standing": 125,
+     "Title": 0
+    },
+    {
+     "Tag": "ConclaveSyndicate",
+     "Standing": 1022,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegionSyndicate",
+     "Standing": 15600,
+     "Title": 0
+    },
+    {
+     "Tag": "LibrarySyndicate",
+     "Standing": 33200,
+     "Title": 0
+    },
+    {
+     "Tag": "PerrinSyndicate",
+     "Standing": -71000,
+     "Title": -2
+    },
+    {
+     "Tag": "RadioLegionIntermissionSyndicate",
+     "Standing": 1000,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegion2Syndicate",
+     "Standing": 1050,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegionIntermission2Syndicate",
+     "Standing": 29000,
+     "Title": 2
+    },
+    {
+     "Tag": "CephalonSudaSyndicate",
+     "Standing": 307000,
+     "Title": 5
+    },
+    {
+     "Tag": "ArbitersSyndicate",
+     "Standing": 352000,
+     "Title": 5
+    },
+    {
+     "Tag": "NewLokaSyndicate",
+     "Standing": -71000,
+     "Title": -2
+    },
+    {
+     "Tag": "RedVeilSyndicate",
+     "Standing": 372000,
+     "Title": 5
+    },
+    {
+     "Tag": "VentKidsSyndicate",
+     "Standing": 5000,
+     "Title": 0
+    },
+    {
+     "Tag": "SolarisSyndicate",
+     "Standing": 308835,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegion3Syndicate",
+     "Standing": 171900,
+     "Title": 17
+    },
+    {
+     "Tag": "QuillsSyndicate",
+     "Standing": 345650,
+     "Title": 5
+    },
+    {
+     "Tag": "NecraloidSyndicate",
+     "Standing": 136000,
+     "Title": 3
+    },
+    {
+     "Tag": "EntratiSyndicate",
+     "Standing": 240000,
+     "Title": 5
+    },
+    {
+     "Tag": "VoxSyndicate",
+     "Standing": 241000,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegionIntermission3Syndicate",
+     "Standing": 245000,
+     "Title": 24
+    },
+    {
+     "Tag": "RadioLegionIntermission4Syndicate",
+     "Standing": 85500,
+     "Title": 8
+    },
+    {
+     "Tag": "RadioLegionIntermission5Syndicate",
+     "Standing": 1000,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegionIntermission6Syndicate",
+     "Standing": 87500,
+     "Title": 8
+    },
+    {
+     "Tag": "RadioLegionIntermission7Syndicate",
+     "Standing": 35500,
+     "Title": 3
+    },
+    {
+     "Tag": "KahlSyndicate",
+     "Standing": 3,
+     "Title": 3
+    },
+    {
+     "Tag": "ZarimanSyndicate",
+     "Standing": 254500,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegionIntermission8Syndicate",
+     "Standing": 15500,
+     "Title": 1
+    },
+    {
+     "Tag": "RadioLegionIntermission9Syndicate",
+     "Standing": 91000,
+     "Title": 9
+    },
+    {
+     "Tag": "EntratiLabSyndicate",
+     "Standing": 303000,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegionIntermission10Syndicate",
+     "Standing": 211500,
+     "Title": 21
+    },
+    {
+     "Tag": "RadioLegionIntermission11Syndicate",
+     "Standing": 113000,
+     "Title": 11
+    },
+    {
+     "Tag": "HexSyndicate",
+     "Standing": 316500,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegionIntermission12Syndicate",
+     "Standing": 9000,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegionIntermission13Syndicate",
+     "Standing": 5500,
+     "Title": 0
+    },
+    {
+     "Tag": "RadioLegionIntermission14Syndicate",
+     "Standing": 87500,
+     "Title": 8
+    },
+    {
+     "Tag": "NightcapJournalSyndicate",
+     "Standing": 0,
+     "Title": 4
+    },
+    {
+     "Tag": "RadioLegionIntermission15Syndicate",
+     "Standing": 422000,
+     "Title": 42
+    },
+    {
+     "Tag": "SteelMeridianSyndicate",
+     "Standing": 372000,
+     "Title": 5
+    },
+    {
+     "Tag": "RadioLegionIntermission16Syndicate",
+     "Standing": 181500,
+     "Title": 17
+    }
+   ],
+   "PlayerSkills": {
+    "LPP_SPACE": 199177,
+    "LPS_TACTICAL": 5,
+    "LPS_PILOTING": 5,
+    "LPS_COMMAND": 10,
+    "LPS_GUNNERY": 6,
+    "LPS_ENGINEERING": 5,
+    "LPP_DRIFTER": 127000,
+    "LPS_DRIFT_RIDING": 7,
+    "LPS_DRIFT_OPPORTUNITY": 9,
+    "LPS_DRIFT_COMBAT": 10,
+    "LPS_DRIFT_ENDURANCE": 8
+   }
+  }
+ ],
+ "Stats": {
+  "MissionsCompleted": 4107,
+  "TimePlayedSec": 2533243.6267305957,
+  "Rank": 16,
+  "PlayerLevel": 17
+ },
+ "XpComponents": [],
+ "TechProjects": []
+}

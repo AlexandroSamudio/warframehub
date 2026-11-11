@@ -159,6 +159,15 @@ export const itemCache = sqliteTable('item_cache', {
   fetchedAt: integer('fetched_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
+/** The last imported profile, normalised (SPEC §13.2). One row per user. */
+export const profileCache = sqliteTable('profile_cache', {
+  userId: integer('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  payloadJson: text('payload_json').notNull(),
+  fetchedAt: integer('fetched_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
 export type GoalStatus = 'active' | 'built';
 
 /** A Warframe or weapon the user wants to build (SPEC §13). Keeps its own recipe copy. */

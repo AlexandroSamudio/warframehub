@@ -424,10 +424,19 @@ Each phase ends with something you can run and check.
   - `POST /api/goals/reorder`
 - **Design:** surface brief `.impeccable/surfaces/goals.md`; components in `DESIGN.md` (Farm Queue, Relic Row, Goal Card, Amount Field, Icons).
 
+### 13.3 Profile import (data side, 11 Nov 2026)
+
+- **Source:** `GET https://api.warframe.com/cdn/getProfileViewingData.php?playerId=<accountId>`, no login. The ID is the `user_id` from `warframe.com/api/user-data` (that page shows the email: never screenshot it). A real response with the name, ID and clan removed is in `apps/api/src/sources/fixtures/profile/`.
+- **Kept** (`Profile` in `packages/shared/src/profile.ts`): display name, Mastery Rank (`PlayerLevel`), XP per ranked item (`LoadOutInventory.XPInfo`, keyed by the game's internal path, the same `uniqueName` goals use), syndicate standing and rank (`Affiliations`), intrinsic levels (`PlayerSkills` keys `LPS_*`), missions completed, star-chart nodes with a completion, time played. **Not kept:** account ID, clan, loadouts. **Not in the response:** resources, blueprints, parts, counts.
+- **Rate limit:** too many or invalid requests can block the IP from logging into the game. So: only when the user presses Refresh, never automatic, never retried, at least one hour between calls (failed ones count, and the wait survives a restart or a new ID), always show the cached copy.
+- **Storage:** the ID in `settings` (`profile.account_id`, local only, never returned by the API or logged); the normalised profile in `profile_cache`.
+- **API:** `GET /api/profile`, `PUT /api/profile/account {accountId}`, `POST /api/profile/refresh` (409 without an ID, 429 inside the hour, 502 if DE fails or answers oddly, old copy kept), `DELETE /api/profile`.
+- **Open:** "mastered" needs each item's max-rank XP (verify on the wiki before using it); some mastery items (Archwings, Sentinels, Kitguns) may use other paths.
+
 ### 13.2 Later (not designed in detail yet)
 
 - **Circuit points tracker** and **Search Pulse planner**.
-- **Profile import** from DE's public profile endpoint, by account ID (mastery, star chart, syndicates). Read-only and fetched rarely: too many requests can get your IP temporarily blocked from logging into the game.
+- **Profile screen and goal hints** ("you already mastered this"): the data is imported (§13.3); the screen is next.
 - **Second user and VPS hosting:** login, per-user data (already modelled), HTTPS.
 - **Spanish** translation.
 - **Phone access** on the home network (LAN binding setting).
