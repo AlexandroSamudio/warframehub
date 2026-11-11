@@ -57,7 +57,7 @@ A personal Warframe companion that runs on Alex's own computer. The long-term go
 
 - Name: **WarframeHub**. A fan project, not affiliated with or endorsed by Digital Extremes.
 - **Warframe-inspired dark theme** (binding): dark void background, Orokin gold accents, teal second colour, thin geometric frames with angled corners. Dark only; no light mode planned.
-- **Original art only** (binding): no DE logos, game art or copied UI assets.
+- **Original art for the app itself** (binding): no DE logos or copied UI assets, and the interface (frames, marks, icons) stays original. DE's Warframe images (portraits, ability icons) are allowed for personal use in the Warframes section (Alex, 11 Nov 2026): fetched from cdn.warframestat.us once, cached in the data folder, never committed.
 - **Local time + UTC everywhere** (binding).
 - **No cosmetic content** (binding): no decorations, furniture or skins in checklists or goals.
 

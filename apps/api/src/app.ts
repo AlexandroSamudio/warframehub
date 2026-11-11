@@ -1,4 +1,5 @@
 import { HealthResponse, type ApiError } from '@warframehub/shared';
+import { join } from 'node:path';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 import type { Db } from './db/client.js';
@@ -8,8 +9,11 @@ import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerGoalRoutes } from './routes/goals.js';
 import { registerProfileRoutes } from './routes/profile.js';
+import { registerWarframeRoutes } from './routes/warframes.js';
 import { ItemCatalog } from './sources/items.js';
+import { ImageCache } from './sources/images.js';
 import { ProfileService } from './sources/profile.js';
+import { WarframeCatalog } from './sources/warframes.js';
 import { registerSystemRoutes } from './routes/system.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
 import { registerWebApp } from './routes/web.js';
@@ -30,6 +34,10 @@ export interface AppOptions {
   worldstate?: WorldstateService;
   /** Goal planner item search (warframestat.us + cache). Created with defaults if not given. */
   items?: ItemCatalog;
+  /** The Warframes section's data (warframestat.us + cache). Created with defaults if not given. */
+  warframes?: WarframeCatalog;
+  /** DE images, cached in the data folder. Created with defaults if not given. */
+  images?: ImageCache;
   /** DE public profile import. Created with defaults if not given. */
   profile?: ProfileService;
   /** The default checklist, for "Restore defaults". Read from disk when not given. */
@@ -134,6 +142,25 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       new ItemCatalog(options.db, {
         now,
         onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
+      }),
+  });
+
+  const warframes =
+    options.warframes ??
+    new WarframeCatalog(options.db, {
+      now,
+      onError: (error) => app.log.warn({ err: error }, 'warframes fetch failed'),
+    });
+  registerWarframeRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    catalog: warframes,
+    images:
+      options.images ??
+      new ImageCache({
+        ...(options.dataDir ? { dir: join(options.dataDir, 'images') } : {}),
+        allowed: (name) => warframes.cachedImageNames().has(name),
+        onError: (name, error) => app.log.warn({ name, err: error }, 'image fetch failed'),
       }),
   });
 

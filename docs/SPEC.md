@@ -295,7 +295,7 @@ Rules:
   - dark void background with Orokin **gold** accents and a cool **teal/cyan** secondary
   - thin geometric frames and angled corners on panels
   - a technical display font for headings and labels (**Rajdhani**), plus a clean body font (**Inter**). Both SIL OFL 1.1, bundled with the app via `@fontsource`; nothing is fetched from font services. Numbers that change (countdowns, counts) use Inter's tabular digits, because Rajdhani has none.
-- **Original artwork only.** No DE logos, game art or copied UI assets.
+- **Original artwork for the app itself.** No DE logos or copied UI assets. DE's Warframe images (portraits, ability icons) are allowed for personal use in the Warframes section (Alex, 11 Nov 2026): fetched from cdn.warframestat.us once, cached in the data folder, never committed (§14).
 - **Readable first:**
   - good contrast
   - visible keyboard focus
@@ -452,6 +452,14 @@ Each phase ends with something you can run and check.
 - **Second user and VPS hosting:** login, per-user data (already modelled), HTTPS.
 - **Spanish** translation.
 - **Phone access** on the home network (LAN binding setting).
+
+## 14. Warframes section (11 Nov 2026, Alex's request)
+
+- **What:** every Warframe, one page each, with its Prime and Umbra versions behind a switch: description, passive, abilities (and later their numbers from the wiki), stats and polarities, how to get it (the goal planner's recipe, plus "Add as goal"), your progress (mastered, goal status) and augment mods. Builds come later, after their own planning.
+- **Data** (`apps/api/src/sources/warframes.ts`): warframestat.us `/warframes` (only `category: "Warframes"` with `productCategory: "Suits"`: no Necramechs, Helminth or "Orion & Sirius") and `/mods` (augments: `isAugment` + `compatName`; the ability comes from the mod's own "Larva Augment: …" text). Fetched at most once a week, or on Refresh (once an hour), into `item_cache` (`warframes:all`, `warframes:augments`, and `item:<uniqueName>` per Warframe so "Add as goal" needs no search). Offline: the saved copy, marked stale.
+- **Versions** are grouped by base name ("Nidus Prime", "Excalibur Umbra" → "Nidus", "Excalibur"); the page address is a slug (`nidus`).
+- **Images** (`apps/api/src/sources/images.ts`, `GET /api/images/:file`): only file names the cached data lists; downloaded once from `cdn.warframestat.us/img/`, kept in `$DATA/images/` (never in the repo), served with a long cache header, also offline.
+- **API:** `GET /api/warframes`, `GET /api/warframes/:slug`, `POST /api/warframes/refresh`, `GET /api/images/:file`.
 
 ---
 
