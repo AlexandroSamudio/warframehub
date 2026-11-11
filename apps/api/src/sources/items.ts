@@ -54,6 +54,7 @@ const RawItem = z.looseObject({
   vaulted: z.boolean().optional(),
   masteryReq: z.int().min(0).optional(),
   buildPrice: z.int().min(0).optional(),
+  consumeOnBuild: z.boolean().optional(),
   buildTime: z.int().min(0).optional(),
   components: z.array(RawComponent).default([]),
 });
@@ -128,6 +129,7 @@ export function normaliseItem(raw: unknown): ItemRecipe | null {
     vaulted: item.vaulted ?? null,
     masteryReq: item.masteryReq ?? null,
     buildTime: item.buildTime ?? null,
+    blueprintReusable: item.consumeOnBuild === false,
     parts: parts.sort(byGameOrder),
     resources: resources.sort(byGameOrder),
   };

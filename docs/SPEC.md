@@ -434,6 +434,16 @@ Each phase ends with something you can run and check.
 - **Mastered** (Warframe wiki, "Affinity", checked 11 Nov 2026): rank 30 needs 1000 × rank² affinity for a Warframe or companion (900,000) and half of that for a weapon (450,000). `GET /api/goals` sets `mastered` on a goal when the profile's XP for its `uniqueName` reaches that (`domain/mastery.ts`). The profile keeps counting XP past rank 30. Archwings, Sentinels and Kitguns aren't goals, so their paths aren't checked.
 - **UI** (`#/profile`, brief `.impeccable/surfaces/profile.md`): setup (ID field, steps), then Mastery Rank, items ranked, missions, star-chart nodes, time played, intrinsics, Refresh (locked for an hour), Change ID, Forget. Goal cards show a "mastered (rank 30)" badge.
 
+### 13.4 Inventory: parts and resources as entities (11 Nov 2026, Alex's request)
+
+- **Why manual:** DE's public profile has no inventory, and the only inventory route needs the game's login token (off-limits, §2). So amounts are typed in; the app makes them consistent.
+- **Entities:** resources (`resource_stock`) and parts (`part_stock`: `blueprints` held and finished `crafted`), both shared by all goals and keyed by the game's `uniqueName`. Parts with a crafting recipe (`part-recipes.json`) go blueprint → crafted; the main blueprint and Prime weapon parts only use `crafted` ("have"). Part stock is named "{item} {part}", e.g. "Nidus Prime Chassis". Migration 0006 turned ticks on active goals into `crafted` stock; `goal_parts` now only holds notes.
+- **Goals** count a part as owned from the finished-part stock, shared in goal order like resources (`sharePartStock`).
+- **Craft** (`POST /api/parts/craft {key}`): blueprint −1, finished part +1, Credits and materials out. Blocked (409 `not_enough`, listing what's missing) unless everything is there. **Build** (`POST /api/goals/:id/built`): uses up every part (the main blueprint unless `blueprintReusable`, from the data's `consumeOnBuild: false`) and the item's own resources, blocked the same way; `{useStock: false}` only marks it built. Warframe wiki, "Foundry" (checked 11 Nov 2026): most blueprints are used up when crafting; reusable ones are marked in game.
+- **Undo** (`POST /api/undo`): the last craft or build, within 15 minutes, as exact amount changes (never below 0), plus the goal's status. `GoalsResponse.undo` says what can be undone.
+- **Direct amounts:** `PUT /api/parts {key, blueprints?, crafted?}` and `PUT /api/resources`. Each goal part carries `craftShort`, each goal `buildShort`.
+- **Next:** the goal card UI (counts, Craft, build with stock, Undo, `+250`/`-30` entry), then an Inventory screen.
+
 ### 13.2 Later (not designed in detail yet)
 
 - **Circuit points tracker** and **Search Pulse planner**.

@@ -76,8 +76,13 @@ export const ItemRecipe = z.object({
   masteryReq: z.int().min(0).nullable(),
   /** Build time in seconds, or null when unknown. */
   buildTime: z.int().min(0).nullable(),
-  /** Blueprint and built parts (Chassis, Barrel…). Owned per goal. */
+  /** Blueprint and built parts (Chassis, Barrel…). Their stock is shared, like resources. */
   parts: z.array(RecipePart),
+  /**
+   * The main blueprint stays after building (the data's `consumeOnBuild: false`). Most
+   * blueprints are used up (Warframe wiki, "Foundry", checked 11 Nov 2026).
+   */
+  blueprintReusable: z.boolean().default(false),
   /** Resources (Kuva, Plastids, Credits…). Amounts are shared across goals. */
   resources: z.array(RecipeComponent),
 });
@@ -110,9 +115,26 @@ export type ItemSearchResponse = z.infer<typeof ItemSearchResponse>;
 export const GoalStatus = z.enum(['active', 'built']);
 export type GoalStatus = z.infer<typeof GoalStatus>;
 
+/** Something short for a craft or a build: a resource, a part, or a part's blueprint. */
+export const Shortfall = z.object({
+  kind: z.enum(['resource', 'part', 'blueprint']),
+  key: z.string(),
+  name: z.string(),
+  missing: z.int().positive(),
+});
+export type Shortfall = z.infer<typeof Shortfall>;
+
 export const GoalPart = RecipePart.extend({
-  /** How many the user has (0..count). */
+  /**
+   * This goal's share of the crafted stock (0..count). Active goals get the shared stock
+   * in goal order, like resources.
+   */
   owned: z.int().min(0),
+  /** The whole shared stock: blueprints for this part, and finished parts. */
+  blueprints: z.int().min(0),
+  crafted: z.int().min(0),
+  /** What stops one Craft right now (empty when it can be crafted, or isn't crafted). */
+  craftShort: z.array(Shortfall),
   /** The user's own note, e.g. where this part comes from when no drop table lists it. */
   note: z.string(),
 });
@@ -153,6 +175,8 @@ export const Goal = z.object({
   ready: z.boolean(),
   /** The imported profile shows this item at rank 30 already (false when nothing was imported). */
   mastered: z.boolean(),
+  /** What stops "Mark as built" from using up stock (empty when everything is there). */
+  buildShort: z.array(Shortfall),
   createdAt: z.iso.datetime(),
   builtAt: z.iso.datetime().nullable(),
   recipeFetchedAt: z.iso.datetime(),
@@ -173,12 +197,27 @@ export type ShoppingRow = z.infer<typeof ShoppingRow>;
 export const StockRow = z.object({ key: z.string(), name: z.string(), amount: z.int().min(0) });
 export type StockRow = z.infer<typeof StockRow>;
 
+/** A part's shared stock, e.g. "Nidus Prime Chassis": 1 blueprint, 0 crafted. */
+export const PartStockRow = z.object({
+  key: z.string(),
+  name: z.string(),
+  blueprints: z.int().min(0),
+  crafted: z.int().min(0),
+});
+export type PartStockRow = z.infer<typeof PartStockRow>;
+
+/** The last craft or build, which can still be undone. */
+export const UndoInfo = z.object({ label: z.string(), expiresAt: z.iso.datetime() });
+export type UndoInfo = z.infer<typeof UndoInfo>;
+
 /** Response of `GET /api/goals` and of every goal change. */
 export const GoalsResponse = z.object({
   active: z.array(Goal),
   built: z.array(Goal),
   shoppingList: z.array(ShoppingRow),
   stock: z.array(StockRow),
+  partStock: z.array(PartStockRow),
+  undo: UndoInfo.nullable(),
 });
 export type GoalsResponse = z.infer<typeof GoalsResponse>;
 
@@ -205,3 +244,24 @@ export type SetStockRequest = z.infer<typeof SetStockRequest>;
 
 export const ReorderGoalsRequest = z.object({ goalIds: z.array(z.int().positive()).min(1) });
 export type ReorderGoalsRequest = z.infer<typeof ReorderGoalsRequest>;
+
+/** Set a part's stock directly (a drop, a Market buy, a correction). */
+export const SetPartStockRequest = z
+  .object({
+    key: z.string().min(1).max(300),
+    blueprints: z.int().min(0).max(1_000).optional(),
+    crafted: z.int().min(0).max(1_000).optional(),
+  })
+  .refine((b) => b.blueprints !== undefined || b.crafted !== undefined, {
+    message: 'send blueprints, crafted, or both',
+  });
+export type SetPartStockRequest = z.infer<typeof SetPartStockRequest>;
+
+export const CraftPartRequest = z.object({ key: z.string().min(1).max(300) });
+export type CraftPartRequest = z.infer<typeof CraftPartRequest>;
+
+/** `useStock: false` marks it built without touching amounts ("already built in game"). */
+export const BuildGoalRequest = z.object({ useStock: z.boolean().default(true) }).default({
+  useStock: true,
+});
+export type BuildGoalRequest = z.infer<typeof BuildGoalRequest>;

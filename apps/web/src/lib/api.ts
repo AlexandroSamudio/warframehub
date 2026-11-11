@@ -186,8 +186,9 @@ export function setStock(key: string, amount: number): Promise<GoalsResponse> {
   return request(GoalsResponse, '/api/resources', json('PUT', { key, amount }));
 }
 
+/** Until the build-with-stock UI lands, marking built leaves amounts alone (as before). */
 export function markBuilt(goalId: number): Promise<GoalsResponse> {
-  return request(GoalsResponse, `/api/goals/${goalId}/built`, json('POST'));
+  return request(GoalsResponse, `/api/goals/${goalId}/built`, json('POST', { useStock: false }));
 }
 
 export function reactivateGoal(goalId: number): Promise<GoalsResponse> {
