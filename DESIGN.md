@@ -215,7 +215,7 @@ A dark, cool-neutral console with two restrained accents and a small set of stat
 
 ## Layout
 
-- **Page:** a centred column, at most 90rem wide, with 1rem side padding (1.5rem top). The header has the mark, the name and a tagline on the left and the nav on the right. A thin seam separates the footer.
+- **Page:** a centred column, at most 90rem wide, with 1rem side padding (1.5rem top). The header has the mark and the name on the left, together one link home (the Tracker; gold, brightening to Readout White on hover, no underline), and the nav on the right. No tagline (Alex, 11 Nov 2026). A thin seam separates the footer.
 - **Tracker:**
   - reset clocks in a self-filling grid (`auto-fit`, minimum 8.75rem; two per row on phones);
   - below them, two columns: the checklist (a grid of section panels, minimum 22rem each) and the live-rotations column (17–22rem);

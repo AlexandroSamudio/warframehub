@@ -34,14 +34,18 @@
 
 <div class="page">
   <header>
-    <!-- Original mark: nested diamonds. Not a DE logo. -->
-    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M16 2 30 16 16 30 2 16Z" fill="none" stroke="currentColor" stroke-width="1.5" />
-      <path d="M16 9 23 16 16 23 9 16Z" fill="currentColor" opacity="0.85" />
-      <path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="1.5" />
-    </svg>
-    <h1>{t('app.title')}</h1>
-    <p class="tagline eyebrow">{t('app.tagline')}</p>
+    <!-- The mark and the name take you home (the Tracker). A link, since it navigates. -->
+    <h1>
+      <a class="home" href={hrefFor('tracker')}>
+        <!-- Original mark: nested diamonds. Not a DE logo. -->
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 2 30 16 16 30 2 16Z" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <path d="M16 9 23 16 16 23 9 16Z" fill="currentColor" opacity="0.85" />
+          <path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        {t('app.title')}
+      </a>
+    </h1>
     {#if !stopped}
       <nav aria-label={t('nav.label')}>
         {#each NAV as route (route)}
@@ -117,10 +121,20 @@
     color: var(--gold);
   }
 
-  .tagline {
-    margin: 0;
-    padding-left: 0.75rem;
-    border-left: 1px solid var(--line-strong);
+  .home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .home:hover {
+    color: var(--fg);
+  }
+
+  .home:hover .mark {
+    color: var(--fg);
   }
 
   nav {
