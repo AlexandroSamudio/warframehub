@@ -3,11 +3,13 @@
  * `#/settings` the Settings screen. Hash URLs work both from Vite and from the API's
  * static files without any server-side routing.
  */
-export type Route = 'tracker' | 'goals' | 'profile' | 'settings';
+export type Route = 'tracker' | 'goals' | 'inventory' | 'profile' | 'settings';
 
 export function routeFromHash(hash: string): Route {
   const first = hash.replace(/^#\/?/, '').split(/[/?]/)[0];
-  return first === 'settings' || first === 'goals' || first === 'profile' ? first : 'tracker';
+  return ['settings', 'goals', 'inventory', 'profile'].includes(first ?? '')
+    ? (first as Route)
+    : 'tracker';
 }
 
 export function hrefFor(route: Route): string {

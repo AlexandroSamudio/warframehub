@@ -7,6 +7,7 @@
   import * as api from '../lib/api.ts';
   import { farmQueue } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
+  import { keepPlace as keepRow } from '../lib/keep-place.ts';
   import { formatLocal, formatUtc } from '../lib/time.ts';
   import { shift } from '../lib/reorder.ts';
 
@@ -41,19 +42,13 @@
    * Getting or crafting a part moves rows in "What to farm next" above, which would pull
    * the page up under the pointer. Keep the control that was used where it was on screen.
    */
-  async function keepPlace(call: () => Promise<GoalsResponse>): Promise<boolean> {
-    const el = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    // Anchor on the row (a part row stays mounted even when its Craft button goes away).
-    const anchor = el?.closest('li') ?? el;
-    const before = anchor?.getBoundingClientRect().top;
-    const ok = await run(call);
-    await tick();
-    if (anchor?.isConnected && before !== undefined) {
-      window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: 'instant' });
-    }
-    if (el?.isConnected) el.focus({ preventScroll: true });
-    return ok;
-  }
+  // (A part row stays mounted even when its Craft button goes away; PartRow then moves
+  // focus to its Crafted field itself.)
+  const keepPlace = (call: () => Promise<GoalsResponse>) =>
+    keepRow(
+      () => run(call),
+      () => tick(),
+    );
 
   async function build(goalId: number, useStock: boolean) {
     if (await run(() => api.markBuilt(goalId, useStock))) {

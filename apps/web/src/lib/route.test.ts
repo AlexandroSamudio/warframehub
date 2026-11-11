@@ -10,6 +10,8 @@ describe('routeFromHash', () => {
     ['#/settings?x=1', 'settings'],
     ['#/nope', 'tracker'],
     ['#/goals', 'goals'],
+    ['#/inventory', 'inventory'],
+    ['#/profile', 'profile'],
   ])('%s → %s', (hash, route) => {
     expect(routeFromHash(hash)).toBe(route);
   });

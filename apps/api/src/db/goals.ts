@@ -151,7 +151,13 @@ export function loadGoals(db: Db, userId: number, now: Date = new Date()): Goals
     .where(eq(partStock.userId, userId))
     .orderBy(asc(partStock.name))
     .all()
-    .map((p) => ({ key: p.partKey, name: p.name, blueprints: p.blueprints, crafted: p.crafted }));
+    .map((p) => ({
+      key: p.partKey,
+      name: p.name,
+      blueprints: p.blueprints,
+      crafted: p.crafted,
+      craftable: partCraft(p.partKey) !== null,
+    }));
   const undo = lastUndo(db, userId, now);
   const undoInfo: UndoInfo | null = undo
     ? { kind: undo.kind, name: undo.name, expiresAt: undo.expiresAt.toISOString() }
@@ -311,7 +317,13 @@ function findPart(db: Db, userId: number, key: string) {
 
 /** Sets a part's amounts directly (a drop, a Market buy, a correction). */
 export function setPartStock(db: Db, userId: number, body: SetPartStockRequest): void {
-  const { name } = findPart(db, userId, body.key);
+  // A part you already have amounts for stays editable after its goal is gone.
+  const saved = db
+    .select({ name: partStock.name })
+    .from(partStock)
+    .where(and(eq(partStock.userId, userId), eq(partStock.partKey, body.key)))
+    .get();
+  const name = saved?.name ?? findPart(db, userId, body.key).name;
   writePart(db, userId, body.key, name, {
     ...(body.blueprints !== undefined ? { blueprints: body.blueprints } : {}),
     ...(body.crafted !== undefined ? { crafted: body.crafted } : {}),

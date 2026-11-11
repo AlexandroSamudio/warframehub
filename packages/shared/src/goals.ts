@@ -203,6 +203,8 @@ export const PartStockRow = z.object({
   name: z.string(),
   blueprints: z.int().min(0),
   crafted: z.int().min(0),
+  /** Has a crafting recipe (blueprint → part); otherwise only `crafted` ("have") is used. */
+  craftable: z.boolean(),
 });
 export type PartStockRow = z.infer<typeof PartStockRow>;
 
