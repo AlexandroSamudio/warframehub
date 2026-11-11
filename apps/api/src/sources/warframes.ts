@@ -84,6 +84,7 @@ export function abilitiesOf(raw: RawWarframe): WarframeAbility[] {
     key: i + 1,
     description: a.description,
     image: a.imageName ?? null,
+    numbers: null,
   }));
 }
 

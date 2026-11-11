@@ -11,6 +11,23 @@ import { GoalStatus, ItemRecipe } from './goals.js';
 export const VariantKind = z.enum(['normal', 'prime', 'umbra']);
 export type VariantKind = z.infer<typeof VariantKind>;
 
+/** An ability's numbers from the Warframe wiki (lines by rank, e.g. "10 / 11 / 13 / 16 m"). */
+export const AbilityNumbers = z.object({
+  cost: z.number().nullable(),
+  /** "energy", or what else it costs ("mutation", "health"…). */
+  costType: z.string(),
+  channeled: z.boolean(),
+  /** Helminth can take this ability. */
+  subsumable: z.boolean(),
+  strength: z.array(z.string()),
+  duration: z.array(z.string()),
+  range: z.array(z.string()),
+  misc: z.array(z.string()),
+  /** The wiki page (credit and "more"). */
+  page: z.url(),
+});
+export type AbilityNumbers = z.infer<typeof AbilityNumbers>;
+
 export const WarframeAbility = z.object({
   uniqueName: z.string(),
   name: z.string(),
@@ -19,6 +36,8 @@ export const WarframeAbility = z.object({
   description: z.string(),
   /** File name for `GET /api/images/:file`, or null. */
   image: z.string().nullable(),
+  /** From the wiki; null when the wiki data doesn't cover it (e.g. Umbra's abilities). */
+  numbers: AbilityNumbers.nullable(),
 });
 export type WarframeAbility = z.infer<typeof WarframeAbility>;
 
@@ -52,6 +71,13 @@ export const WarframeVariant = z.object({
   image: z.string().nullable(),
   abilities: z.array(WarframeAbility),
   stats: WarframeStats,
+  /** Stats the wiki lists separately at rank 30, only where they differ. */
+  rank30: z.object({
+    health: z.number().optional(),
+    shield: z.number().optional(),
+    armor: z.number().optional(),
+    energy: z.number().optional(),
+  }),
   /** Slot polarities, e.g. ["madurai", "vazarin"]. */
   polarities: z.array(z.string()),
   aura: z.string().nullable(),
@@ -97,6 +123,8 @@ export const WarframeDetail = z.object({
   variants: z.array(WarframeVariant).min(1),
   /** Augment mods for this Warframe (all versions share them). */
   augments: z.array(WarframeAugment),
+  /** Syndicates that sell the augments (from the wiki). */
+  augmentShops: z.array(z.string()),
   ...Freshness,
 });
 export type WarframeDetail = z.infer<typeof WarframeDetail>;

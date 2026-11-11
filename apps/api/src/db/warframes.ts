@@ -7,6 +7,7 @@ import type {
 import { and, desc, eq } from 'drizzle-orm';
 import { isMastered } from '../domain/mastery.js';
 import { HttpError } from '../http-error.js';
+import { abilityStats, warframeWiki } from '../sources/ability-stats.js';
 import { normaliseItem } from '../sources/items.js';
 import { partSources } from '../sources/part-sources.js';
 import {
@@ -96,7 +97,10 @@ export function warframeDetail(
   if (!group) throw new HttpError(404, 'not_found', `No Warframe called "${slug}"`);
   const xp = profileXp(db, userId);
   const variants: WarframeVariant[] = group.variants.map(({ kind, raw }) => {
-    const passive = raw.passiveDescription ? plainText(raw.passiveDescription) : '';
+    const wiki = warframeWiki(raw.uniqueName);
+    // The data's passive has placeholders ("|SPEED|%"); the wiki's has the numbers.
+    const dataPassive = raw.passiveDescription ? plainText(raw.passiveDescription) : '';
+    const passive = wiki?.passive ?? (/\|[A-Z_]+\|/.test(dataPassive) ? '' : dataPassive);
     return {
       uniqueName: raw.uniqueName,
       name: raw.name,
@@ -104,7 +108,26 @@ export function warframeDetail(
       description: plainText(raw.description),
       passive: passive === '' ? null : passive,
       image: raw.imageName ?? null,
-      abilities: abilitiesOf(raw).map((a) => ({ ...a, description: plainText(a.description) })),
+      abilities: abilitiesOf(raw).map((a) => {
+        const n = abilityStats(a.uniqueName);
+        return {
+          ...a,
+          description: plainText(a.description),
+          numbers: n
+            ? {
+                cost: n.cost,
+                costType: n.costType,
+                channeled: n.channeled,
+                subsumable: n.subsumable,
+                strength: n.strength,
+                duration: n.duration,
+                range: n.range,
+                misc: n.misc,
+                page: n.page,
+              }
+            : null,
+        };
+      }),
       stats: {
         health: raw.health,
         shield: raw.shield,
@@ -112,6 +135,7 @@ export function warframeDetail(
         energy: raw.power,
         sprint: raw.sprintSpeed,
       },
+      rank30: wiki?.rank30 ?? {},
       polarities: raw.polarities,
       aura: raw.aura ?? null,
       masteryReq: raw.masteryReq ?? null,
@@ -130,6 +154,7 @@ export function warframeDetail(
     name: group.name,
     variants,
     augments: state.augments[group.name] ?? [],
+    augmentShops: warframeWiki(group.variants[0]!.raw.uniqueName)?.augmentShops ?? [],
     ...freshness(state, nextRefreshAt),
   };
 }
