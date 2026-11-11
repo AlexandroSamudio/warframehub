@@ -47,6 +47,7 @@ function goal(
       drops: drops ?? [],
       craft: null,
       note: '',
+      sources: [],
     })),
     resources: [],
     progress: { done: 0, total: 1 },

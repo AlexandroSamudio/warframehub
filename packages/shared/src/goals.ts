@@ -46,9 +46,21 @@ export const PartCraft = z.object({
 });
 export type PartCraft = z.infer<typeof PartCraft>;
 
+/** Where a part with no drop data comes from, read from the Warframe wiki. */
+export const PartSource = z.object({
+  kind: z.literal('quest'),
+  /** The quest's name, e.g. "The Glast Gambit". */
+  title: z.string(),
+  /** Its page on the Warframe wiki. */
+  url: z.url(),
+});
+export type PartSource = z.infer<typeof PartSource>;
+
 /** A part of a recipe. `craft` is null when it isn't crafted (e.g. Prime weapon parts drop finished). */
 export const RecipePart = RecipeComponent.extend({
   craft: PartCraft.nullable().default(null),
+  /** Quest rewards the wiki names for this part. Empty when none is known. */
+  sources: z.array(PartSource).default([]),
 });
 export type RecipePart = z.infer<typeof RecipePart>;
 

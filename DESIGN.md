@@ -334,7 +334,7 @@ Two groups under Label headings: **For {item}** (the item's own recipe; a row th
 
 ### Part Note
 
-A single-line text field (200 characters) with the visible label "Where do you get this?" above it, saved on change with a polite "Saved" (same pattern as the Amount Field). It appears for parts no drop table lists ("Get another way" in the farm queue, and on the part in its card).
+A single-line text field (200 characters) with a visible label above it, saved on change with a polite "Saved" (same pattern as the Amount Field). It appears for parts no drop table lists ("Get another way" in the farm queue, and on the part in its card). Above it, when the Warframe wiki names a quest, one line: **"Quest:"** (600 weight, Readout White), the quest's name as a teal external link (new tab, `noopener noreferrer`), and "· Warframe wiki" in Dim Readout. The label then reads "Your own note (shown instead of the wiki)"; without a source it reads "Where do you get this?". A typed note replaces the wiki line.
 
 ### Amount Field
 

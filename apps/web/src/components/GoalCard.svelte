@@ -3,7 +3,7 @@
   import { formatAmount, materialList, progressPercent, splitResources } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
   import AmountField from './AmountField.svelte';
-  import PartNote from './PartNote.svelte';
+  import PartWhere from './PartWhere.svelte';
   import Icon from './Icon.svelte';
 
   interface Props {
@@ -191,10 +191,10 @@
                 {/if}
                 {#if p.drops.length === 0 || p.note !== ''}
                   <div class="part-note">
-                    <span class="note-label">{t('part.noteLabel')}</span>
-                    <PartNote
-                      value={p.note}
-                      label={`${t('part.noteLabel')} ${p.name}`}
+                    <PartWhere
+                      note={p.note}
+                      sources={p.sources}
+                      context={p.name}
                       onSave={(note) => onNote(goal.id, p.key, note)}
                     />
                   </div>
@@ -468,13 +468,6 @@
 
   .part-note {
     margin: 0.25rem 0 0 1.5rem;
-    display: grid;
-    gap: 0.1rem;
-  }
-
-  .note-label {
-    font-size: 0.75rem;
-    color: var(--muted);
   }
 
   .incl {

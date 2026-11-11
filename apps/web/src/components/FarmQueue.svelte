@@ -12,7 +12,7 @@
   import { t } from '../lib/i18n/index.ts';
   import AmountField from './AmountField.svelte';
   import DropList from './DropList.svelte';
-  import PartNote from './PartNote.svelte';
+  import PartWhere from './PartWhere.svelte';
 
   interface Props {
     queue: FarmQueue;
@@ -88,11 +88,11 @@
               <span class="lead">{p.name}</span>
               <span class="for">{t('farm.for', { goal: p.goalName })}</span>
             </div>
-            {#if p.note === ''}<p class="relics">{t('farm.noDrops')}</p>{/if}
-            <span class="note-label">{t('part.noteLabel')}</span>
-            <PartNote
-              value={p.note}
-              label={`${t('part.noteLabel')} ${p.name} ${p.goalName}`}
+            <PartWhere
+              note={p.note}
+              sources={p.sources}
+              showNoDrops
+              context={`${p.name} ${p.goalName}`}
               onSave={(note) => onNote(p.goalId, p.key, note)}
             />
           </li>
@@ -229,12 +229,6 @@
 
   .relics {
     margin: 0;
-  }
-
-  .note-label {
-    margin-top: 0.15rem;
-    font-size: 0.75rem;
-    color: var(--muted);
   }
 
   .more {
