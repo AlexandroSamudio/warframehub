@@ -177,5 +177,10 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
         - all page scans 0.
   - **Follow-up** (branch `goals-part-recipes`, Alex's requests): per-part crafting materials (DE public export, saved in `apps/api/data/part-recipes.json`, refresh with `npm run update-part-recipes`), a note per part for parts with no drop data ("Get another way"), and those materials counting in the shopping list until the part is owned. Migration `0004`. UI went through Impeccable again (brief addendum, dual-agent critique, audit).
   - **Header** (11 Nov 2026, PR #27): the "Weekly Tracker" tagline is gone; the mark and the WarframeHub name are one gold link home (`#/`). `DESIGN.md` updated.
+  - **Builds follow-up** (#31): How to play as important as the mods (two equal framed sections), and a build description.
+  - **Spanish and English** (13 Nov 2026, Alex's request; SPEC §8.3). Neutral Spanish (tú), Spanish by default, switch in Settings. Game words as in the Spanish game client: DE's public export first, then the Spanish wiki, then our own translation (`docs/GLOSSARY-es.md`). Three PRs:
+    - **PR 1** (branch `i18n-spanish`): the setting, every interface string in `es.ts`, server messages by key (`apps/api/src/i18n.ts`), Spanish dates and numbers.
+    - **PR 2:** game data from DE's export (`_es` files): names and effects for Warframes, abilities, mods, arcanes, weapons, parts, resources, shards and nodes, through a refresh script; search in both languages; the wiki's ability-number notes translated by us. Open point: DE's Spanish passives have blanks (`|SPEED|`) to fill from the wiki's numbers.
+    - **PR 3:** the default checklist and the live rotations (official terms where they exist, our own translation otherwise, English as the fallback for anything new).
   - Impeccable 4.8.2 has no `audit-storage` command (its own reference mentions one), so audit reports go in the PR description.
 - **Impeccable telemetry:** turned off by Alex on 10 Nov 2026 (`impeccable telemetry off`).

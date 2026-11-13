@@ -232,7 +232,7 @@ export const BuildSlot = z.object({
 export type BuildSlot = z.infer<typeof BuildSlot>;
 
 export const BuildShard = z.object({
-  stat: z.string().refine((key) => shardStat(key) !== undefined, 'Unknown Archon Shard stat'),
+  stat: z.string().refine((key) => shardStat(key) !== undefined, 'unknownShardStat'),
   tauforged: z.boolean().default(false),
   note: Note,
 });
@@ -265,7 +265,7 @@ const SourceUrl = z
       .pipe(
         z.url({
           protocol: /^https?$/,
-          error: 'The source link must start with http:// or https://',
+          error: 'sourceUrl',
         }),
       ),
   ])
@@ -294,7 +294,8 @@ export const BuildContent = z.object({
 });
 export type BuildContent = z.infer<typeof BuildContent>;
 
-const BuildName = z.string().trim().min(1, 'Give the build a name').max(60);
+// Validation messages are keys of the API's messages (apps/api/src/i18n.ts).
+const BuildName = z.string().trim().min(1, 'buildName').max(60);
 
 /** `POST /api/builds`. */
 export const CreateBuildRequest = z.object({

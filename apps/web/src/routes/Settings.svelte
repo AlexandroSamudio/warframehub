@@ -1,8 +1,14 @@
 <script lang="ts">
-  import type { SettingsResponse } from '@warframehub/shared';
+  import type { Language, SettingsResponse } from '@warframehub/shared';
   import { onMount } from 'svelte';
   import { getSettings, shutdown, updateSettings } from '../lib/api.ts';
-  import { t } from '../lib/i18n/index.ts';
+  import { language, setLanguage, t } from '../lib/i18n/index.ts';
+
+  /** Each language named in itself, so you can find yours whatever is on screen. */
+  const LANGUAGES: { id: Language; name: string }[] = [
+    { id: 'es', name: 'Español' },
+    { id: 'en', name: 'English' },
+  ];
   import { DISPLAY_TZ } from '../lib/time.ts';
 
   interface Props {
@@ -26,6 +32,24 @@
   const zones = $derived(
     [...new Set([...known, DISPLAY_TZ, ...(settings ? [settings.displayTz] : [])])].sort(),
   );
+
+  let langStatus = $state<string | null>(null);
+
+  /** Switches the whole app at once; the server keeps it for next time. */
+  async function saveLanguage(next: Language) {
+    const before = language.current;
+    setLanguage(next);
+    langStatus = null;
+    try {
+      settings = await updateSettings({ language: next });
+      langStatus = t('settings.saved');
+    } catch (error) {
+      setLanguage(before);
+      langStatus = t('settings.languageError', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
 
   async function saveZone(e: Event) {
     const displayTz = (e.currentTarget as HTMLSelectElement).value;
@@ -64,6 +88,27 @@
 
   {#if settings}
     <dl>
+      <dt id="lang-label">{t('settings.language')}</dt>
+      <dd>
+        <!-- A segmented radio group, in the version switch's style. -->
+        <div class="switch" role="radiogroup" aria-labelledby="lang-label">
+          {#each LANGUAGES as l (l.id)}
+            <label class:on={language.current === l.id} lang={l.id}>
+              <input
+                type="radio"
+                name="language"
+                value={l.id}
+                checked={language.current === l.id}
+                onchange={() => saveLanguage(l.id)}
+              />
+              {l.name}
+            </label>
+          {/each}
+        </div>
+        <p class="hint">{t('settings.languageHint')}</p>
+        {#if langStatus}<p class="status" role="status">{langStatus}</p>{/if}
+      </dd>
+
       <dt><label for="tz">{t('settings.timeZone')}</label></dt>
       <dd>
         <select id="tz" value={settings.displayTz} onchange={saveZone}>
@@ -176,6 +221,53 @@
     margin: 0.25rem 0 0;
     font-size: 0.8rem;
     color: var(--ok);
+  }
+
+  /* The language switch: the version switch's segmented look (DESIGN.md). */
+  .switch {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .switch label {
+    position: relative;
+    padding: 0.3rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    margin-left: -1px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .switch label:first-of-type {
+    margin-left: 0;
+  }
+
+  .switch label:not(.on):hover {
+    color: var(--fg);
+    border-color: var(--gold);
+  }
+
+  .switch label.on {
+    z-index: 1;
+    border-color: var(--gold);
+    color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .switch label:has(input:focus-visible) {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
   }
 
   .quit {

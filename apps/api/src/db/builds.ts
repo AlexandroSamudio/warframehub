@@ -13,6 +13,7 @@ import {
 } from '@warframehub/shared';
 import { and, asc, eq, max } from 'drizzle-orm';
 import { HttpError } from '../http-error.js';
+import type { MessageParams, ServerMessageKey } from '../i18n.js';
 import { abilityStats } from '../sources/ability-stats.js';
 import type { CatalogState, WarframeGroup } from '../sources/warframes.js';
 import type { Db } from './client.js';
@@ -50,7 +51,7 @@ function getRow(db: Db, userId: number, id: number): BuildRow {
     .from(builds)
     .where(and(eq(builds.userId, userId), eq(builds.id, id)))
     .get();
-  if (!row) throw new HttpError(404, 'not_found', `No build ${id}`);
+  if (!row) throw new HttpError(404, 'not_found', 'noBuild', { id });
   return row;
 }
 
@@ -87,8 +88,8 @@ export function augmentFits(mod: ModOption, group: WarframeGroup): boolean {
   return mod.augmentFor === group.name || group.variants.some((v) => v.raw.name === mod.augmentFor);
 }
 
-function bad(message: string): never {
-  throw new HttpError(400, 'bad_request', message);
+function bad(key: ServerMessageKey, params: MessageParams = {}): never {
+  throw new HttpError(400, 'bad_request', key, params);
 }
 
 /** Every mod, arcane and Helminth ability a build points to. */
@@ -116,32 +117,33 @@ export function checkContent(
 
   const mod = (slot: BuildSlot | null, where: 'aura' | 'exilus' | 'slot'): BuildSlot | null => {
     if (!slot) return null;
-    if (usedMods.has(slot.uniqueName)) bad(`${slot.name} is in the build twice`);
+    if (usedMods.has(slot.uniqueName)) bad('inBuildTwice', { name: slot.name });
     usedMods.add(slot.uniqueName);
     const data = rules.mods.get(slot.uniqueName);
     if (!data) {
       if (kept.has(slot.uniqueName)) return slot;
-      return bad(`Unknown mod: ${slot.name}`);
+      return bad('unknownMod', { name: slot.name });
     }
-    if (where === 'aura' && !data.aura) bad(`${data.name} isn't an aura mod`);
-    if (where !== 'aura' && data.aura) bad(`${data.name} only goes in the aura slot`);
-    if (where === 'exilus' && !data.exilus) bad(`${data.name} can't go in the Exilus slot`);
-    if (!augmentFits(data, rules.group)) bad(`${data.name} is an augment for ${data.augmentFor}`);
-    if (slot.rank > data.maxRank) bad(`${data.name} goes up to rank ${data.maxRank}`);
+    if (where === 'aura' && !data.aura) bad('notAura', { name: data.name });
+    if (where !== 'aura' && data.aura) bad('onlyAura', { name: data.name });
+    if (where === 'exilus' && !data.exilus) bad('notExilus', { name: data.name });
+    if (!augmentFits(data, rules.group))
+      bad('augmentFor', { name: data.name, warframe: data.augmentFor ?? '' });
+    if (slot.rank > data.maxRank) bad('maxRank', { name: data.name, max: data.maxRank });
     return { ...slot, name: data.name };
   };
 
   const usedArcanes = new Set<string>();
   const arcane = (slot: BuildSlot | null): BuildSlot | null => {
     if (!slot) return null;
-    if (usedArcanes.has(slot.uniqueName)) bad(`${slot.name} is in the build twice`);
+    if (usedArcanes.has(slot.uniqueName)) bad('inBuildTwice', { name: slot.name });
     usedArcanes.add(slot.uniqueName);
     const data = rules.arcanes.get(slot.uniqueName);
     if (!data) {
       if (kept.has(slot.uniqueName)) return slot;
-      return bad(`Unknown arcane: ${slot.name}`);
+      return bad('unknownArcane', { name: slot.name });
     }
-    if (slot.rank > data.maxRank) bad(`${data.name} goes up to rank ${data.maxRank}`);
+    if (slot.rank > data.maxRank) bad('maxRank', { name: data.name, max: data.maxRank });
     return { ...slot, name: data.name };
   };
 
@@ -151,14 +153,14 @@ export function checkContent(
     const own = rules.group.variants.some((v) =>
       v.raw.abilities.some((a) => a.uniqueName === helminth!.uniqueName),
     );
-    if (own) bad(`${helminth.name} is already one of ${rules.group.name}'s abilities`);
+    if (own) bad('ownAbility', { name: helminth.name, warframe: rules.group.name });
     if (data) helminth = { ...helminth, name: data.name };
-    else if (!kept.has(helminth.uniqueName)) bad(`Helminth can't give ${helminth.name}`);
+    else if (!kept.has(helminth.uniqueName)) bad('helminthCant', { name: helminth.name });
   }
 
   const weapons = new Set<string>();
   for (const w of content.weapons) {
-    if (weapons.has(w.uniqueName)) bad(`${w.name} is in the build twice`);
+    if (weapons.has(w.uniqueName)) bad('inBuildTwice', { name: w.name });
     weapons.add(w.uniqueName);
   }
 
@@ -229,7 +231,7 @@ export function deleteBuild(db: Db, userId: number, id: number): void {
 /** Sets the order of one Warframe's builds. Every one of its builds must be listed once. */
 export function reorderBuilds(db: Db, userId: number, body: ReorderBuildsRequest): void {
   if (new Set(body.buildIds).size !== body.buildIds.length) {
-    bad('A build is listed twice');
+    bad('buildTwice');
   }
   const rows = db
     .select({ id: builds.id })
@@ -238,9 +240,9 @@ export function reorderBuilds(db: Db, userId: number, body: ReorderBuildsRequest
     .all();
   const mine = new Set(rows.map((r) => r.id));
   if (body.buildIds.some((id) => !mine.has(id))) {
-    throw new HttpError(404, 'not_found', 'Unknown build in the new order');
+    throw new HttpError(404, 'not_found', 'unknownBuildInOrder');
   }
-  if (mine.size !== body.buildIds.length) bad('List every build of this Warframe');
+  if (mine.size !== body.buildIds.length) bad('listEveryBuild');
   db.transaction((tx) => {
     body.buildIds.forEach((id, sortOrder) => {
       tx.update(builds)

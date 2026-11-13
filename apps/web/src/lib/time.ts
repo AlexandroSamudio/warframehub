@@ -1,4 +1,4 @@
-import { t } from './i18n/index.ts';
+import { locale, t } from './i18n/index.ts';
 
 /** Display time zone until the tracker response tells us the user's setting (SPEC §8.1). */
 export const DISPLAY_TZ = 'America/Argentina/Buenos_Aires';
@@ -8,12 +8,22 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 export function formatLocal(iso: string, timeZone = DISPLAY_TZ): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(locale(), {
     timeZone,
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+  }).format(new Date(iso));
+}
+
+/** "13 Nov 2026" / "13 nov 2026" in the current language (and zone, when given). */
+export function formatDay(iso: string, timeZone?: string): string {
+  return new Intl.DateTimeFormat(locale(), {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    ...(timeZone ? { timeZone } : {}),
   }).format(new Date(iso));
 }
 

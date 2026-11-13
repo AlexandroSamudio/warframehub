@@ -71,6 +71,8 @@ async function setup(file = ':memory:') {
   const app = await buildApp({ db: database.db, userId, now, liveTimes: () => ({}), profile });
   const call = (method: 'GET' | 'PUT' | 'POST' | 'DELETE', url: string, payload?: object) =>
     app.inject({ method, url, ...(payload ? { payload } : {}) });
+  // These tests read the English messages (Spanish is the default; see i18n.test.ts).
+  await app.inject({ method: 'PATCH', url: '/api/settings', payload: { language: 'en' } });
   return { app, database, de, clock, call, warnings };
 }
 type Ctx = Awaited<ReturnType<typeof setup>>;
@@ -132,7 +134,7 @@ describe('profile routes', () => {
     ctx.clock.now = new Date(START.getTime() + 10 * 60_000);
     const early = await ctx.call('POST', '/api/profile/refresh');
     expect(early.statusCode).toBe(429);
-    expect(ApiError.parse(early.json()).error.message).toContain('50 minutes');
+    expect(ApiError.parse(early.json()).error.message).toContain('50 min.');
     expect(ctx.de.state.calls).toHaveLength(1);
     expect((await body(ctx.call('GET', '/api/profile'))).nextRefreshAt).toBe(
       new Date(START.getTime() + MIN_REFRESH_GAP_MS).toISOString(),

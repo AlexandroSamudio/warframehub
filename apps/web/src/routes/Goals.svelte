@@ -8,7 +8,7 @@
   import { farmQueue } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
   import { keepPlace as keepRow } from '../lib/keep-place.ts';
-  import { formatLocal, formatUtc } from '../lib/time.ts';
+  import { formatDay, formatLocal, formatUtc } from '../lib/time.ts';
   import { shift } from '../lib/reorder.ts';
 
   let data = $state<GoalsResponse | null>(null);
@@ -86,13 +86,7 @@
   }
 
   function builtDate(iso: string | null): string {
-    return iso
-      ? new Intl.DateTimeFormat('en-GB', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        }).format(new Date(iso))
-      : '';
+    return iso ? formatDay(iso) : '';
   }
 
   onMount(() => {

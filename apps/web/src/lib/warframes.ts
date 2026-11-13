@@ -5,6 +5,7 @@ import type {
   WarframeVariant,
 } from '@warframehub/shared';
 import { formatAmount } from './goals.ts';
+import { formatDay } from './time.ts';
 
 /**
  * The list, filtered by the Warframe's name (case-insensitive). "prime" and "umbra" (or
@@ -30,12 +31,7 @@ export function polarityName(p: string): string {
 export function formatRelease(date: string): string {
   const d = new Date(`${date}T00:00:00Z`);
   if (Number.isNaN(d.getTime())) return date;
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(d);
+  return formatDay(d.toISOString(), 'UTC');
 }
 
 export interface StatLine {

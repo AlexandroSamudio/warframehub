@@ -8,6 +8,7 @@ import type {
   Shortfall,
   ShoppingRow,
 } from '@warframehub/shared';
+import { locale } from './i18n/index.ts';
 
 /** One missing part in the "What to farm next" list. Parts belong to one goal. */
 export interface MissingPart {
@@ -159,7 +160,10 @@ export function relicNames(drops: ItemDrop[]): string[] {
 
 // ---- formatting --------------------------------------------------------------
 
-const integer = new Intl.NumberFormat('en-US');
+/** Whole numbers in the current language, always grouped: "25,000" / "25.000". */
+function integer(): Intl.NumberFormat {
+  return new Intl.NumberFormat(locale(), { useGrouping: 'always', maximumFractionDigits: 0 });
+}
 
 /** The materials of a craft as quantity + name pairs: Credits first, then A–Z. */
 export function materialList(craft: PartCraft): { count: number; name: string }[] {
@@ -226,9 +230,9 @@ export function splitResources(resources: GoalResource[]): {
   };
 }
 
-/** 25000 → "25,000". */
+/** 25000 → "25,000" (English) or "25.000" (Spanish). */
 export function formatAmount(n: number): string {
-  return integer.format(n);
+  return integer().format(n);
 }
 
 /** "25,000" or "25000" → 25000; anything that isn't a whole number ≥ 0 → null. */
@@ -236,10 +240,11 @@ export type Entry = { amount: number } | { error: 'invalid' | 'belowZero' };
 
 /**
  * What the user typed into an amount field: "1,200" sets it, "+250" adds to what's saved,
- * "-30" takes away. Thousands separators and spaces are fine.
+ * "-30" takes away. Thousands separators (comma or dot, in either language) and spaces are
+ * fine.
  */
 export function parseEntry(text: string, current: number): Entry {
-  const m = /^\s*([+-])?\s*([\d,\s]+)$/.exec(text);
+  const m = /^\s*([+-])?\s*([\d,.\s]+)$/.exec(text);
   const n = m ? parseAmount(m[2]!) : null;
   if (!m || n === null) return { error: 'invalid' };
   const amount = m[1] === '+' ? current + n : m[1] === '-' ? current - n : n;
@@ -247,9 +252,14 @@ export function parseEntry(text: string, current: number): Entry {
   return Number.isSafeInteger(amount) ? { amount } : { error: 'invalid' };
 }
 
+/**
+ * "25,000", "25.000", "25 000" or "25000" → 25000. A comma or dot only counts as a
+ * thousands separator before groups of three digits, so "1.5" is not a whole number.
+ */
 export function parseAmount(text: string): number | null {
-  const cleaned = text.replace(/[,\s]/g, '');
-  if (!/^\d+$/.test(cleaned)) return null;
+  const trimmed = text.trim().replace(/\s/g, '');
+  if (!/^\d+$/.test(trimmed) && !/^\d{1,3}([.,]\d{3})+$/.test(trimmed)) return null;
+  const cleaned = trimmed.replace(/[.,]/g, '');
   const n = Number(cleaned);
   return Number.isSafeInteger(n) ? n : null;
 }
@@ -257,7 +267,8 @@ export function parseAmount(text: string): number | null {
 /** 14.29 → "14.29%"; 100 → "100%"; null → "". */
 export function formatChance(chance: number | null): string {
   if (chance === null) return '';
-  return `${Number.isInteger(chance) ? chance : chance.toFixed(2).replace(/0$/, '')}%`;
+  // Up to two decimals, in the language's own decimal mark ("14.29%" / "14,29%").
+  return `${new Intl.NumberFormat(locale(), { maximumFractionDigits: 2, useGrouping: false }).format(chance)}%`;
 }
 
 /** Goal progress as a 0–100 percentage for the bar. */

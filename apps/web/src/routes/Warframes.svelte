@@ -5,7 +5,7 @@
   import * as api from '../lib/api.ts';
   import { t } from '../lib/i18n/index.ts';
   import { hrefFor } from '../lib/route.svelte.ts';
-  import { formatLocal, formatUtc } from '../lib/time.ts';
+  import { formatDay, formatLocal, formatUtc } from '../lib/time.ts';
   import { filterWarframes } from '../lib/warframes.ts';
 
   let data = $state<WarframesResponse | null>(null);
@@ -18,10 +18,7 @@
 
   const shown = $derived(data ? filterWarframes(data.warframes, filter) : []);
   const locked = $derived(data?.nextRefreshAt != null && Date.parse(data.nextRefreshAt) > now);
-  const dateOf = (iso: string) =>
-    new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(
-      new Date(iso),
-    );
+  const dateOf = (iso: string) => formatDay(iso);
 
   function load() {
     loadError = null;

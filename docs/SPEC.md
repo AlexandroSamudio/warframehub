@@ -303,9 +303,17 @@ Rules:
   - aligned numbers (`tabular-nums`) for timers
 - Light mode is **not** planned for v1. The theme is dark by design.
 
-### 8.3 Ready for translation
+### 8.3 Languages: Spanish and English (13 Nov 2026, Alex's request)
 
-All UI text lives in one module (`apps/web/src/lib/i18n/en.ts`), accessed through a `t()` helper. Spanish later is a matter of adding `es.ts` and a setting. Seed checklist text gets a translation key at the same time.
+- **Setting:** `language` (`es` | `en`) in Settings, saved on the server (`settings` table, key `language`) and **Spanish by default**. A local copy lets the first paint use it; the server's value wins. The page's `lang` follows it.
+- **Spanish** is neutral, with **tú**. Game words follow the **Spanish game client**: DE's public export first, then the Spanish Warframe wiki, then our own translation only where neither has the term. `docs/GLOSSARY-es.md` lists each term the interface uses and its source.
+- **Interface:** every string is in `apps/web/src/lib/i18n/en.ts` and `es.ts`, read through `t()`, which follows the reactive language. A test checks that every key exists in both with the same `{placeholders}`.
+- **Server messages:** errors carry a key and values (`HttpError(status, code, key, params)`). The error handler writes them in the user's language from `apps/api/src/i18n.ts`. Validation messages people see are keys too; anything else names the invalid fields.
+- **Formats:** dates and numbers use the language's format ("13 nov 2026", "1.250", "14,29%"). Amount fields accept "1.250" or "1,250" in either language; a separator only counts before groups of three digits.
+- **Delivered in three PRs:**
+  1. The switch, the interface and server messages.
+  2. Game data in Spanish: names and effects from DE's export via a refresh script; search matches both languages.
+  3. The default checklist and the live rotations.
 
 ---
 

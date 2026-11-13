@@ -69,7 +69,7 @@ export class WorldstateService {
     const now = this.now().getTime();
     const wait = this.lastManualRefresh + MANUAL_REFRESH_INTERVAL_MS - now;
     if (wait > 0) {
-      throw new HttpError(429, 'rate_limited', `Try again in ${Math.ceil(wait / 1000)} s`);
+      throw new HttpError(429, 'rate_limited', 'rateLimited', { seconds: Math.ceil(wait / 1000) });
     }
     this.lastManualRefresh = now;
     await Promise.all(WORLDSTATE_ENDPOINTS.map((e) => this.refreshIfNeeded(e, true)));

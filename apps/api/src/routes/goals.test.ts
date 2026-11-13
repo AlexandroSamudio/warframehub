@@ -25,6 +25,8 @@ async function setup(file = ':memory:') {
     liveTimes: () => ({}),
     items: new ItemCatalog(database.db, { fetch: api.fetchFn, now, sleep: async () => {} }),
   });
+  // These tests read the English messages (Spanish is the default; see i18n.test.ts).
+  await app.inject({ method: 'PATCH', url: '/api/settings', payload: { language: 'en' } });
   return { app, database, api, clock };
 }
 type Ctx = Awaited<ReturnType<typeof setup>>;

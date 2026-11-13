@@ -1,5 +1,6 @@
 import type { Profile, ProfileIntrinsic } from '@warframehub/shared';
 import type { MessageKey } from './i18n/en.ts';
+import { locale } from './i18n/index.ts';
 import { DISPLAY_TZ, formatUtc } from './time.ts';
 
 /** The intrinsic tags in DE's profile, grouped as the game groups them. Unknown tags are left out. */
@@ -49,7 +50,7 @@ export function hoursPlayed(profile: Pick<Profile, 'timePlayedSeconds'>): number
 
 /** "10 Nov, 21:00" in the display zone; the caller adds the UTC time next to it. */
 export function formatWhen(iso: string, timeZone = DISPLAY_TZ): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(locale(), {
     timeZone,
     day: 'numeric',
     month: 'short',

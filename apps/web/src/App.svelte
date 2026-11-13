@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { HealthResponse } from '@warframehub/shared';
   import { onMount } from 'svelte';
-  import { getHealth, heartbeat } from './lib/api.ts';
-  import { t } from './lib/i18n/index.ts';
+  import { getHealth, getSettings, heartbeat } from './lib/api.ts';
+  import { language, setLanguage, t } from './lib/i18n/index.ts';
   import { hrefFor, router, type Route } from './lib/route.svelte.ts';
   import BuildEdit from './routes/BuildEdit.svelte';
   import Goals from './routes/Goals.svelte';
@@ -21,6 +21,15 @@
   const HEARTBEAT_MS = 60_000;
 
   onMount(() => {
+    // The language saved on the server wins over the local copy used for the first paint.
+    setLanguage(language.current);
+    getSettings()
+      .then((s) => {
+        if (s.language !== language.current) setLanguage(s.language);
+      })
+      .catch(() => {
+        // Offline or stopped: the local copy stays.
+      });
     getHealth()
       .then((h) => (health = h))
       .catch(() => {

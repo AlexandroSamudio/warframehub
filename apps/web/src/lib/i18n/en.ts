@@ -3,9 +3,10 @@ export const en = {
   'app.title': 'WarframeHub',
 
   'tracker.loading': 'Loading your checklist…',
-  'tracker.error': "Can't reach the API. Is it running? Start everything with npm run dev.",
+  'tracker.error': "Can't reach WarframeHub. Is it still running?",
   'tracker.retry': 'Try again',
-  'tracker.saveError': "Couldn't save that change. Check that the API is running and try again.",
+  'tracker.saveError':
+    "Couldn't save that change. Check that WarframeHub is still running and try again.",
   'tracker.dismiss': 'Dismiss',
 
   'clocks.label': 'Reset clocks',
@@ -15,7 +16,8 @@ export const en = {
   'clock.eight_hour': '8-hour vendors',
   'clock.four_day': 'Every 4 days',
   'clock.baro': 'Baro',
-  'clock.at': '{local} · {utc} UTC',
+  // A non-breaking space keeps "00:00 UTC" together on narrow clocks.
+  'clock.at': '{local} · {utc} UTC',
   'clock.unknown': 'Waiting for live data',
   'clock.estimated': 'estimated',
   'clock.estimatedHint': 'No live data yet: this is the usual time, the real reset may differ',
@@ -157,7 +159,7 @@ export const en = {
 
   'goals.title': 'Goals',
   'goals.loading': 'Loading your goals…',
-  'goals.loadError': "Can't load your goals. Is the server running?",
+  'goals.loadError': "Can't load your goals. Is WarframeHub still running?",
   'goals.saveError': "Couldn't save that change: {message}",
   'goals.unreachable': "Couldn't reach WarframeHub. Is it still running?",
   'goals.empty': 'No goals yet. Search for a Warframe or weapon you want to build.',
@@ -271,6 +273,10 @@ export const en = {
   'goalsCard.open': 'Open goals',
 
   'settings.title': 'Settings',
+  'settings.language': 'Language',
+  'settings.languageHint':
+    'Changes the whole app, including its messages. Item, mod and ability names and the default checklist are still in English for now.',
+  'settings.languageError': "Couldn't save the language: {message}",
   'settings.timeZone': 'Display time zone',
   'settings.timeZoneHint':
     'Times are shown in this zone, with UTC next to them. Resets always follow UTC.',
@@ -282,7 +288,7 @@ export const en = {
   'settings.idle': 'Stops on its own',
   'settings.idleOn': 'After {minutes} minutes with no WarframeHub tab open',
   'settings.idleOff': 'Never (development mode)',
-  'settings.loadError': "Can't load settings. Is the server running?",
+  'settings.loadError': "Can't load settings. Is WarframeHub still running?",
   'settings.quit': 'Quit WarframeHub',
   'settings.quitHint': 'Stops the server. Open WarframeHub from the app menu to start it again.',
   'settings.quitConfirm': 'Stop WarframeHub now?',
@@ -297,7 +303,7 @@ export const en = {
 
   'profile.title': 'Profile',
   'profile.loading': 'Loading your profile…',
-  'profile.loadError': "Can't reach the API. Is it running?",
+  'profile.loadError': "Can't reach WarframeHub. Is it still running?",
   'profile.intro':
     'Read your Mastery Rank and progress from your public Warframe profile. Goals then show when you have already mastered an item.',
   'profile.idLabel': 'Account ID',
@@ -316,7 +322,7 @@ export const en = {
   'profile.updated': 'Updated {local} ({utc} UTC)',
   'profile.nextRefresh': 'Refreshed recently. You can refresh again at {local} ({utc} UTC).',
   'profile.refreshHint': 'Pressing Refresh makes one request to Warframe. Once an hour at most.',
-  'profile.unreachable': "can't reach the app. Is it running?",
+  'profile.unreachable': "Can't reach the app. Is it still running?",
   'profile.opensNewTab': '(opens in a new tab)',
   'profile.refreshError': "Couldn't refresh: {message}",
   'profile.saveError': "Couldn't save that: {message}",

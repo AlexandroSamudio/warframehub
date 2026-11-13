@@ -96,7 +96,7 @@ export function warframeDetail(
   nextRefreshAt: Date | null,
 ): WarframeDetail {
   const group = groups.find((g) => g.slug === slug);
-  if (!group) throw new HttpError(404, 'not_found', `No Warframe called "${slug}"`);
+  if (!group) throw new HttpError(404, 'not_found', 'noWarframe', { slug });
   const xp = profileXp(db, userId);
   const rules = buildRules(state, group, helminthOptions(groups));
   const variants: WarframeVariant[] = group.variants.map(({ kind, raw }) => {

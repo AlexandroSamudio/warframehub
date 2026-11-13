@@ -45,7 +45,7 @@ export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps):
     const state = await catalog.state();
     const { groups } = catalog.groups(state);
     const group = groups.find((g) => g.slug === slug);
-    if (!group) throw new HttpError(404, 'not_found', `No Warframe called "${slug}"`);
+    if (!group) throw new HttpError(404, 'not_found', 'noWarframe', { slug });
     return { state, group, helminth: helminthOptions(groups), groups };
   }
 
