@@ -50,6 +50,13 @@
       "when": 1794411869162,
       "tag": "0006_giant_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1794584795023,
+      "tag": "0007_tired_romulus",
+      "breakpoints": true
     }
   ]
 }

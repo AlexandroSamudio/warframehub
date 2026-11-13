@@ -62,6 +62,9 @@ describe('normalising', () => {
     const names = imageNames(raws());
     expect(names.has('Nidus.png')).toBe(true);
     expect([...names].some((n) => n.startsWith('Bonewidow'))).toBe(false);
+    // Builds add mod and arcane images.
+    const withMods = imageNames(raws(), [{ image: 'AbilityStrengthMod.jpg' }, { image: null }]);
+    expect(withMods.has('AbilityStrengthMod.jpg')).toBe(true);
   });
 });
 
@@ -119,12 +122,12 @@ describe('Warframes routes', () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it('lists every Warframe once, fetching the list and the mods once', async () => {
+  it('lists every Warframe once, fetching the list, mods and arcanes once', async () => {
     const body = WarframesResponse.parse((await ctx.get('/api/warframes')).json());
     expect(body.warframes.map((w) => w.name)).toEqual(['Excalibur', 'Mesa', 'Nidus']);
     expect(body.warframes[2]!.variants.map((v) => v.kind)).toEqual(['normal', 'prime']);
     await ctx.get('/api/warframes');
-    expect(ctx.up.state.calls.filter((c) => !c.includes('cdn.'))).toHaveLength(2);
+    expect(ctx.up.state.calls.filter((c) => !c.includes('cdn.'))).toHaveLength(3);
   });
 
   it('gives a page with abilities, stats, augments and the goal recipe', async () => {

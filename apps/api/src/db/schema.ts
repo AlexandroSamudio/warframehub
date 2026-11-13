@@ -248,3 +248,24 @@ export const resourceStock = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.resourceKey] })],
 );
+
+/**
+ * A saved build (SPEC §14.1): mods, arcanes, shards, Helminth, weapons and a guide, for one
+ * Warframe (by slug). `content_json` is the whole `BuildContent`, always saved whole.
+ */
+export const builds = sqliteTable(
+  'builds',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    warframeSlug: text('warframe_slug').notNull(),
+    name: text('name').notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    contentJson: text('content_json').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (t) => [index('builds_user_warframe').on(t.userId, t.warframeSlug)],
+);

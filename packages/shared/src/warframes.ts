@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BuildView } from './builds.js';
 import { GoalStatus, ItemRecipe } from './goals.js';
 
 /**
@@ -125,6 +126,10 @@ export const WarframeDetail = z.object({
   augments: z.array(WarframeAugment),
   /** Syndicates that sell the augments (from the wiki). */
   augmentShops: z.array(z.string()),
+  /** The version that owns the builds (SPEC §14.1), e.g. "Mesa Prime". */
+  buildsVariant: z.string(),
+  /** Your builds for this Warframe, in your order. */
+  builds: z.array(BuildView),
   ...Freshness,
 });
 export type WarframeDetail = z.infer<typeof WarframeDetail>;
