@@ -153,7 +153,11 @@ describe('builds', () => {
     expect(view!.slots[2]).toBeNull();
     expect(view!.arcanes[0]!.effect).toContain('replenish 150 Energy');
     expect(view!.shards[0]).toMatchObject({ color: 'crimson', text: '+15% Ability Strength' });
-    expect(view!.helminth).toMatchObject({ name: 'Larva', page: expect.stringContaining('wiki') });
+    expect(view!.helminth).toMatchObject({
+      name: 'Larva',
+      from: 'Nidus',
+      page: expect.stringContaining('wiki'),
+    });
     expect(view!.content.guide).toContain('**4**');
   });
 

@@ -1,5 +1,7 @@
 import {
   ApiError,
+  Build,
+  BuildOptionsResponse,
   ChecklistResponse,
   ClearSectionResponse,
   GoalsResponse,
@@ -12,6 +14,7 @@ import {
   WarframeDetail,
   WarframesResponse,
   WorldstateResponse,
+  type BuildContent,
   type CreateItemRequest,
   type CreateSectionRequest,
   type PutTickRequest,
@@ -249,4 +252,34 @@ export function refreshWarframes(): Promise<WarframesResponse> {
 /** Where a Warframe image is served from (downloaded once, then local). */
 export function imageUrl(file: string): string {
   return `/api/images/${encodeURIComponent(file)}`;
+}
+
+// ---- builds (SPEC §14.1) ------------------------------------------------------
+
+export function getBuildOptions(slug: string): Promise<BuildOptionsResponse> {
+  return request(BuildOptionsResponse, `/api/builds/options?slug=${encodeURIComponent(slug)}`);
+}
+
+export function getBuild(id: number): Promise<Build> {
+  return request(Build, `/api/builds/${id}`);
+}
+
+export function createBuild(slug: string, name: string, content: BuildContent): Promise<Build> {
+  return request(Build, '/api/builds', json('POST', { slug, name, content }));
+}
+
+export function updateBuild(id: number, name: string, content: BuildContent): Promise<Build> {
+  return request(Build, `/api/builds/${id}`, json('PUT', { name, content }));
+}
+
+export async function deleteBuild(id: number): Promise<void> {
+  await request({ parse: () => undefined }, `/api/builds/${id}`, { method: 'DELETE' });
+}
+
+export function reorderBuilds(slug: string, buildIds: number[]): Promise<Build[]> {
+  return request(
+    { parse: (data: unknown) => Build.array().parse(data) },
+    '/api/builds/reorder',
+    json('POST', { slug, buildIds }),
+  );
 }

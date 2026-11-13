@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-10T19:54:18Z",
+  "generatedAt": "2026-11-13T16:59:48Z",
   "title": "Design System: WarframeHub",
   "extensions": {
     "colorMeta": {
@@ -213,12 +213,61 @@
           "#bbd3e8",
           "#e6eef4"
         ]
+      },
+      "shard-emerald": {
+        "role": "tertiary",
+        "displayName": "Shard Emerald",
+        "canonical": "#4fd18e",
+        "tonalRamp": [
+          "#122b1e",
+          "#1c5437",
+          "#218350",
+          "#1fc770",
+          "#4bdd92",
+          "#88ddb1",
+          "#c1e1d1",
+          "#e9f2ed"
+        ]
+      },
+      "shard-topaz": {
+        "role": "tertiary",
+        "displayName": "Shard Topaz",
+        "canonical": "#f08c4a",
+        "tonalRamp": [
+          "#2b1c12",
+          "#54321c",
+          "#834821",
+          "#c7621f",
+          "#dd854b",
+          "#ddaa88",
+          "#e1cec1",
+          "#f2ece9"
+        ]
+      },
+      "shard-violet": {
+        "role": "tertiary",
+        "displayName": "Shard Violet",
+        "canonical": "#b994f2",
+        "tonalRamp": [
+          "#1c122b",
+          "#321c54",
+          "#472183",
+          "#611fc7",
+          "#844bdd",
+          "#aa88dd",
+          "#cec1e1",
+          "#ece9f2"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
         "purpose": "The app name in the header only."
+      },
+      "page-title": {
+        "displayName": "Page title",
+        "purpose": "The name on a Warframe page and the build edit page title, in gold."
       },
       "headline": {
         "displayName": "Headline",
@@ -280,12 +329,20 @@
     ],
     "breakpoints": [
       {
+        "name": "mod-grid-1col",
+        "value": "24rem"
+      },
+      {
         "name": "phone",
         "value": "30rem"
       },
       {
         "name": "settings-stack",
         "value": "36rem"
+      },
+      {
+        "name": "mod-grid-2col",
+        "value": "48rem"
       },
       {
         "name": "tracker-stack",
@@ -377,11 +434,46 @@
       "description": "\"To craft\" label plus quantity + name pairs; each pair is unbreakable.",
       "html": "<div class=\"ds-craft\"><span class=\"ds-craft-label\">To craft</span><ul class=\"ds-materials\"><li><b>15,000</b> Credits</li><li><b>5,000</b> Nano Spores</li><li><b>3</b> Neurodes</li></ul></div>",
       "css": ".ds-craft { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.6rem; font: 400 0.85rem var(--font-body, Inter, sans-serif); color: var(--muted, #9ba7ba); } .ds-craft-label { font: 600 0.8rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.1em; } .ds-materials { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.1rem 0.9rem; } .ds-materials li { white-space: nowrap; } .ds-materials b { font-weight: 600; color: var(--fg, #e6e9ef); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Build Tabs",
+      "kind": "tabs",
+      "description": "One tab per build in the segmented version-switch look; build names stay sentence case (user's words). Selected tab gold on a gold tint.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\" class=\"on\">Steel Path Peacemaker</button><button role=\"tab\" aria-selected=\"false\">Starter</button></div>",
+      "css": ".ds-tabs { display: flex; flex-wrap: wrap; } .ds-tabs button { font: 600 0.9rem var(--font-display, Rajdhani, sans-serif); letter-spacing: 0.03em; text-transform: none; color: var(--muted, #9ba7ba); background: transparent; border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; margin: 0 0 -1px -1px; padding: 0.3rem 0.8rem; cursor: pointer; } .ds-tabs button:first-child { margin-left: 0; } .ds-tabs button:not(.on):hover { color: var(--fg, #e6e9ef); } .ds-tabs button.on { position: relative; z-index: 1; border-color: var(--gold, #d6b465); color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 12%, transparent); } .ds-tabs button:focus-visible { z-index: 2; outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
+    },
+    {
+      "name": "Mod Tile",
+      "kind": "custom",
+      "description": "A cell in the seam grid (surface cells, 1px seam gaps): cut-corner Mod Pic, name, rank and polarity, effect; empty slots a step darker.",
+      "html": "<div class=\"ds-modgrid\"><div class=\"ds-tile\"><span class=\"ds-pic\"></span><b>Intensify</b><span class=\"ds-meta\">R5 · Madurai</span><span class=\"ds-meta\">+30% Ability Strength</span></div><div class=\"ds-tile ds-empty\"><span class=\"ds-meta\">Empty</span></div></div>",
+      "css": ".ds-modgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line, #2c3749); border: 1px solid var(--line, #2c3749); } .ds-tile { background: var(--surface, #10151e); padding: 0.6rem 0.7rem 0.7rem; display: grid; align-content: start; gap: 0.35rem; color: var(--fg, #e6e9ef); font: 400 0.9rem var(--font-body, Inter, sans-serif); } .ds-tile b { font-weight: 600; } .ds-empty { background: color-mix(in srgb, var(--surface, #10151e) 60%, var(--bg, #07090d)); } .ds-meta { color: var(--muted, #9ba7ba); font-size: 0.85rem; font-variant-numeric: tabular-nums; } .ds-pic { width: 2.75rem; height: 2.75rem; background: var(--surface-2, #171e2a); border: 1px solid var(--line-strong, #5a6b88); clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%); }"
+    },
+    {
+      "name": "Shard Gem",
+      "kind": "custom",
+      "description": "Small rotated square in the shard colour; the colour name is read out beside it.",
+      "html": "<span class=\"ds-shard\"><span class=\"ds-gem\" style=\"--gem:#68b2ee\"></span>+150% Shield capacity</span>",
+      "css": ".ds-shard { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--fg, #e6e9ef); font: 400 0.9rem var(--font-body, Inter, sans-serif); } .ds-gem { width: 0.7rem; height: 0.7rem; flex: none; transform: rotate(45deg); background: var(--gem); }"
+    },
+    {
+      "name": "Picker",
+      "kind": "input",
+      "description": "In-slot combobox (no modal): teal outline on the inset colour, labelled field, listbox of what fits the slot.",
+      "html": "<div class=\"ds-picker\"><label for=\"ds-pk\">Find a mod for Slot 3</label><input id=\"ds-pk\" class=\"ds-picker-input\" role=\"combobox\" aria-expanded=\"true\"></div>",
+      "css": ".ds-picker { display: grid; gap: 0.35rem; padding: 0.6rem; background: var(--surface-2, #171e2a); border: 1px solid var(--teal, #66cbd9); } .ds-picker label { font-size: 0.75rem; color: var(--muted, #9ba7ba); } .ds-picker-input { font: 400 0.875rem/1.5 var(--font-body, Inter, sans-serif); color: var(--fg, #e6e9ef); background: var(--surface-2, #171e2a); border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; padding: 0.25rem 0.5rem; } .ds-picker-input:focus-visible { outline: 2px solid var(--teal, #66cbd9); outline-offset: 0; border-color: var(--teal, #66cbd9); }"
+    },
+    {
+      "name": "Leave Bar",
+      "kind": "custom",
+      "description": "Sticky gold-outlined bar that holds navigation away from unsaved build edits: Keep editing (primary, focused) and Leave (danger).",
+      "html": "<div class=\"ds-leave\" role=\"alertdialog\"><span>Leave without saving? Your changes to this build will be lost.</span><button class=\"ds-btn-primary\">Keep editing</button><button class=\"ds-btn-danger\">Leave</button></div>",
+      "css": ".ds-leave { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; padding: 0.6rem 0.9rem; background: var(--surface, #10151e); border: 1px solid var(--gold, #d6b465); color: var(--gold, #d6b465); font: 400 0.9rem var(--font-body, Inter, sans-serif); } .ds-leave span { flex: 1 1 16rem; }"
     }
   ],
   "narrative": {
     "northStar": "The Orbiter Console",
-    "overview": "WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.\n\nMost visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No game art, logos or copied UI.",
+    "overview": "WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.\n\nMost visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits, ability icons and (in builds) mod and arcane pictures appear only as content in the Warframes section.",
     "keyCharacteristics": [
       "Near-black void with soft gold and teal glows at the top corners of the page",
       "Flat hull panels with two cut corners and a 1px seam that follows the cut",
@@ -433,7 +525,7 @@
       "**Don't** add shadows, glows on components, rounded corners or solid-filled buttons.",
       "**Don't** use Rajdhani for changing numbers (it has no tabular digits).",
       "**Don't** use gold and teal on the same element, or green and rose for anything but status.",
-      "**Don't** use DE logos, game art or copied UI assets; decoration is original CSS or SVG geometry.",
+      "**Don't** use DE logos or copied UI assets; decoration is original CSS or SVG geometry. DE images are content (Warframes section only), never decoration.",
       "**Don't** add a light theme; the console is dark by design.",
       "**Don't** show cosmetic content (decorations, furniture, skins)."
     ]

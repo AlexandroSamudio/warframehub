@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hrefFor, paramFromHash, routeFromHash } from './route.svelte.ts';
+import { buildHref, hrefFor, paramFromHash, routeFromHash, subFromHash } from './route.svelte.ts';
 
 describe('routeFromHash', () => {
   it.each([
@@ -38,5 +38,27 @@ describe('paramFromHash', () => {
   it('builds the address back', () => {
     expect(hrefFor('warframes', 'nidus')).toBe('#/warframes/nidus');
     expect(paramFromHash(hrefFor('warframes', 'mesa'))).toBe('mesa');
+  });
+});
+
+describe('subFromHash', () => {
+  it('reads the new-build and edit-build pages under a Warframe', () => {
+    expect(subFromHash('#/warframes/mesa/builds/new')).toEqual({ kind: 'new' });
+    expect(subFromHash('#/warframes/mesa/builds/12')).toEqual({ kind: 'edit', id: 12 });
+    expect(paramFromHash('#/warframes/mesa/builds/12')).toBe('mesa');
+    expect(routeFromHash('#/warframes/mesa/builds/new')).toBe('warframes');
+  });
+
+  it('ignores anything else', () => {
+    expect(subFromHash('#/warframes/mesa')).toBeNull();
+    expect(subFromHash('#/warframes/mesa/builds')).toBeNull();
+    expect(subFromHash('#/warframes/mesa/builds/0')).toBeNull();
+    expect(subFromHash('#/warframes/mesa/builds/x1')).toBeNull();
+    expect(subFromHash('#/goals/mesa/builds/new')).toBeNull();
+  });
+
+  it('builds the addresses back', () => {
+    expect(subFromHash(buildHref('mesa'))).toEqual({ kind: 'new' });
+    expect(subFromHash(buildHref('mesa', 7))).toEqual({ kind: 'edit', id: 7 });
   });
 });

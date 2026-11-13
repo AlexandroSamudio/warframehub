@@ -470,7 +470,20 @@ Each phase ends with something you can run and check.
 - **Data:** the Warframe catalog (§14) also keeps `warframes:mods` (from `/mods`: type "Warframe Mod" with `compatName` WARFRAME, AURA or a Warframe's name for augments; the Flawed `Beginner`/`Intermediate` copies and Conclave-only `PvPMods` are left out; when two mods share a name the `/Mods/Warframe/` one wins, so the stray `Expert` "Intensify" goes while Primed mods stay) and `warframes:arcanes` (from `/items/search/arcane?by=category`: "Warframe Arcane" plus the older "Arcane" type; the `/arcanes` endpoint is out of date). Checked on 13 Nov 2026: 368 mods (113 general, 36 auras, 33 that fit the Exilus slot, 219 augments) and 71 arcanes. Helminth choices: abilities the wiki marks as subsumable plus Helminth's own (77). Archon Shard stats are a checked constant (`SHARD_STATS` in `packages/shared/src/builds.ts`, from the wiki's Shard Buffs table).
 - **Storage:** table `builds` (migration `0007`): one row per build, `content_json` is the whole `BuildContent`, saved whole. Each reference keeps its name, so a build still reads if the data drops a mod; such a mod is also kept when the build is edited.
 - **Checks on save** (400 with a message): aura slot only auras, aura mods only there, Exilus slot only mods that fit it, rank within the mod's ranks, no mod or arcane twice, no other Warframe's augments, Helminth not one of the Warframe's own abilities, source link http(s) only.
-- **API:** `GET /api/warframes/:slug` adds `buildsVariant` and `builds` (resolved: effect at the chosen rank, polarity, image); `GET /api/builds/options?slug=`; `GET`/`PUT`/`DELETE /api/builds/:id`; `POST /api/builds`; `POST /api/builds/reorder`. Mod and arcane images go through `GET /api/images/:file` like the portraits.
+- **API:** `GET /api/warframes/:slug` adds `buildsVariant` and `builds` (resolved: effect at the chosen rank, polarity, image); `GET /api/builds/options?slug=`; `GET`/`PUT`/`DELETE /api/builds/:id`; `POST /api/builds`; `POST /api/builds/reorder`. Mod and arcane images go through `GET /api/images/:file` like the portraits. The Helminth ability carries its source Warframe (`from`).
+- **Screens** (brief: the Builds addendum in `.impeccable/surfaces/warframes.md`; DESIGN.md "Builds section", "Build edit page"):
+  - **The Warframe page** opens on the version that owns the builds. A **Builds** panel after Abilities has one tab per build (remembered per Warframe, ‹ › to reorder). The selected build shows:
+    - the source line, plus "How to play" (a jump) and Edit;
+    - the mods as a seam grid of tiles (picture, rank, polarity, effect at that rank, note);
+    - arcanes, shards, Helminth ("Replaces …: Roar (Rhino)") and weapons;
+    - the guide, last.
+  - **The edit page** (`#/warframes/{slug}/builds/new`, `…/builds/{id}`) has:
+    - inline pickers per slot (only what fits; names, then effect text; this Warframe's augments first; pictures; focus moves to the next empty slot);
+    - shard stats showing the Tauforged values when ticked;
+    - a Write/Preview guide;
+    - Delete with an inline confirm.
+  - **Unsaved changes** hold any move away (the router's leave guard) behind an inline "Leave without saving?" bar; closing the tab gets the browser's own warning.
+- **Guide format** (`apps/web/src/lib/markdown.ts`, no dependency): everything is escaped first, then `#`/`##` become h5 and `###` h6, along with paragraphs, `-`/`1.` lists, bold, italic, code and http(s) links (new tab). Marks never reach into code or link addresses.
 
 ---
 

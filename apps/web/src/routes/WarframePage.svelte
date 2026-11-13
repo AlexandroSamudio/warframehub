@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProfileResponse, VariantKind, WarframeDetail } from '@warframehub/shared';
   import AbilityRow from '../components/AbilityRow.svelte';
+  import BuildsSection from '../components/BuildsSection.svelte';
   import Icon from '../components/Icon.svelte';
   import * as api from '../lib/api.ts';
   import { formatAmount, formatChance, groupDrops, materialList } from '../lib/goals.ts';
@@ -25,8 +26,25 @@
   let adding = $state(false);
   let portraitFailed = $state(false);
 
-  const v = $derived(data ? pickVariant(data.variants, kind) : null);
+  // Opens on the version that owns the builds (the one Alex plays: SPEC §14.1).
+  const v = $derived(
+    data
+      ? pickVariant(
+          data.variants,
+          kind ?? data.variants.find((x) => x.name === data?.buildsVariant)?.kind ?? null,
+        )
+      : null,
+  );
   const stats = $derived(v ? statLines(v) : []);
+  // Builds belong to one version (the Prime, or Excalibur Umbra): SPEC §14.1.
+  const owner = $derived(data?.variants.find((x) => x.name === data?.buildsVariant) ?? null);
+  const ownerAbilities = $derived(new Map(owner?.abilities.map((a) => [a.key, a.name]) ?? []));
+
+  function showOwner() {
+    if (!owner) return;
+    kind = owner.kind;
+    portraitFailed = false;
+  }
 
   let nameEl = $state<HTMLHeadingElement | null>(null);
   let goalsLink = $state<HTMLAnchorElement | null>(null);
@@ -200,6 +218,18 @@
         {/each}
       </ul>
     </section>
+
+    <BuildsSection
+      {slug}
+      owner={data.buildsVariant}
+      isOwner={v.name === data.buildsVariant}
+      builds={data.builds}
+      abilityNames={ownerAbilities}
+      onShowOwner={showOwner}
+      onReordered={(builds) => {
+        if (data) data = { ...data, builds };
+      }}
+    />
 
     {#if data.augments.length > 0}
       <section class="panel frame" aria-labelledby="wf-augments">
