@@ -16,6 +16,9 @@ colors:
   shard-crimson: '#ec6e66'
   shard-amber: '#e8ac4c'
   shard-azure: '#68b2ee'
+  shard-emerald: '#4fd18e'
+  shard-topaz: '#f08c4a'
+  shard-violet: '#b994f2'
 typography:
   display:
     fontFamily: 'Rajdhani, Segoe UI, system-ui, sans-serif'
@@ -23,6 +26,12 @@ typography:
     fontWeight: 700
     lineHeight: 1
     letterSpacing: '0.08em'
+  page-title:
+    fontFamily: 'Rajdhani, Segoe UI, system-ui, sans-serif'
+    fontSize: '1.5rem'
+    fontWeight: 600
+    lineHeight: 1.15
+    letterSpacing: '0.04em'
   headline:
     fontFamily: 'Rajdhani, Segoe UI, system-ui, sans-serif'
     fontSize: '1.2rem'
@@ -137,7 +146,7 @@ components:
 
 WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.
 
-Most visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits and ability icons appear only as content in the Warframes section.
+Most visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits, ability icons and (in builds) mod and arcane pictures appear only as content in the Warframes section.
 
 **Key Characteristics:**
 
@@ -163,7 +172,7 @@ A dark, cool-neutral console with two restrained accents and a small set of stat
 
 - **Status Green** (`status-green`): "Live" badges, "Done" on a finished section, and that section's seam and progress fill. Only means success or done.
 - **Alert Rose** (`alert-rose`): errors, failed saves and destructive buttons (Delete, Quit). Only means problem or danger.
-- **Shard colours** (`shard-crimson`, `shard-amber`, `shard-azure`): only for Archon shard badges, matching each shard's in-game colour name.
+- **Shard colours** (`shard-crimson`, `shard-amber`, `shard-azure`, `shard-emerald`, `shard-topaz`, `shard-violet`): only for Archon Shards (badges, and the small gem on a build's shard rows), matching each shard's in-game colour name. Each is at least 6.8:1 on every background. Emerald is a shard name, not a status: it never means "done".
 
 ### Neutral
 
@@ -191,6 +200,7 @@ A dark, cool-neutral console with two restrained accents and a small set of stat
 ### Hierarchy
 
 - **Display** (Rajdhani 700, 1.9rem, line-height 1, 0.08em, uppercase): the app name in the header only.
+- **Page title** (Rajdhani 600, 1.5rem, 1.15, gold): the name on a Warframe page and the title of the build edit page.
 - **Headline** (Rajdhani 600, 1.2rem, 1.2): checklist section titles and screen titles, in gold.
 - **Title** (Rajdhani 600, 1.05rem, 1.2): rotation card titles (teal) and editor section names.
 - **Body** (Inter 400, 15px, 1.5): item titles, descriptions, rotation details. Descriptions and meta lines are 0.8–0.9rem in Dim Readout.
@@ -376,9 +386,27 @@ The Inventory header row (gold title, `type="search"` filter), a muted meta line
 
 One column (≤ 56rem) of frame panels: a header panel (gold accent) with the portrait in a cut-corner frame (10rem; 8rem and stacked on phones), the name (gold, 1.5rem), the **version switch** (a segmented radio group in the button style: the chosen version gold on a gold-tinted fill; others brighten with a gold line on hover), badges, the release line, the description and the passive ("Passive" in gold display face). Opening a page focuses the name; prose is held to 60ch. Then **Abilities** (rows: a 40px icon in a small cut-corner frame, the key number in gold, the name, the description, and a two-column numbers list: Cost, Strength, Duration, Range, Other; tabular digits; one column on phones), **Augments**, **Stats and polarities** (definition list; "(450 at rank 30)" in Dim Readout where the wiki differs), **How to get it** (the goal planner's best drop/relic per part, "To craft" materials, "To build" resources, then **Add as goal** or "In your goals"/"Built") and **Your progress**. A small muted credit line closes the page (wiki CC BY-SA, warframestat.us, Digital Extremes).
 
+### Builds section (Warframe page, after Abilities)
+
+A gold-ticked frame: "Builds" (gold) with a teal **Add a build** link on the right. Only the version that owns the builds shows them (the Prime, or Excalibur Umbra; the page opens on it); any other version shows one muted line, "Builds are on Mesa Prime.", with a text button that switches to it. Empty: "No builds yet. Save one you found on Overframe, YouTube or anywhere."
+
+- **Tabs**, one per build in your order: the version switch's segmented look, but build names stay in **sentence case** (0.9rem, Rajdhani, 0.03em), because they're the user's words, not labels. Real ARIA tabs (arrows, Home, End). The last tab opened is remembered per Warframe. Two 32px **‹ ›** icon buttons right after the tabs move the selected build earlier or later (they point the way the tabs run; a `title` says so).
+- **Source line**, muted, joined by "·" (drawn by CSS, not read out): "From Test · Update 41 · Saved 13 Nov 2026 · overframe.gg" (the host is a teal external link). On the right: a "How to play" text button that scrolls to the guide and focuses its heading (smooth only without reduced motion), and **Edit**.
+- **Mods**: small Label headings (Mods, Arcanes, Archon Shards, Helminth, Weapons, How to play); a group only shows when it has something. Aura and Exilus side by side, then the 8 slots, as a **seam grid**: cells on the surface colour with 1px seam-coloured gaps (one mod-screen block, not separate cards). 4 columns on desktop, 2 under 48rem, 1 under 24rem; empty slots stay, a step darker, saying "Empty".
+- **Mod Tile**: a 36px picture in a small cut-corner frame (**Mod Pic**), the name (600), "R5 · Madurai" (rank in tabular digits), the effect at that rank (Dim Readout, lines kept), and the note after a small gold **NOTE** label. A mod the data no longer has keeps its saved name and says "Not in the game data now".
+- **Shard rows**: a small rotated-square gem in the shard colour (its colour name is read out), the stat, a muted "Tauforged" badge, the note under it. **Helminth**: "Replaces Ballistic Battery: **Roar** (Rhino) · Wiki". **Weapons**: name (600) and note.
+- **Guide**: the build's light Markdown (escaped first; headings, lists, bold, italic, code, http(s) links), held to 64ch. Its headings are content, so they're **Readout White** (h5, 1.05rem) and Dim Readout (h6, 0.9rem), never gold. When the guide opens with its own heading, the "How to play" label is kept for screen readers only.
+
+### Build edit page
+
+The Warframe page's column: "← Back to Mesa Prime", the page title ("New build for Mesa Prime" / "Edit Steel Path Peacemaker"), then frame panels: **About** (Name, Source link, Author, Game update; "(optional)" in the label), **Mods** and **Arcanes** (the seam grid, 2 columns, 1 on phones; a cell shows its Label, then "Choose a mod" as a teal button, or the chosen mod's picture, name, a Rank select, its effect, a note field and Change / Remove), **Archon Shards** (rows: a stat select grouped by colour that shows the Tauforged values when that box is ticked, the Tauforged checkbox, a note, Remove; "Add a shard" up to 5), **Helminth**, **Weapons** (the item search, weapons only) and **How to play** (Write / Preview toggle in the version-switch style, a textarea, one muted hint line). Save (primary), Cancel (link), and on edit a danger **Delete build** with the inline confirm. Errors show as a rose alert at the top (focused) and again above Save.
+
+- **Picker**: opens inside the slot (no modal) with a teal outline on the inset colour: a labelled text field ("Find a mod for Slot 3") with Close, a muted match count (only "Nothing matches" is announced), and a listbox (the ARIA combobox pattern: arrows, Enter, Esc returns focus). Options show a 28px Mod Pic, the name, and polarity + effect at max rank; the active option gets a teal tint and a teal name. It offers only what fits the slot (auras in Aura, Exilus mods in Exilus, never a mod already used), matches names first and then effect text ("strength"), and lists this Warframe's augments first when nothing is typed. After filling an empty slot, focus moves to the next empty one.
+- **Leave bar**: with unsaved changes, any move away (links, the nav, browser Back) is held and a sticky gold-outlined bar appears at the top: "Leave without saving? Your changes to this build will be lost." with **Keep editing** (primary, focused) and **Leave** (danger). Closing the tab gets the browser's own warning.
+
 ### DE images
 
-Portraits and ability icons are **content**, never decoration: always inside a thin frame on the surface colour, with fixed width and height (no layout shift), no filters, tints or glows, never as a background. A portrait has alt text with the Warframe's name; an ability icon next to its name is decorative (`alt=""`). A failed image leaves its frame empty at the same size.
+Portraits, ability icons, and mod and arcane pictures in builds (since 13 Nov 2026) are **content**, never decoration: always inside a thin frame on the surface colour, with fixed width and height (no layout shift), no filters, tints or glows, never as a background. A portrait has alt text with the Warframe's name; an ability icon next to its name is decorative (`alt=""`). A failed image leaves its frame empty at the same size.
 
 ### Icons
 

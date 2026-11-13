@@ -18,6 +18,9 @@
   --shard-crimson: #ec6e66;
   --shard-amber: #e8ac4c;
   --shard-azure: #68b2ee;
+  --shard-emerald: #4fd18e;
+  --shard-topaz: #f08c4a;
+  --shard-violet: #b994f2;
 
   /* Fonts are bundled with the app (no requests to font services). */
   --font-display: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;

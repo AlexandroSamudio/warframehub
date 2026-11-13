@@ -4,6 +4,7 @@
   import { getHealth, heartbeat } from './lib/api.ts';
   import { t } from './lib/i18n/index.ts';
   import { hrefFor, router, type Route } from './lib/route.svelte.ts';
+  import BuildEdit from './routes/BuildEdit.svelte';
   import Goals from './routes/Goals.svelte';
   import Inventory from './routes/Inventory.svelte';
   import WarframePage from './routes/WarframePage.svelte';
@@ -65,6 +66,8 @@
       </section>
     {:else if router.route === 'goals'}
       <Goals />
+    {:else if router.route === 'warframes' && router.param && router.sub}
+      <BuildEdit slug={router.param} sub={router.sub} />
     {:else if router.route === 'warframes' && router.param}
       <WarframePage slug={router.param} />
     {:else if router.route === 'warframes'}

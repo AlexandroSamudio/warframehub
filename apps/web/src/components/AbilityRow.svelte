@@ -53,8 +53,9 @@
         {#if n.cost !== null}
           <dt>{t('wf.cost')}</dt>
           <dd class="num">
-            {t('wf.costValue', { cost: n.cost, type: n.costType })}{#if n.channeled}
-              · {t('wf.channeled')}{/if}
+            {t('wf.costValue', { cost: n.cost, type: n.costType })}{#if n.channeled}{` · ${t(
+                'wf.channeled',
+              )}`}{/if}
           </dd>
         {/if}
         {#each groups as [label, lines] (label)}

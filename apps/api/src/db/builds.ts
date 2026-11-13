@@ -292,6 +292,7 @@ export function resolveBuild(build: Build, rules: BuildRules): BuildView {
       ? {
           ...h,
           image: rules.helminth.get(h.uniqueName)?.image ?? null,
+          from: rules.helminth.get(h.uniqueName)?.from ?? null,
           page: abilityStats(h.uniqueName)?.page ?? null,
         }
       : null,

@@ -308,6 +308,8 @@ export type ResolvedShard = z.infer<typeof ResolvedShard>;
 
 export const ResolvedHelminth = BuildHelminth.extend({
   image: z.string().nullable(),
+  /** The Warframe it comes from ("Rhino"), "Helminth" for its own, or null if unknown. */
+  from: z.string().nullable(),
   /** The wiki page of the subsumed ability, when known. */
   page: z.url().nullable(),
 });
