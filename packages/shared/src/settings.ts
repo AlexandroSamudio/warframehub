@@ -8,11 +8,17 @@ export const TimeZone = z.string().refine((tz) => {
   } catch {
     return false;
   }
-}, 'unknown time zone');
+}, 'unknownTimeZone');
+
+/** The app's language (SPEC §8.3): Spanish (neutral, tú) or English. Spanish by default. */
+export const Language = z.enum(['es', 'en']);
+export type Language = z.infer<typeof Language>;
+export const DEFAULT_LANGUAGE: Language = 'es';
 
 /** Response of `GET`/`PATCH /api/settings` (SPEC §8.1 Settings screen). */
 export const SettingsResponse = z.object({
   displayTz: z.string(),
+  language: Language,
   /** Read-only: where the database lives. */
   dataDir: z.string(),
   version: z.string(),
@@ -21,5 +27,9 @@ export const SettingsResponse = z.object({
 });
 export type SettingsResponse = z.infer<typeof SettingsResponse>;
 
-export const UpdateSettingsRequest = z.object({ displayTz: TimeZone });
+/** Change one setting or more; the others stay. */
+export const UpdateSettingsRequest = z
+  .object({ displayTz: TimeZone, language: Language })
+  .partial()
+  .refine((body) => Object.keys(body).length > 0, 'badRequest');
 export type UpdateSettingsRequest = z.infer<typeof UpdateSettingsRequest>;

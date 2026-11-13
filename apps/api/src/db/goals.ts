@@ -179,7 +179,7 @@ function getGoal(db: Db, userId: number, id: number) {
     .from(goals)
     .where(and(eq(goals.id, id), eq(goals.userId, userId)))
     .get();
-  if (!row) throw new HttpError(404, 'not_found', `No goal ${id}`);
+  if (!row) throw new HttpError(404, 'not_found', 'noGoal', { id });
   return row;
 }
 
@@ -191,7 +191,7 @@ function assertNoActiveDuplicate(db: Db, userId: number, uniqueName: string, nam
       and(eq(goals.userId, userId), eq(goals.uniqueName, uniqueName), eq(goals.status, 'active')),
     )
     .get();
-  if (dup) throw new HttpError(409, 'already_active', `${name} is already one of your goals`);
+  if (dup) throw new HttpError(409, 'already_active', 'alreadyGoal', { name });
 }
 
 function nextSortOrder(db: Db, userId: number): number {
@@ -212,11 +212,7 @@ export function createGoal(
 ): void {
   const recipe = catalog.get(uniqueName);
   if (!recipe) {
-    throw new HttpError(
-      404,
-      'unknown_item',
-      'Search for the item first, then add it from the results',
-    );
+    throw new HttpError(404, 'unknown_item', 'searchFirst');
   }
   assertNoActiveDuplicate(db, userId, uniqueName, recipe.name);
   db.insert(goals)
@@ -243,9 +239,13 @@ export function updatePart(
   const row = getGoal(db, userId, goalId);
   const part = parseRecipe(row.recipeJson).parts.find((p) => p.key === body.componentKey);
   if (!part)
-    throw new HttpError(404, 'unknown_part', `${row.name} has no part ${body.componentKey}`);
+    throw new HttpError(404, 'unknown_part', 'noPart', { name: row.name, part: body.componentKey });
   if (body.owned !== undefined && body.owned > part.count) {
-    throw new HttpError(400, 'bad_count', `${row.name} needs only ${part.count} × ${part.name}`);
+    throw new HttpError(400, 'bad_count', 'badCount', {
+      name: row.name,
+      count: part.count,
+      part: part.name,
+    });
   }
   if (body.owned !== undefined) {
     // Ticking on a goal card changes this goal's share, so the shared stock moves by the
@@ -312,7 +312,7 @@ function findPart(db: Db, userId: number, key: string) {
     const part = recipe.parts.find((p) => p.key === key);
     if (part) return { part, name: partStockName(recipe.name, part.name) };
   }
-  throw new HttpError(404, 'unknown_part', 'None of your goals needs that part');
+  throw new HttpError(404, 'unknown_part', 'partNotNeeded');
 }
 
 /** Sets a part's amounts directly (a drop, a Market buy, a correction). */
@@ -330,9 +330,9 @@ export function setPartStock(db: Db, userId: number, body: SetPartStockRequest):
   });
 }
 
-function notEnough(what: string, short: Shortfall[]): HttpError {
-  const list = short.map((s) => `${s.missing.toLocaleString('en-US')} ${s.name}`).join(', ');
-  return new HttpError(409, 'not_enough', `Can't ${what} yet. Missing: ${list}.`);
+function notEnough(what: 'craft' | 'build', short: Shortfall[]): HttpError {
+  const list = short.map((s) => ({ count: s.missing, name: s.name }));
+  return new HttpError(409, 'not_enough', what === 'craft' ? 'cantCraft' : 'cantBuild', { list });
 }
 
 /** Applies amount changes in one go and remembers them for Undo. */
@@ -356,18 +356,18 @@ function commit(db: Db, userId: number, action: UndoAction, now: Date, extra?: (
 export function craftPart(db: Db, userId: number, key: string, now: Date): void {
   const { part, name } = findPart(db, userId, key);
   if (!part.craft) {
-    throw new HttpError(400, 'not_crafted', `${name} isn't crafted; set how many you have`);
+    throw new HttpError(400, 'not_crafted', 'notCrafted', { name });
   }
   const deltas = craftDeltas({ key, name }, part.craft);
   const short = shortfalls(deltas, inventory(db, userId));
-  if (short.length > 0) throw notEnough(`craft ${name}`, short);
+  if (short.length > 0) throw notEnough('craft', short);
   commit(db, userId, { kind: 'craft', name, deltas }, now);
 }
 
 /** Puts back the last craft or build (within {@link UNDO_MS}). */
 export function undoLast(db: Db, userId: number, now: Date): void {
   const action = lastUndo(db, userId, now);
-  if (!action) throw new HttpError(409, 'nothing_to_undo', 'There is nothing to undo');
+  if (!action) throw new HttpError(409, 'nothing_to_undo', 'nothingToUndo');
   const goal = action.builtGoalId
     ? db.select().from(goals).where(eq(goals.id, action.builtGoalId)).get()
     : undefined;
@@ -406,7 +406,7 @@ export function setStock(db: Db, userId: number, body: SetStockRequest): void {
       }
     }
   }
-  if (!name) throw new HttpError(404, 'unknown_resource', 'None of your goals needs that resource');
+  if (!name) throw new HttpError(404, 'unknown_resource', 'resourceNotNeeded');
   db.insert(resourceStock)
     .values({ userId, resourceKey: body.key, name, amount: body.amount })
     .onConflictDoUpdate({
@@ -430,10 +430,10 @@ export function markBuilt(
 ): void {
   const row = getGoal(db, userId, goalId);
   if (row.status === 'built')
-    throw new HttpError(409, 'already_built', `${row.name} is already built`);
+    throw new HttpError(409, 'already_built', 'alreadyBuilt', { name: row.name });
   const deltas = useStock ? buildDeltas(parseRecipe(row.recipeJson)) : [];
   const short = shortfalls(deltas, inventory(db, userId));
-  if (short.length > 0) throw notEnough(`build ${row.name}`, short);
+  if (short.length > 0) throw notEnough('build', short);
   commit(db, userId, { kind: 'build', name: row.name, deltas, builtGoalId: goalId }, now, (tx) =>
     tx.update(goals).set({ status: 'built', builtAt: now }).where(eq(goals.id, goalId)).run(),
   );
@@ -443,7 +443,7 @@ export function markBuilt(
 export function reactivate(db: Db, userId: number, goalId: number): void {
   const row = getGoal(db, userId, goalId);
   if (row.status === 'active')
-    throw new HttpError(409, 'already_active', `${row.name} is already active`);
+    throw new HttpError(409, 'already_active', 'alreadyActive', { name: row.name });
   assertNoActiveDuplicate(db, userId, row.uniqueName, row.name);
   db.update(goals)
     .set({ status: 'active', builtAt: null, sortOrder: nextSortOrder(db, userId) })
@@ -459,7 +459,7 @@ export function deleteGoal(db: Db, userId: number, goalId: number): void {
 
 export function reorderGoals(db: Db, userId: number, body: ReorderGoalsRequest): void {
   if (new Set(body.goalIds).size !== body.goalIds.length) {
-    throw new HttpError(400, 'bad_request', 'A goal is listed twice');
+    throw new HttpError(400, 'bad_request', 'goalTwice');
   }
   const owned = db
     .select({ id: goals.id })
@@ -467,7 +467,7 @@ export function reorderGoals(db: Db, userId: number, body: ReorderGoalsRequest):
     .where(and(eq(goals.userId, userId), inArray(goals.id, body.goalIds)))
     .all();
   if (owned.length !== body.goalIds.length) {
-    throw new HttpError(404, 'not_found', 'Unknown goal in the new order');
+    throw new HttpError(404, 'not_found', 'unknownGoalInOrder');
   }
   db.transaction((tx) => {
     body.goalIds.forEach((id, sortOrder) => {
@@ -490,11 +490,7 @@ export async function refreshRecipe(
   const row = getGoal(db, userId, goalId);
   const recipe = await catalog.refresh(row.uniqueName, row.name);
   if (!recipe) {
-    throw new HttpError(
-      404,
-      'item_gone',
-      `warframestat.us no longer lists ${row.name}; the saved recipe is kept`,
-    );
+    throw new HttpError(404, 'item_gone', 'itemGone', { name: row.name });
   }
   db.update(goals)
     .set({ recipeJson: JSON.stringify(recipe), name: recipe.name, recipeFetchedAt: now })

@@ -150,7 +150,7 @@ export class ProfileService {
   async refresh(): Promise<ProfileResponse> {
     const accountId = this.setting(ACCOUNT_KEY);
     if (typeof accountId !== 'string') {
-      throw new HttpError(409, 'no_account', 'Save your account ID first');
+      throw new HttpError(409, 'no_account', 'noAccount');
     }
     const nextRefreshAt = this.current().nextRefreshAt;
     if (nextRefreshAt) {
@@ -158,11 +158,7 @@ export class ProfileService {
         1,
         Math.ceil((Date.parse(nextRefreshAt) - this.now().getTime()) / 60_000),
       );
-      throw new HttpError(
-        429,
-        'refresh_too_soon',
-        `Refreshed recently. Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`,
-      );
+      throw new HttpError(429, 'refresh_too_soon', 'profileTooSoon', { minutes });
     }
     // Counted before the call: a failed or invalid request is the risky kind, too.
     this.write(this.db, ATTEMPT_KEY, this.now().getTime());
@@ -176,11 +172,7 @@ export class ProfileService {
       profile = normaliseProfile(await res.json());
     } catch (error) {
       this.onError(error instanceof Error ? error.message : 'profile fetch failed');
-      throw new HttpError(
-        502,
-        'profile_unavailable',
-        "Couldn't read your profile. Check the account ID, then try again later.",
-      );
+      throw new HttpError(502, 'profile_unavailable', 'profileUnavailable');
     }
     const values = { payloadJson: JSON.stringify(profile), fetchedAt: this.now() };
     this.db

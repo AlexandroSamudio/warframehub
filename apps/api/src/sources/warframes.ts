@@ -249,11 +249,7 @@ export class WarframeCatalog {
       } catch (error) {
         this.onError(error);
         if (!row) {
-          throw new HttpError(
-            503,
-            'warframes_unavailable',
-            "Can't reach warframestat.us to load the Warframes. Try again when you're online.",
-          );
+          throw new HttpError(503, 'warframes_unavailable', 'warframesUnavailable');
         }
         stale = true;
       }
@@ -266,21 +262,13 @@ export class WarframeCatalog {
     const next = this.nextRefreshAt();
     if (next) {
       const minutes = Math.max(1, Math.ceil((next.getTime() - this.now().getTime()) / 60_000));
-      throw new HttpError(
-        429,
-        'refresh_too_soon',
-        `Refreshed recently. Try again in ${minutes} min.`,
-      );
+      throw new HttpError(429, 'refresh_too_soon', 'warframesTooSoon', { minutes });
     }
     try {
       await this.fetchAndStore();
     } catch (error) {
       this.onError(error);
-      throw new HttpError(
-        503,
-        'warframes_unavailable',
-        "Can't reach warframestat.us right now. The saved list is kept.",
-      );
+      throw new HttpError(503, 'warframes_unavailable', 'warframesRefreshFailed');
     }
     return this.read(false);
   }

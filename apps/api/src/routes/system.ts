@@ -2,7 +2,7 @@ import { SettingsResponse, UpdateSettingsRequest } from '@warframehub/shared';
 import type { FastifyInstance } from 'fastify';
 import type { Db } from '../db/client.js';
 import { settings } from '../db/schema.js';
-import { displayTz } from '../db/tracker.js';
+import { displayTz, userLanguage } from '../db/tracker.js';
 import { APP_VERSION } from '../version.js';
 
 export interface SystemRouteDeps {
@@ -19,6 +19,7 @@ export function registerSystemRoutes(app: FastifyInstance, deps: SystemRouteDeps
   const current = (): SettingsResponse =>
     SettingsResponse.parse({
       displayTz: displayTz(db, userId),
+      language: userLanguage(db, userId),
       dataDir: deps.dataDir,
       version: APP_VERSION,
       idleMinutes: deps.idleMinutes,
@@ -28,13 +29,17 @@ export function registerSystemRoutes(app: FastifyInstance, deps: SystemRouteDeps
 
   app.patch('/api/settings', async (request) => {
     const body = UpdateSettingsRequest.parse(request.body);
-    db.insert(settings)
-      .values({ userId, key: 'display_tz', valueJson: JSON.stringify(body.displayTz) })
-      .onConflictDoUpdate({
-        target: [settings.userId, settings.key],
-        set: { valueJson: JSON.stringify(body.displayTz) },
-      })
-      .run();
+    const save = (key: string, value: unknown) =>
+      db
+        .insert(settings)
+        .values({ userId, key, valueJson: JSON.stringify(value) })
+        .onConflictDoUpdate({
+          target: [settings.userId, settings.key],
+          set: { valueJson: JSON.stringify(value) },
+        })
+        .run();
+    if (body.displayTz !== undefined) save('display_tz', body.displayTz);
+    if (body.language !== undefined) save('language', body.language);
     return current();
   });
 

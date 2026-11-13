@@ -1,10 +1,18 @@
-import { HealthResponse, SHARD_IMAGES, type ApiError } from '@warframehub/shared';
+import {
+  DEFAULT_LANGUAGE,
+  HealthResponse,
+  SHARD_IMAGES,
+  type ApiError,
+  type Language,
+} from '@warframehub/shared';
 import { join } from 'node:path';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 import type { Db } from './db/client.js';
 import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
+import { isServerMessageKey, message, type ServerMessageKey } from './i18n.js';
+import { userLanguage } from './db/tracker.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerBuildRoutes } from './routes/builds.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
@@ -81,32 +89,55 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     app.addHook('onRequest', async () => onActivity());
   }
 
+  // Messages go out in the user's language (SPEC §8.3). A broken settings row never
+  // stops an error from being answered.
+  const lang = (): Language => {
+    try {
+      return userLanguage(options.db, options.userId);
+    } catch {
+      return DEFAULT_LANGUAGE;
+    }
+  };
+
   app.setNotFoundHandler((request, reply) => {
     void reply
       .code(404)
-      .send(errorBody('not_found', `No route for ${request.method} ${request.url}`));
+      .send(
+        errorBody(
+          'not_found',
+          message(lang(), 'notFoundRoute', { route: `${request.method} ${request.url}` }),
+        ),
+      );
   });
 
   app.setErrorHandler((error, request, reply) => {
     if (error instanceof HttpError) {
-      return reply.code(error.statusCode).send(errorBody(error.code, error.message));
+      return reply
+        .code(error.statusCode)
+        .send(errorBody(error.code, message(lang(), error.key, error.params)));
     }
     if (error instanceof ZodError) {
-      const message = error.issues
-        .map((issue) => `${issue.path.join('.') || 'body'}: ${issue.message}`)
-        .join('; ');
-      return reply.code(400).send(errorBody('bad_request', message));
+      // Messages people can see are keys (e.g. "buildName"); anything else names the fields.
+      const known = error.issues.filter((issue) => isServerMessageKey(issue.message));
+      const text =
+        known.length > 0
+          ? [
+              ...new Set(known.map((issue) => message(lang(), issue.message as ServerMessageKey))),
+            ].join('; ')
+          : message(lang(), 'invalid', {
+              fields: [...new Set(error.issues.map((i) => i.path.join('.') || 'body'))].join(', '),
+            });
+      return reply.code(400).send(errorBody('bad_request', text));
     }
     const status =
       typeof error === 'object' && error !== null && 'statusCode' in error
         ? Number(error.statusCode)
         : 500;
     if (status >= 400 && status < 500) {
-      const message = error instanceof Error ? error.message : 'Bad request';
-      return reply.code(status).send(errorBody('bad_request', message));
+      return reply.code(status).send(errorBody('bad_request', message(lang(), 'badRequest')));
     }
     request.log.error(error);
-    return reply.code(500).send(errorBody('internal', 'Something went wrong on the server'));
+    return reply.code(500).send(errorBody('internal', message(lang(), 'internal')));
   });
 
   app.get('/api/health', async (): Promise<HealthResponse> => {

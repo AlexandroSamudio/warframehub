@@ -77,7 +77,7 @@ function getSection(db: Db, userId: number, id: number) {
     .from(sections)
     .where(and(eq(sections.id, id), eq(sections.userId, userId)))
     .get();
-  if (!row) throw new HttpError(404, 'not_found', `No section ${id}`);
+  if (!row) throw new HttpError(404, 'not_found', 'noSection', { id });
   return row;
 }
 
@@ -87,7 +87,7 @@ function getItem(db: Db, userId: number, id: number) {
     .from(items)
     .where(and(eq(items.id, id), eq(items.userId, userId)))
     .get();
-  if (!row) throw new HttpError(404, 'not_found', `No item ${id}`);
+  if (!row) throw new HttpError(404, 'not_found', 'noItem', { id });
   return row;
 }
 
@@ -163,11 +163,7 @@ export function deleteSection(db: Db, userId: number, id: number): void {
     .where(and(eq(items.sectionId, id), eq(items.origin, 'default')))
     .all();
   if (defaults.length > 0) {
-    throw new HttpError(
-      409,
-      'has_default_items',
-      'Move the default items out of this section (or hide them) before deleting it',
-    );
+    throw new HttpError(409, 'has_default_items', 'hasDefaultItems');
   }
   db.delete(sections).where(eq(sections.id, id)).run(); // items, ticks, counters cascade
 }
@@ -179,7 +175,7 @@ export function reorderSections(db: Db, userId: number, body: ReorderSectionsReq
     .where(and(eq(sections.userId, userId), inArray(sections.id, body.sectionIds)))
     .all();
   if (owned.length !== new Set(body.sectionIds).size) {
-    throw new HttpError(404, 'not_found', 'Unknown section in the new order');
+    throw new HttpError(404, 'not_found', 'unknownSectionInOrder');
   }
   db.transaction((tx) => {
     body.sectionIds.forEach((id, sortOrder) => {
@@ -249,7 +245,7 @@ export function updateItem(
     next.slots = null;
   }
   if (!slotsMatchKind(next.kind, next.slots)) {
-    throw new HttpError(400, 'bad_slots', `Slots don't match a "${next.kind}" item`);
+    throw new HttpError(400, 'bad_slots', 'badSlots', { kind: next.kind });
   }
   const contentChanged = CONTENT_KEYS.some(
     (key) => JSON.stringify(next[key]) !== JSON.stringify(current[key]),
@@ -288,7 +284,7 @@ export function deleteItem(db: Db, userId: number, id: number, now: Date): void 
 export function reorderItems(db: Db, userId: number, body: ReorderItemsRequest, now: Date): void {
   getSection(db, userId, body.sectionId);
   if (new Set(body.itemIds).size !== body.itemIds.length) {
-    throw new HttpError(400, 'bad_request', 'An item is listed twice');
+    throw new HttpError(400, 'bad_request', 'itemTwice');
   }
   const owned =
     body.itemIds.length === 0
@@ -299,7 +295,7 @@ export function reorderItems(db: Db, userId: number, body: ReorderItemsRequest, 
           .where(and(eq(items.userId, userId), inArray(items.id, body.itemIds)))
           .all();
   if (owned.length !== body.itemIds.length) {
-    throw new HttpError(404, 'not_found', 'Unknown item in the new order');
+    throw new HttpError(404, 'not_found', 'unknownItemInOrder');
   }
   db.transaction((tx) => {
     body.itemIds.forEach((id, sortOrder) => {

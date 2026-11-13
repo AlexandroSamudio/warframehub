@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Goal, GoalResource, StockRow } from '@warframehub/shared';
   import { tick } from 'svelte';
+  import { formatDay } from '../lib/time.ts';
   import {
     formatAmount,
     joinNames,
@@ -67,11 +68,7 @@
   const bodyId = $derived(`goal-${goal.id}-body`);
   const percent = $derived(progressPercent(goal));
   const resourceGroups = $derived(splitResources(goal.resources));
-  const recipeDate = $derived(
-    new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(
-      new Date(goal.recipeFetchedAt),
-    ),
-  );
+  const recipeDate = $derived(formatDay(goal.recipeFetchedAt));
 
   /** "25,000 Credits and 5 Orokin Cell": the item's own resources that building uses up. */
   const buildResources = $derived(

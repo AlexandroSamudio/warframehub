@@ -1,5 +1,7 @@
 import {
+  DEFAULT_LANGUAGE,
   ItemSlots,
+  Language,
   slotCount,
   type ClearSectionResponse,
   type ClockId,
@@ -78,6 +80,17 @@ export function displayTz(db: Db, userId: number): string {
     .get();
   const value: unknown = row ? JSON.parse(row.valueJson) : DEFAULT_SETTINGS.display_tz;
   return typeof value === 'string' ? value : String(DEFAULT_SETTINGS.display_tz);
+}
+
+/** The user's language (SPEC §8.3); Spanish until changed in Settings. */
+export function userLanguage(db: Db, userId: number): Language {
+  const row = db
+    .select({ valueJson: settings.valueJson })
+    .from(settings)
+    .where(and(eq(settings.userId, userId), eq(settings.key, 'language')))
+    .get();
+  const parsed = Language.safeParse(row ? JSON.parse(row.valueJson) : null);
+  return parsed.success ? parsed.data : DEFAULT_LANGUAGE;
 }
 
 function seedNotice(db: Db, userId: number): { removedTitles: string[] } | null {
@@ -201,12 +214,12 @@ export function setTick(
     .innerJoin(sections, eq(sections.id, items.sectionId))
     .where(and(eq(items.id, input.itemId), eq(items.userId, userId)))
     .get();
-  if (!row) throw new HttpError(404, 'not_found', `No item ${input.itemId}`);
+  if (!row) throw new HttpError(404, 'not_found', 'noItem', { id: input.itemId });
 
   const count = slotCount(row.kind, parseSlots(row.slotsJson));
-  if (count === 0) throw new HttpError(400, 'not_tickable', 'Info rows have no checkbox');
+  if (count === 0) throw new HttpError(400, 'not_tickable', 'infoNoCheckbox');
   if (input.slot >= count) {
-    throw new HttpError(400, 'bad_slot', `Item ${input.itemId} has ${count} slot(s)`);
+    throw new HttpError(400, 'bad_slot', 'badSlot', { id: input.itemId, count });
   }
 
   const key = periodKey(
@@ -246,9 +259,9 @@ export function clearSection(
     .from(sections)
     .where(and(eq(sections.id, sectionId), eq(sections.userId, userId)))
     .get();
-  if (!section) throw new HttpError(404, 'not_found', `No section ${sectionId}`);
+  if (!section) throw new HttpError(404, 'not_found', 'noSection', { id: sectionId });
   if (section.period !== 'manual') {
-    throw new HttpError(409, 'not_manual', 'Only manual sections can be cleared by hand');
+    throw new HttpError(409, 'not_manual', 'notManual');
   }
   const row = db
     .insert(manualCounters)

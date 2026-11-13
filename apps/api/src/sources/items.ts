@@ -202,11 +202,7 @@ export class ItemCatalog {
   async search(rawQuery: string): Promise<ItemSearchResponse> {
     const query = rawQuery.trim().toLowerCase().replace(/\s+/g, ' ');
     if (query.length < MIN_QUERY_LENGTH) {
-      throw new HttpError(
-        400,
-        'query_too_short',
-        `Type at least ${MIN_QUERY_LENGTH} letters to search`,
-      );
+      throw new HttpError(400, 'query_too_short', 'queryTooShort', { min: MIN_QUERY_LENGTH });
     }
     const key = `search:${query}`;
     const cached = this.row(key);
@@ -219,11 +215,7 @@ export class ItemCatalog {
     } catch (error) {
       this.onError(query, error);
       if (cached) return this.fromCache(query, cached, true);
-      throw new HttpError(
-        503,
-        'items_unavailable',
-        "Can't reach warframestat.us to search items. Try again when you're online.",
-      );
+      throw new HttpError(503, 'items_unavailable', 'itemsUnavailable');
     }
   }
 
@@ -237,11 +229,7 @@ export class ItemCatalog {
       await this.fetchAndStore(query);
     } catch (error) {
       this.onError(query, error);
-      throw new HttpError(
-        503,
-        'items_unavailable',
-        "Can't reach warframestat.us to update this recipe. Try again when you're online.",
-      );
+      throw new HttpError(503, 'items_unavailable', 'recipeUnavailable');
     }
     const { uniqueNames } = JSON.parse(this.row(`search:${query}`)!.payloadJson) as CachedSearch;
     return uniqueNames.includes(uniqueName) ? this.get(uniqueName) : null;

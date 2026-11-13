@@ -58,8 +58,13 @@ async function setup() {
     liveTimes: () => ({}),
     warframes: new WarframeCatalog(database.db, { fetch: up.fetchFn, now }),
   });
-  const call = (method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, payload?: object) =>
-    app.inject({ method, url, ...(payload ? { payload } : {}) });
+  const call = (
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    url: string,
+    payload?: object,
+  ) => app.inject({ method, url, ...(payload ? { payload } : {}) });
+  // These tests read the English messages (Spanish is the default; see i18n.test.ts).
+  await call('PATCH', '/api/settings', { language: 'en' });
   return { app, database, up, clock, call };
 }
 type Ctx = Awaited<ReturnType<typeof setup>>;

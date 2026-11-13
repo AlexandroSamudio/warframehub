@@ -30,7 +30,9 @@
   const guideSource = $derived.by(() => {
     const lines = c.guide.trim().split('\n');
     const first = /^#{1,3}\s+(.*)$/.exec(lines[0] ?? '');
-    const same = first && first[1]!.trim().toLowerCase() === t('build.guide').toLowerCase();
+    // Either language: a guide copied from an English or a Spanish source.
+    const titles = ['how to play', 'cómo jugarla', 'cómo jugar', t('build.guide').toLowerCase()];
+    const same = first && titles.includes(first[1]!.trim().toLowerCase());
     return same ? lines.slice(1).join('\n').trim() : c.guide.trim();
   });
   const hasGuide = $derived(guideSource !== '');

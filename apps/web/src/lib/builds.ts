@@ -8,6 +8,7 @@ import {
   type ShardColor,
   type ShardStat,
 } from '@warframehub/shared';
+import { formatDay } from './time.ts';
 
 /** Helpers for the Builds section and the edit page (SPEC §14.1). */
 
@@ -80,14 +81,9 @@ export function sourceHost(url: string): string {
   }
 }
 
-/** "13 Nov 2026" in the user's zone. */
+/** "13 Nov 2026" / "13 nov 2026" in the user's zone. */
 export function formatSaved(iso: string, timeZone?: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    ...(timeZone ? { timeZone } : {}),
-  }).format(new Date(iso));
+  return formatDay(iso, timeZone);
 }
 
 export function emptyContent(): BuildContent {

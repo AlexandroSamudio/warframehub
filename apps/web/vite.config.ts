@@ -18,5 +18,10 @@ export default defineConfig({
     // Forward API calls to the Fastify server during development.
     proxy: { '/api': 'http://127.0.0.1:4317' },
   },
-  test: { name: 'web', include: ['src/**/*.test.ts'], environment: 'node' },
+  test: {
+    name: 'web',
+    include: ['src/**/*.test.ts'],
+    environment: 'node',
+    setupFiles: ['src/test-setup.ts'],
+  },
 });
