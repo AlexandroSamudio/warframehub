@@ -117,7 +117,7 @@ Context from the planning conversation (13 Oct – 10 Nov 2026) that is **not** 
 
 Before the repo existed, a single-page tracker was published as a claude.ai Artifact ("Tenno Week Tracker"), with ticks saved in the Artifact's storage. It proved out the checklist layout and the reset-clock idea. The repo replaces it; it isn't maintained.
 
-## Status (10 Nov 2026)
+## Status (11 Nov 2026)
 
 - `main`: v1 (Phases 0–6) merged, plus seeds v2–v6.
 - **Phase 6** (the last v1 phase, SPEC §11), now merged:
@@ -152,7 +152,9 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
 
   - **Part sources** (branch `goals-part-sources`, Alex's request): Alex found by hand that the Nidus Blueprint comes from The Glast Gambit. A script (`npm run update-part-sources`) reads the Warframe wiki's quest reward fields into `apps/api/data/part-sources.json` (27 items), shown as "Quest: … · Warframe wiki" on parts with no drop data; his own note always wins; Market prices deliberately not used. Not covered (stay manual via notes): vendors, the Dojo, events and any wording the script doesn't recognise.
   - **Inventory, part 1 (data + API)** (11 Nov 2026, Alex's request): parts are shared entities with blueprint and crafted amounts; Craft and Build use up stock (blocked when short), with Undo. See SPEC §13.4. Part 2 (goal card UI) added Craft, build with stock, Undo and `+250`/`-30` entry. Part 3 added the Inventory screen.
+  - **Profile import** (11 Nov 2026, Alex's request; PRs #19, #20): part 1 added the DE public profile source, a cache and routes (called rarely, see `CLAUDE.md` Rules); part 2 added the Profile screen and a "mastered" badge on goals. Brief in `.impeccable/surfaces/profile.md`.
   - **Warframes section, part 1 (data + API)** (11 Nov 2026, Alex's request): every Warframe with its versions, abilities, stats, augments, recipe and progress; DE images allowed and cached locally. See SPEC §14. Part 2 added ability numbers, passives and augment shops from the wiki (`npm run update-ability-stats`). Part 3 added the screens (list + page). Next: a real build editor (to be planned with Alex).
   - **Follow-up** (branch `goals-part-recipes`, Alex's requests): per-part crafting materials (DE public export, saved in `apps/api/data/part-recipes.json`, refresh with `npm run update-part-recipes`), a note per part for parts with no drop data ("Get another way"), and those materials counting in the shopping list until the part is owned. Migration `0004`. UI went through Impeccable again (brief addendum, dual-agent critique, audit).
+  - **Header** (11 Nov 2026, PR #27): the "Weekly Tracker" tagline is gone; the mark and the WarframeHub name are one gold link home (`#/`). `DESIGN.md` updated.
   - Impeccable 4.8.2 has no `audit-storage` command (its own reference mentions one), so audit reports go in the PR description.
 - **Impeccable telemetry:** turned off by Alex on 10 Nov 2026 (`impeccable telemetry off`).
