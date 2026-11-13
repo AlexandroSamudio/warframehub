@@ -8,6 +8,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { isMastered } from '../domain/mastery.js';
 import { HttpError } from '../http-error.js';
 import { abilityStats, warframeWiki } from '../sources/ability-stats.js';
+import { buildsVariant, helminthOptions } from '../sources/build-data.js';
 import { normaliseItem } from '../sources/items.js';
 import { partSources } from '../sources/part-sources.js';
 import {
@@ -17,6 +18,7 @@ import {
   type RawWarframe,
   type WarframeGroup,
 } from '../sources/warframes.js';
+import { buildRules, listBuilds, resolveBuild } from './builds.js';
 import type { Db } from './client.js';
 import { profileXp } from './profile.js';
 import { goals } from './schema.js';
@@ -96,6 +98,7 @@ export function warframeDetail(
   const group = groups.find((g) => g.slug === slug);
   if (!group) throw new HttpError(404, 'not_found', `No Warframe called "${slug}"`);
   const xp = profileXp(db, userId);
+  const rules = buildRules(state, group, helminthOptions(groups));
   const variants: WarframeVariant[] = group.variants.map(({ kind, raw }) => {
     const wiki = warframeWiki(raw.uniqueName);
     // The data's passive has placeholders ("|SPEED|%"); the wiki's has the numbers.
@@ -155,6 +158,8 @@ export function warframeDetail(
     variants,
     augments: state.augments[group.name] ?? [],
     augmentShops: warframeWiki(group.variants[0]!.raw.uniqueName)?.augmentShops ?? [],
+    buildsVariant: buildsVariant(group).raw.name,
+    builds: listBuilds(db, userId, group.slug).map((b) => resolveBuild(b, rules)),
     ...freshness(state, nextRefreshAt),
   };
 }

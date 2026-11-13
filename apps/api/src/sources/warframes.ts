@@ -1,9 +1,16 @@
-import type { VariantKind, WarframeAbility, WarframeAugment } from '@warframehub/shared';
+import type {
+  ArcaneOption,
+  ModOption,
+  VariantKind,
+  WarframeAbility,
+  WarframeAugment,
+} from '@warframehub/shared';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
 import { itemCache } from '../db/schema.js';
 import { HttpError } from '../http-error.js';
+import { normaliseArcanes, normaliseMods } from './build-data.js';
 import { ITEMS_BASE } from './items.js';
 import { UnexpectedDataError } from './warframestat.js';
 import { FETCH_TIMEOUT_MS, USER_AGENT, type FetchFn } from './worldstate.js';
@@ -12,11 +19,15 @@ import { FETCH_TIMEOUT_MS, USER_AGENT, type FetchFn } from './worldstate.js';
  * The Warframes section's data (SPEC §14), from warframestat.us: the full Warframe list
  * (`/warframes`) and the augment mods from the full mod list (`/mods`). Checked on
  * 11 Nov 2026; trimmed real responses are in ./fixtures/warframes. Both are fetched at most
- * once a week (or on Refresh, once an hour) and kept in `item_cache`.
+ * once a week (or on Refresh, once an hour) and kept in `item_cache`. Builds (SPEC §14.1)
+ * also keep the Warframe mods and the arcanes (`/items/search/arcane?by=category`, added
+ * 13 Nov 2026; the older `/arcanes` endpoint is out of date).
  */
 
 const LIST_KEY = 'warframes:all';
 const AUGMENTS_KEY = 'warframes:augments';
+const MODS_KEY = 'warframes:mods';
+const ARCANES_KEY = 'warframes:arcanes';
 const LIST_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const MIN_REFRESH_GAP_MS = 60 * 60 * 1000;
 
@@ -97,6 +108,18 @@ export interface WarframeGroup {
 
 const KIND_ORDER: Record<VariantKind, number> = { normal: 0, prime: 1, umbra: 2 };
 
+/** Every Warframe's name and base name ("Excalibur Umbra", "Excalibur"), for augments. */
+export function warframeNames(raws: unknown[]): Set<string> {
+  const names = new Set<string>();
+  for (const raw of raws) {
+    const parsed = RawWarframe.safeParse(raw);
+    if (!parsed.success || !isWarframe(parsed.data)) continue;
+    names.add(parsed.data.name);
+    names.add(variantOf(parsed.data.name).base);
+  }
+  return names;
+}
+
 /** Groups the versions of each Warframe under its base name, A–Z. */
 export function groupWarframes(raws: RawWarframe[]): WarframeGroup[] {
   const groups = new Map<string, WarframeGroup>();
@@ -155,14 +178,21 @@ export function augmentsOf(rawMods: unknown[]): Record<string, WarframeAugment[]
   return out;
 }
 
-/** Every image file name the data mentions: the only ones `GET /api/images` serves. */
-export function imageNames(raws: RawWarframe[]): Set<string> {
+/**
+ * Every image file name the data mentions: the only ones `GET /api/images` serves.
+ * Portraits and ability icons, plus mod and arcane images for builds (`extra`).
+ */
+export function imageNames(
+  raws: RawWarframe[],
+  extra: { image: string | null }[] = [],
+): Set<string> {
   const names = new Set<string>();
   for (const raw of raws) {
     if (!isWarframe(raw)) continue;
     if (raw.imageName) names.add(raw.imageName);
     for (const a of raw.abilities) if (a.imageName) names.add(a.imageName);
   }
+  for (const item of extra) if (item.image) names.add(item.image);
   return names;
 }
 
@@ -177,6 +207,9 @@ export interface WarframeCatalogOptions {
 export interface CatalogState {
   raws: RawWarframe[];
   augments: Record<string, WarframeAugment[]>;
+  /** Mods and arcanes a build can use (empty until the first fetch that has them). */
+  mods: ModOption[];
+  arcanes: ArcaneOption[];
   fetchedAt: Date;
   stale: boolean;
 }
@@ -206,7 +239,9 @@ export class WarframeCatalog {
   /** The cached data, fetched first when missing or a week old. */
   async state(): Promise<CatalogState> {
     const row = this.row(LIST_KEY);
-    const old = !row || this.now().getTime() - row.fetchedAt.getTime() >= LIST_TTL_MS;
+    // A list saved before builds existed has no mods yet: fetch once more for them.
+    const old =
+      !row || this.now().getTime() - row.fetchedAt.getTime() >= LIST_TTL_MS || !this.row(MODS_KEY);
     let stale = false;
     if (old) {
       try {
@@ -263,7 +298,7 @@ export class WarframeCatalog {
         at,
         raws: state.raws,
         groups: groupWarframes(state.raws),
-        images: imageNames(state.raws),
+        images: imageNames(state.raws, [...state.mods, ...state.arcanes]),
       };
     }
     return this.memo;
@@ -287,9 +322,13 @@ export class WarframeCatalog {
   private read(stale: boolean): CatalogState {
     const list = this.row(LIST_KEY)!;
     const aug = this.row(AUGMENTS_KEY);
+    const mods = this.row(MODS_KEY);
+    const arcanes = this.row(ARCANES_KEY);
     return {
       raws: this.parseList(list.payloadJson),
       augments: aug ? (JSON.parse(aug.payloadJson) as Record<string, WarframeAugment[]>) : {},
+      mods: mods ? (JSON.parse(mods.payloadJson) as ModOption[]) : [],
+      arcanes: arcanes ? (JSON.parse(arcanes.payloadJson) as ArcaneOption[]) : [],
       fetchedAt: list.fetchedAt,
       stale,
     };
@@ -316,9 +355,16 @@ export class WarframeCatalog {
 
   private async doFetch(): Promise<void> {
     this.lastAttempt = this.now().getTime();
-    const [list, mods] = await Promise.all([
+    const [list, mods, arcanes] = await Promise.all([
       this.fetchJson(`${ITEMS_BASE}/warframes?language=en`),
       this.fetchJson(`${ITEMS_BASE}/mods?language=en`),
+      // Arcanes are extra: if they fail, the saved ones are kept and the rest still updates.
+      this.fetchJson(`${ITEMS_BASE}/items/search/arcane?by=category&language=en`).catch(
+        (error: unknown) => {
+          this.onError(error);
+          return null;
+        },
+      ),
     ]);
     if (!Array.isArray(list) || !Array.isArray(mods)) {
       throw new UnexpectedDataError('warframes: expected two lists');
@@ -339,6 +385,11 @@ export class WarframeCatalog {
       };
       write(LIST_KEY, kept);
       write(AUGMENTS_KEY, augmentsOf(mods));
+      write(MODS_KEY, normaliseMods(mods, warframeNames(kept)));
+      if (Array.isArray(arcanes)) {
+        const list = normaliseArcanes(arcanes);
+        if (list.length > 0) write(ARCANES_KEY, list);
+      }
       // Each Warframe also goes in as an item, so "Add as goal" works without a search.
       for (const raw of kept as { uniqueName: string }[]) write(`item:${raw.uniqueName}`, raw);
     });

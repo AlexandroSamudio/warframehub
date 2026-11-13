@@ -6,6 +6,7 @@ import type { Db } from './db/client.js';
 import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
+import { registerBuildRoutes } from './routes/builds.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerGoalRoutes } from './routes/goals.js';
 import { registerProfileRoutes } from './routes/profile.js';
@@ -163,6 +164,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         onError: (name, error) => app.log.warn({ name, err: error }, 'image fetch failed'),
       }),
   });
+  registerBuildRoutes(app, { db: options.db, userId: options.userId, now, catalog: warframes });
 
   registerProfileRoutes(
     app,

@@ -1,0 +1,565 @@
+[
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/CritChanceOnDamage",
+  "name": "Arcane Avenger",
+  "codexSecret": true,
+  "rarity": "Rare",
+  "levelStats": [
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +7.5% Critical Chance for 12s"
+    ]
+   },
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +15% Critical Chance for 12s"
+    ]
+   },
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +22.5% Critical Chance for 12s"
+    ]
+   },
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +30% Critical Chance for 12s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +37.5% Critical Chance for 12s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Damaged:\\n21% chance for +45% Critical Chance for 12s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionAB.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneAvenger.png?95298",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Avenger",
+  "introduced": {
+   "name": "Update 16.0",
+   "url": "https://wiki.warframe.com/w/Update_16%23Update_16.0",
+   "aliases": [
+    "Update 16",
+    "Sanctuary",
+    "16.0",
+    "16"
+   ],
+   "parent": "16.0",
+   "date": "2015-03-19"
+  },
+  "releaseDate": "2015-03-19",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/PunctureProcResist",
+  "name": "Arcane Defense",
+  "codexSecret": true,
+  "levelStats": [
+   {
+    "stats": [
+     "+17% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect."
+    ]
+   },
+   {
+    "stats": [
+     "+34% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect."
+    ]
+   },
+   {
+    "stats": [
+     "+51% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect."
+    ]
+   },
+   {
+    "stats": [
+     "+68% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect.",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "+85% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect.",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "+102% chance to resist a <DT_PUNCTURE_COLOR>Puncture Status effect.",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Arcane",
+  "imageName": "ArcaneProjectionPuncture.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/GolemArcaneRadialEnergyOnEnergyPickup",
+  "name": "Arcane Energize",
+  "codexSecret": true,
+  "rarity": "Legendary",
+  "levelStats": [
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 25 Energy to self and allies within 15m\\n15s cooldown"
+    ]
+   },
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 50 Energy to self and allies within 15m\\n15s cooldown"
+    ]
+   },
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 75 Energy to self and allies within 15m\\n15s cooldown"
+    ]
+   },
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 100 Energy to self and allies within 15m\\n15s cooldown\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 125 Energy to self and allies within 15m\\n15s cooldown\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Energy Pickup:\\n60% chance to replenish 150 Energy to self and allies within 15m\\n15s cooldown\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionBI.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneEnergize.png?cc86e",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Energize",
+  "introduced": {
+   "name": "Update 17.9.1",
+   "url": "https://wiki.warframe.com/w/Update_17%23Update_17.9.1",
+   "aliases": [
+    "17.9.1"
+   ],
+   "parent": "17.9",
+   "date": "2015-10-29"
+  },
+  "releaseDate": "2015-10-29",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/HealthRegenOnDamage",
+  "name": "Arcane Grace",
+  "codexSecret": true,
+  "rarity": "Legendary",
+  "levelStats": [
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +1% Health Regeneration/s for 9s"
+    ]
+   },
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +2% Health Regeneration/s for 9s"
+    ]
+   },
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +3% Health Regeneration/s for 9s"
+    ]
+   },
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +4% Health Regeneration/s for 9s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +5% Health Regeneration/s for 9s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Health Damaged:\\n9% chance for +6% Health Regeneration/s for 9s\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionAC.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneGrace.png?9db80",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Grace",
+  "introduced": {
+   "name": "Update 16.0",
+   "url": "https://wiki.warframe.com/w/Update_16%23Update_16.0",
+   "aliases": [
+    "Update 16",
+    "Sanctuary",
+    "16.0",
+    "16"
+   ],
+   "parent": "16.0",
+   "date": "2015-03-19"
+  },
+  "releaseDate": "2015-03-19",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/NoCostCastChanceAbility1Listener",
+  "name": "Arcane Steadfast",
+  "codexSecret": true,
+  "excludeFromCodex": true,
+  "rarity": "Rare",
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionCF.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneSteadfast.png?e6086",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Steadfast",
+  "introduced": {
+   "name": "Update 32.3",
+   "url": "https://wiki.warframe.com/w/Update_32%23Update_32.3",
+   "aliases": [
+    "32.3"
+   ],
+   "parent": "32.0",
+   "date": "2023-02-15"
+  },
+  "releaseDate": "2023-02-15",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/NoCostCastChanceAbility2Listener",
+  "name": "Arcane Steadfast",
+  "codexSecret": true,
+  "excludeFromCodex": true,
+  "rarity": "Rare",
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionCF.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneSteadfast.png?e6086",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Steadfast",
+  "introduced": {
+   "name": "Update 32.3",
+   "url": "https://wiki.warframe.com/w/Update_32%23Update_32.3",
+   "aliases": [
+    "32.3"
+   ],
+   "parent": "32.0",
+   "date": "2023-02-15"
+  },
+  "releaseDate": "2023-02-15",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/NoCostCastChanceAbility3Listener",
+  "name": "Arcane Steadfast",
+  "codexSecret": true,
+  "excludeFromCodex": true,
+  "rarity": "Rare",
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionCF.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneSteadfast.png?e6086",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Steadfast",
+  "introduced": {
+   "name": "Update 32.3",
+   "url": "https://wiki.warframe.com/w/Update_32%23Update_32.3",
+   "aliases": [
+    "32.3"
+   ],
+   "parent": "32.0",
+   "date": "2023-02-15"
+  },
+  "releaseDate": "2023-02-15",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/NoCostCastChanceAbility4Listener",
+  "name": "Arcane Steadfast",
+  "codexSecret": true,
+  "excludeFromCodex": true,
+  "rarity": "Rare",
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionCF.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneSteadfast.png?e6086",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Steadfast",
+  "introduced": {
+   "name": "Update 32.3",
+   "url": "https://wiki.warframe.com/w/Update_32%23Update_32.3",
+   "aliases": [
+    "32.3"
+   ],
+   "parent": "32.0",
+   "date": "2023-02-15"
+  },
+  "releaseDate": "2023-02-15",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Utility/NoCostCastChanceOnCast",
+  "name": "Arcane Steadfast",
+  "codexSecret": true,
+  "rarity": "Rare",
+  "levelStats": [
+   {
+    "stats": [
+     "On Ability Cast: 5% chance that the next three Abilities will not cost Energy."
+    ]
+   },
+   {
+    "stats": [
+     "On Ability Cast: 8% chance that the next three Abilities will not cost Energy."
+    ]
+   },
+   {
+    "stats": [
+     "On Ability Cast: 11% chance that the next three Abilities will not cost Energy."
+    ]
+   },
+   {
+    "stats": [
+     "On Ability Cast: 14% chance that the next three Abilities will not cost Energy.",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Ability Cast: 17% chance that the next three Abilities will not cost Energy.",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Ability Cast: 20% chance that the next three Abilities will not cost Energy.",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionCF.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/ArcaneSteadfast.png?e6086",
+  "wikiaUrl": "https://wiki.warframe.com/w/Arcane_Steadfast",
+  "introduced": {
+   "name": "Update 32.3",
+   "url": "https://wiki.warframe.com/w/Update_32%23Update_32.3",
+   "aliases": [
+    "32.3"
+   ],
+   "parent": "32.0",
+   "date": "2023-02-15"
+  },
+  "releaseDate": "2023-02-15",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/OperatorArmour/HealOnTransferenceIn",
+  "name": "Magus Elevate",
+  "codexSecret": true,
+  "rarity": "Rare",
+  "levelStats": [
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 50 Health to Warframe"
+    ]
+   },
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 100 Health to Warframe"
+    ]
+   },
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 150 Health to Warframe"
+    ]
+   },
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 200 Health to Warframe"
+    ]
+   },
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 250 Health to Warframe"
+    ]
+   },
+   {
+    "stats": [
+     "On Transference In:\\n95% chance to restore 300 Health to Warframe"
+    ]
+   }
+  ],
+  "type": "Operator Arcane",
+  "imageName": "HealOnTransferenceIn.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/MagusElevate.png?748b2",
+  "wikiaUrl": "https://wiki.warframe.com/w/Magus_Elevate",
+  "introduced": {
+   "name": "Update 22.0",
+   "url": "https://wiki.warframe.com/w/Update_22%23Update_22.0",
+   "aliases": [
+    "Update 22",
+    "22.0",
+    "22",
+    "Plains of Eidolon",
+    "PoE"
+   ],
+   "parent": "22.0",
+   "date": "2017-10-12"
+  },
+  "releaseDate": "2017-10-12",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/PowerStrengthOnKill",
+  "name": "Molt Augmented",
+  "codexSecret": true,
+  "rarity": "Rare",
+  "levelStats": [
+   {
+    "stats": [
+     "On Kill:\\n+0.04% Ability Strength. Stacks up to 250x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+0.08% Ability Strength. Stacks up to 250x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+0.12% Ability Strength. Stacks up to 250x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+0.16% Ability Strength. Stacks up to 250x.\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+0.2% Ability Strength. Stacks up to 250x.\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+0.24% Ability Strength. Stacks up to 250x.\\n+1 Arcane Revive",
+     "+1 Arcane Revive"
+    ]
+   }
+  ],
+  "type": "Warframe Arcane",
+  "imageName": "ArcaneProjectionBX.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/MoltAugmented.png?15a05",
+  "wikiaUrl": "https://wiki.warframe.com/w/Molt_Augmented",
+  "introduced": {
+   "name": "Update 31.6",
+   "url": "https://wiki.warframe.com/w/Update_31%23Update_31.6",
+   "aliases": [
+    "31.6"
+   ],
+   "parent": "31.0",
+   "date": "2022-06-09"
+  },
+  "releaseDate": "2022-06-09",
+  "masterable": false
+ },
+ {
+  "uniqueName": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/PrimaryDamageOnKill",
+  "name": "Primary Merciless",
+  "codexSecret": true,
+  "rarity": "Rare",
+  "levelStats": [
+   {
+    "stats": [
+     "On Kill:\\n+5% Damage for 4s. Stacks up to 12x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+10% Damage for 4s. Stacks up to 12x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+15% Damage for 4s. Stacks up to 12x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+20% Damage for 4s. Stacks up to 12x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+25% Damage for 4s. Stacks up to 12x."
+    ]
+   },
+   {
+    "stats": [
+     "On Kill:\\n+30% Damage for 4s. Stacks up to 12x.\\n+30% Reload Speed",
+     "+30% Reload Speed"
+    ]
+   }
+  ],
+  "type": "Primary Arcane",
+  "imageName": "ArcaneProjectionSteelPathWarcrimesB.png",
+  "category": "Arcanes",
+  "tradable": true,
+  "wikiAvailable": true,
+  "wikiaThumbnail": "https://wiki.warframe.com/images/PrimaryMerciless.png?ccf7d",
+  "wikiaUrl": "https://wiki.warframe.com/w/Primary_Merciless",
+  "introduced": {
+   "name": "Update 30.5",
+   "url": "https://wiki.warframe.com/w/Update_30%23Update_30.5",
+   "aliases": [
+    "30.5"
+   ],
+   "parent": "30.5",
+   "date": "2021-07-06"
+  },
+  "releaseDate": "2021-07-06",
+  "masterable": false
+ }
+]
