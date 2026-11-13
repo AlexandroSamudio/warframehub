@@ -471,18 +471,14 @@ Each phase ends with something you can run and check.
 - **Storage:** table `builds` (migration `0007`): one row per build, `content_json` is the whole `BuildContent`, saved whole. Each reference keeps its name, so a build still reads if the data drops a mod; such a mod is also kept when the build is edited.
 - **Checks on save** (400 with a message): aura slot only auras, aura mods only there, Exilus slot only mods that fit it, rank within the mod's ranks, no mod or arcane twice, no other Warframe's augments, Helminth not one of the Warframe's own abilities, source link http(s) only.
 - **API:** `GET /api/warframes/:slug` adds `buildsVariant` and `builds` (resolved: effect at the chosen rank, polarity, image); `GET /api/builds/options?slug=`; `GET`/`PUT`/`DELETE /api/builds/:id`; `POST /api/builds`; `POST /api/builds/reorder`. Mod and arcane images go through `GET /api/images/:file` like the portraits. The Helminth ability carries its source Warframe (`from`).
-- **Screens** (brief: the Builds addendum in `.impeccable/surfaces/warframes.md`; DESIGN.md "Builds section", "Build edit page"):
-  - **The Warframe page** opens on the version that owns the builds. A **Builds** panel after Abilities has one tab per build (remembered per Warframe, ‹ › to reorder). The selected build shows:
-    - the source line, plus "How to play" (a jump) and Edit;
-    - the mods as a seam grid of tiles (picture, rank, polarity, effect at that rank, note);
-    - arcanes, shards, Helminth ("Replaces …: Roar (Rhino)") and weapons;
-    - the guide, last.
-  - **The edit page** (`#/warframes/{slug}/builds/new`, `…/builds/{id}`) has:
-    - inline pickers per slot (only what fits; names, then effect text; this Warframe's augments first; pictures; focus moves to the next empty slot);
-    - shard stats showing the Tauforged values when ticked;
-    - a Write/Preview guide;
-    - Delete with an inline confirm.
-  - **Unsaved changes** hold any move away (the router's leave guard) behind an inline "Leave without saving?" bar; closing the tab gets the browser's own warning.
+- **Pictures** (13 Nov 2026, Alex): Archon Shards (`SHARD_IMAGES`, warframestat.us; a Tauforged shard is the normal picture with the game's "…MythicGlow" glow laid over it, since that file is only the glow), weapons (the item data's `imageName`; the item search now returns `image`, and builds resolve it from the saved item), Helminth ability icons, and the **polarity symbols** from the Warframe wiki (`GET /api/polarities/:name`, 7 SVGs: Madurai, Vazarin, Naramon, Zenurik, Unairu, Penjaga, Umbra; Universal and Aura have none and stay words). SVGs with scripts or event handlers are refused; they're served with a sandboxing CSP and only used as CSS masks (the wiki draws them black, so they're filled with a console colour). `GET /api/builds/:id` returns the resolved build (pictures included) for the edit page.
+- **Screens** (brief: "Addendum 2: the Builds page" in `.impeccable/surfaces/warframes.md`; DESIGN.md "Builds page", "Build edit page"):
+  - **The Warframe page** has two page tabs under its header: **Overview** (`#/warframes/{slug}`) and **Builds (n)** (`…/builds`, `…/builds/{id}`). On Builds the header shrinks to one line and always shows the version that owns the builds. The page opens on that version.
+  - **The Builds page:**
+    - a build list on the left: name, author · update, 4 mod thumbnails; the open one in gold; ↑/↓; Add a build. It becomes a row above the build under 60rem.
+    - The open build has a title row (meta line, How to play, Edit), a **loadout strip** (arcane pictures with effect, shard rows with pictures, the Helminth icon "Roar (Rhino) · replaces …"), **picture-led mod cards** (art, name and rank, polarity symbol and word, effect at that rank, note), weapons with pictures, and the guide.
+    - `…/builds` opens the build opened last (or the first). An unknown id says so and links back.
+  - **The edit page** (`…/builds/new`, `…/builds/{id}/edit`) shows the same pictures. Shards are picked by their colour pictures, then the stat. Back and Cancel return to the build; Save opens it; Delete returns to the list. The pickers, next-empty-slot focus and the leave guard are as before.
 - **Guide format** (`apps/web/src/lib/markdown.ts`, no dependency): everything is escaped first, then `#`/`##` become h5 and `###` h6, along with paragraphs, `-`/`1.` lists, bold, italic, code and http(s) links (new tab). Marks never reach into code or link addresses.
 
 ---

@@ -152,7 +152,13 @@ describe('builds', () => {
     expect(view!.slots[1]).toMatchObject({ name: 'Power Drift' });
     expect(view!.slots[2]).toBeNull();
     expect(view!.arcanes[0]!.effect).toContain('replenish 150 Energy');
-    expect(view!.shards[0]).toMatchObject({ color: 'crimson', text: '+15% Ability Strength' });
+    expect(view!.shards[0]).toMatchObject({
+      color: 'crimson',
+      text: '+15% Ability Strength',
+      image: 'ArchonShardAmarMythicGlow.png',
+    });
+    // The weapon was never seen in a search here, so it has no picture yet.
+    expect(view!.weapons[0]).toMatchObject({ name: 'Regulators', image: null });
     expect(view!.helminth).toMatchObject({
       name: 'Larva',
       from: 'Nidus',

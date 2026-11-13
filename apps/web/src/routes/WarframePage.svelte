@@ -1,21 +1,26 @@
 <script lang="ts">
   import type { ProfileResponse, VariantKind, WarframeDetail } from '@warframehub/shared';
   import AbilityRow from '../components/AbilityRow.svelte';
-  import BuildsSection from '../components/BuildsSection.svelte';
+  import BuildsPage from '../components/BuildsPage.svelte';
   import Icon from '../components/Icon.svelte';
   import * as api from '../lib/api.ts';
   import { formatAmount, formatChance, groupDrops, materialList } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
-  import { hrefFor } from '../lib/route.svelte.ts';
+  import { buildHref, hrefFor, type BuildSub } from '../lib/route.svelte.ts';
   import { formatRelease, pickVariant, polarityName, statLines } from '../lib/warframes.ts';
   import { listState } from '../lib/warframes-state.svelte.ts';
   import { onMount, tick } from 'svelte';
 
   interface Props {
     slug: string;
+    /** On the Builds page (`…/builds`, `…/builds/12`); null on the Overview. */
+    sub?: BuildSub | null;
   }
 
-  let { slug }: Props = $props();
+  let { slug, sub = null }: Props = $props();
+
+  /** Overview and Builds share the header and the page tabs (SPEC §14.1). */
+  const onBuilds = $derived(sub?.kind === 'list' || sub?.kind === 'view');
 
   let data = $state<WarframeDetail | null>(null);
   let profile = $state<ProfileResponse | null>(null);
@@ -26,25 +31,19 @@
   let adding = $state(false);
   let portraitFailed = $state(false);
 
-  // Opens on the version that owns the builds (the one Alex plays: SPEC §14.1).
-  const v = $derived(
-    data
-      ? pickVariant(
-          data.variants,
-          kind ?? data.variants.find((x) => x.name === data?.buildsVariant)?.kind ?? null,
-        )
-      : null,
-  );
-  const stats = $derived(v ? statLines(v) : []);
   // Builds belong to one version (the Prime, or Excalibur Umbra): SPEC §14.1.
   const owner = $derived(data?.variants.find((x) => x.name === data?.buildsVariant) ?? null);
   const ownerAbilities = $derived(new Map(owner?.abilities.map((a) => [a.key, a.name]) ?? []));
-
-  function showOwner() {
-    if (!owner) return;
-    kind = owner.kind;
-    portraitFailed = false;
-  }
+  // Opens on the version that owns the builds (the one Alex plays); the Builds page always
+  // shows that version.
+  const v = $derived(
+    data
+      ? onBuilds && owner
+        ? owner
+        : pickVariant(data.variants, kind ?? owner?.kind ?? null)
+      : null,
+  );
+  const stats = $derived(v ? statLines(v) : []);
 
   let nameEl = $state<HTMLHeadingElement | null>(null);
   let goalsLink = $state<HTMLAnchorElement | null>(null);
@@ -147,7 +146,7 @@
   </a>
 
   {#if data && v}
-    <section class="head frame accent" aria-labelledby="wf-name">
+    <section class="head frame accent" class:compact={onBuilds} aria-labelledby="wf-name">
       <span class="portrait">
         {#if v.image && !portraitFailed}
           {#key v.image}
@@ -164,7 +163,7 @@
       <div class="intro">
         <h2 id="wf-name" tabindex="-1" bind:this={nameEl}>{v.name}</h2>
 
-        {#if data.variants.length > 1}
+        {#if data.variants.length > 1 && !onBuilds}
           <fieldset class="switch">
             <legend class="sr-only">{t('wf.versions')}</legend>
             {#each data.variants as variant (variant.kind)}
@@ -187,7 +186,7 @@
           {#if v.vaulted}<span class="badge">{t('wf.vaulted')}</span>{/if}
           {#if v.masteryReq}<span class="badge">{t('wf.mr', { n: v.masteryReq })}</span>{/if}
         </p>
-        {#if v.released}
+        {#if v.released && !onBuilds}
           <p class="released">
             {v.released.update
               ? t('wf.releasedIn', {
@@ -197,157 +196,175 @@
               : t('wf.released', { date: formatRelease(v.released.date) })}
           </p>
         {/if}
-        <p class="desc">{v.description}</p>
-        {#if v.passive}
-          <p class="passive"><b>{t('wf.passive')}</b> {v.passive}</p>
-          {#if augmentsFor('Passive').length > 0}
-            <p class="passive-aug">
-              {t('wf.augmentsOf', { names: augmentsFor('Passive').join(', ') })}
-            </p>
+        {#if !onBuilds}
+          <p class="desc">{v.description}</p>
+          {#if v.passive}
+            <p class="passive"><b>{t('wf.passive')}</b> {v.passive}</p>
+            {#if augmentsFor('Passive').length > 0}
+              <p class="passive-aug">
+                {t('wf.augmentsOf', { names: augmentsFor('Passive').join(', ') })}
+              </p>
+            {/if}
           {/if}
         {/if}
       </div>
     </section>
 
-    <section class="panel frame" aria-labelledby="wf-abilities">
-      <h3 id="wf-abilities">{t('wf.abilities')}</h3>
-      <p class="hint">{t('wf.ranks')}</p>
-      <ul class="abilities">
-        {#each v.abilities as a (a.uniqueName)}
-          <AbilityRow ability={a} augments={augmentsFor(a.name)} />
-        {/each}
-      </ul>
-    </section>
+    <!-- Overview and Builds are two pages of one Warframe: links, so each has its address. -->
+    <nav class="page-tabs" aria-label={t('wf.pages', { name: data.name })}>
+      <a href={hrefFor('warframes', slug)} aria-current={onBuilds ? undefined : 'page'}
+        >{t('wf.overview')}</a
+      >
+      <a href={buildHref(slug)} aria-current={onBuilds ? 'page' : undefined}
+        >{t('build.title')}{#if data.builds.length > 0}<span class="count num"
+            >{data.builds.length}</span
+          >{/if}</a
+      >
+    </nav>
 
-    <BuildsSection
-      {slug}
-      owner={data.buildsVariant}
-      isOwner={v.name === data.buildsVariant}
-      builds={data.builds}
-      abilityNames={ownerAbilities}
-      onShowOwner={showOwner}
-      onReordered={(builds) => {
-        if (data) data = { ...data, builds };
-      }}
-    />
-
-    {#if data.augments.length > 0}
-      <section class="panel frame" aria-labelledby="wf-augments">
-        <h3 id="wf-augments">{t('wf.augments')}</h3>
-        {#if data.augmentShops.length > 0}
-          <p class="hint">{t('wf.soldBy', { shops: data.augmentShops.join(', ') })}</p>
-        {/if}
-        <ul class="rows">
-          {#each data.augments as aug (aug.name)}
-            <li>
-              <span class="lead">{aug.name}</span>
-              {#if aug.ability}<span class="for"
-                  >{t('wf.augmentFor', { ability: aug.ability })}</span
-                >{/if}
-              <p class="effect">{aug.effect}</p>
-            </li>
+    {#if onBuilds}
+      <BuildsPage
+        {slug}
+        open={sub?.kind === 'view' ? sub.id : null}
+        owner={data.buildsVariant}
+        ownerNote={owner?.kind === 'umbra' && data.variants.some((x) => x.kind === 'prime')
+          ? t('build.umbraNote', { base: data.name, owner: data.buildsVariant })
+          : null}
+        builds={data.builds}
+        abilityNames={ownerAbilities}
+        onReordered={(builds) => {
+          if (data) data = { ...data, builds };
+        }}
+      />
+    {:else}
+      <section class="panel frame" aria-labelledby="wf-abilities">
+        <h3 id="wf-abilities">{t('wf.abilities')}</h3>
+        <p class="hint">{t('wf.ranks')}</p>
+        <ul class="abilities">
+          {#each v.abilities as a (a.uniqueName)}
+            <AbilityRow ability={a} augments={augmentsFor(a.name)} />
           {/each}
         </ul>
       </section>
-    {/if}
 
-    <section class="panel frame" aria-labelledby="wf-stats">
-      <h3 id="wf-stats">{t('wf.stats')}</h3>
-      <dl class="stats">
-        {#each stats as s (s.key)}
-          <dt>{t(`wf.stat.${s.key}`)}</dt>
-          <dd class="num">
-            {s.value}{#if s.rank30}<span class="r30">{t('wf.atRank30', { value: s.rank30 })}</span
-              >{/if}
-          </dd>
-        {/each}
-        <dt>{t('wf.aura')}</dt>
-        <dd>{v.aura ? polarityName(v.aura) : t('wf.none')}</dd>
-        <dt>{t('wf.polarities')}</dt>
-        <dd>
-          {v.polarities.length > 0 ? v.polarities.map(polarityName).join(', ') : t('wf.none')}
-        </dd>
-      </dl>
-    </section>
-
-    <section class="panel frame" aria-labelledby="wf-get">
-      <h3 id="wf-get">{t('wf.get')}</h3>
-      {#if v.vaulted}<p class="hint">{t('wf.vaultedNote')}</p>{/if}
-      {#if v.recipe && v.recipe.parts.length > 0}
-        <ul class="rows">
-          {#each v.recipe.parts as p (p.key)}
-            <li>
-              <span class="lead"
-                >{p.name}{#if p.count > 1}<span class="for num"> × {p.count}</span>{/if}</span
-              >
-              {#if p.sources.length > 0}
-                <span class="for"
-                  >{t('part.sourceQuest')}
-                  {#each p.sources as s, i (s.url)}{#if i > 0},
-                    {/if}<a href={s.url} target="_blank" rel="noopener noreferrer"
-                      >{s.title}<span class="sr-only"> {t('part.opensNewTab')}</span></a
-                    >{/each}</span
-                >
-              {:else}
-                <span class="for">{bestDrop(p.drops)}</span>
-              {/if}
-              {#if p.craft}
-                <p class="effect">
-                  <span class="craft-label">{t('part.craftLabel')}</span>
-                  {materialList(p.craft)
-                    .map((m) => `${formatAmount(m.count)} ${m.name}`)
-                    .join(' · ')}
-                </p>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-        <p class="build">
-          <span class="craft-label">{t('wf.toBuild', { name: v.name })}</span>
-          {v.recipe.resources.map((r) => `${formatAmount(r.count)} ${r.name}`).join(' · ')}
-        </p>
-      {:else}
-        <p class="hint">{t('wf.getNone')}</p>
+      {#if data.augments.length > 0}
+        <section class="panel frame" aria-labelledby="wf-augments">
+          <h3 id="wf-augments">{t('wf.augments')}</h3>
+          {#if data.augmentShops.length > 0}
+            <p class="hint">{t('wf.soldBy', { shops: data.augmentShops.join(', ') })}</p>
+          {/if}
+          <ul class="rows">
+            {#each data.augments as aug (aug.name)}
+              <li>
+                <span class="lead">{aug.name}</span>
+                {#if aug.ability}<span class="for"
+                    >{t('wf.augmentFor', { ability: aug.ability })}</span
+                  >{/if}
+                <p class="effect">{aug.effect}</p>
+              </li>
+            {/each}
+          </ul>
+        </section>
       {/if}
 
-      <div class="goal">
-        {#if v.goal?.status === 'active'}
-          <span class="badge teal">{t('wf.inGoals')}</span>
-          <a href={hrefFor('goals')} bind:this={goalsLink}>{t('wf.goToGoals')}</a>
-        {:else if v.goal?.status === 'built'}
-          <span class="badge ok">{t('wf.built')}</span>
-        {:else if v.recipe}
-          <button type="button" class="primary" aria-disabled={adding} onclick={addGoal}>
-            {adding ? t('wf.adding') : t('wf.addGoal')}
-          </button>
-        {/if}
-        <span class="goal-msg" class:bad={goalMessage?.bad} role="status"
-          >{goalMessage?.text ?? ''}</span
-        >
-      </div>
-    </section>
+      <section class="panel frame" aria-labelledby="wf-stats">
+        <h3 id="wf-stats">{t('wf.stats')}</h3>
+        <dl class="stats">
+          {#each stats as s (s.key)}
+            <dt>{t(`wf.stat.${s.key}`)}</dt>
+            <dd class="num">
+              {s.value}{#if s.rank30}<span class="r30">{t('wf.atRank30', { value: s.rank30 })}</span
+                >{/if}
+            </dd>
+          {/each}
+          <dt>{t('wf.aura')}</dt>
+          <dd>{v.aura ? polarityName(v.aura) : t('wf.none')}</dd>
+          <dt>{t('wf.polarities')}</dt>
+          <dd>
+            {v.polarities.length > 0 ? v.polarities.map(polarityName).join(', ') : t('wf.none')}
+          </dd>
+        </dl>
+      </section>
 
-    <section class="panel frame" aria-labelledby="wf-progress">
-      <h3 id="wf-progress">{t('wf.progress')}</h3>
-      <ul class="facts">
-        <li>
-          {#if v.mastered}
-            {t('wf.masteredYes')}
-          {:else if profile && !profile.profile}
-            <a href={hrefFor('profile')}>{t('wf.noProfile')}</a>
-          {:else}
-            {t('wf.masteredNo')}
+      <section class="panel frame" aria-labelledby="wf-get">
+        <h3 id="wf-get">{t('wf.get')}</h3>
+        {#if v.vaulted}<p class="hint">{t('wf.vaultedNote')}</p>{/if}
+        {#if v.recipe && v.recipe.parts.length > 0}
+          <ul class="rows">
+            {#each v.recipe.parts as p (p.key)}
+              <li>
+                <span class="lead"
+                  >{p.name}{#if p.count > 1}<span class="for num"> × {p.count}</span>{/if}</span
+                >
+                {#if p.sources.length > 0}
+                  <span class="for"
+                    >{t('part.sourceQuest')}
+                    {#each p.sources as s, i (s.url)}{#if i > 0},
+                      {/if}<a href={s.url} target="_blank" rel="noopener noreferrer"
+                        >{s.title}<span class="sr-only"> {t('part.opensNewTab')}</span></a
+                      >{/each}</span
+                  >
+                {:else}
+                  <span class="for">{bestDrop(p.drops)}</span>
+                {/if}
+                {#if p.craft}
+                  <p class="effect">
+                    <span class="craft-label">{t('part.craftLabel')}</span>
+                    {materialList(p.craft)
+                      .map((m) => `${formatAmount(m.count)} ${m.name}`)
+                      .join(' · ')}
+                  </p>
+                {/if}
+              </li>
+            {/each}
+          </ul>
+          <p class="build">
+            <span class="craft-label">{t('wf.toBuild', { name: v.name })}</span>
+            {v.recipe.resources.map((r) => `${formatAmount(r.count)} ${r.name}`).join(' · ')}
+          </p>
+        {:else}
+          <p class="hint">{t('wf.getNone')}</p>
+        {/if}
+
+        <div class="goal">
+          {#if v.goal?.status === 'active'}
+            <span class="badge teal">{t('wf.inGoals')}</span>
+            <a href={hrefFor('goals')} bind:this={goalsLink}>{t('wf.goToGoals')}</a>
+          {:else if v.goal?.status === 'built'}
+            <span class="badge ok">{t('wf.built')}</span>
+          {:else if v.recipe}
+            <button type="button" class="primary" aria-disabled={adding} onclick={addGoal}>
+              {adding ? t('wf.adding') : t('wf.addGoal')}
+            </button>
           {/if}
-        </li>
-        <li>
-          {v.goal?.status === 'active'
-            ? t('wf.inGoals')
-            : v.goal?.status === 'built'
-              ? t('wf.built')
-              : t('wf.goalNone')}
-        </li>
-      </ul>
-    </section>
+          <span class="goal-msg" class:bad={goalMessage?.bad} role="status"
+            >{goalMessage?.text ?? ''}</span
+          >
+        </div>
+      </section>
+
+      <section class="panel frame" aria-labelledby="wf-progress">
+        <h3 id="wf-progress">{t('wf.progress')}</h3>
+        <ul class="facts">
+          <li>
+            {#if v.mastered}
+              {t('wf.masteredYes')}
+            {:else if profile && !profile.profile}
+              <a href={hrefFor('profile')}>{t('wf.noProfile')}</a>
+            {:else}
+              {t('wf.masteredNo')}
+            {/if}
+          </li>
+          <li>
+            {v.goal?.status === 'active'
+              ? t('wf.inGoals')
+              : v.goal?.status === 'built'
+                ? t('wf.built')
+                : t('wf.goalNone')}
+          </li>
+        </ul>
+      </section>
+    {/if}
 
     <p class="credit">
       {t('wf.credit')}
@@ -372,8 +389,11 @@
 </div>
 
 <style>
+  /*
+   * Overview and Builds use the app's full column, so the header and the page tabs never
+   * jump between them. Prose keeps its own measure (60–64ch).
+   */
   .page {
-    max-width: 56rem;
     display: grid;
     gap: 0.9rem;
   }
@@ -402,6 +422,69 @@
     grid-template-columns: 10rem minmax(0, 1fr);
     gap: 1.2rem;
     padding: 1.1rem 1.3rem 1.2rem;
+  }
+
+  /* On the Builds page the header is one line: the build is the content. */
+  .head.compact {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .head.compact .portrait {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .head.compact .intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.8rem;
+  }
+
+  /*
+   * Overview | Builds: two pages of one Warframe, as large as the screen titles. The
+   * current one is gold with the nav's 2px gold underline; a seam runs under both.
+   */
+  .page-tabs {
+    display: flex;
+    gap: 1.6rem;
+    border-bottom: 1px solid var(--line);
+    margin-top: 0.2rem;
+  }
+
+  .page-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: -1px;
+    padding: 0.35rem 0.1rem 0.5rem;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .page-tabs a:hover {
+    color: var(--fg);
+  }
+
+  .page-tabs a[aria-current='page'] {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .page-tabs .count {
+    font-size: 0.8rem;
+    min-width: 1.4rem;
+    padding: 0 0.35rem;
+    border: 1px solid currentColor;
+    text-align: center;
   }
 
   .portrait {

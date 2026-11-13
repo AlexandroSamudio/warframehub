@@ -85,6 +85,8 @@ export const ItemRecipe = z.object({
   blueprintReusable: z.boolean().default(false),
   /** Resources (Kuva, Plastids, Credits…). Amounts are shared across goals. */
   resources: z.array(RecipeComponent),
+  /** Picture file name for `GET /api/images/:file` (builds' weapons), or null. */
+  image: z.string().nullable().default(null),
 });
 export type ItemRecipe = z.infer<typeof ItemRecipe>;
 
@@ -96,6 +98,7 @@ export const ItemSearchResult = ItemRecipe.pick({
   type: true,
   isPrime: true,
   vaulted: true,
+  image: true,
 });
 export type ItemSearchResult = z.infer<typeof ItemSearchResult>;
 

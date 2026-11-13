@@ -384,29 +384,103 @@ The Inventory header row (gold title, `type="search"` filter), a muted meta line
 
 ### Warframe page
 
-One column (≤ 56rem) of frame panels: a header panel (gold accent) with the portrait in a cut-corner frame (10rem; 8rem and stacked on phones), the name (gold, 1.5rem), the **version switch** (a segmented radio group in the button style: the chosen version gold on a gold-tinted fill; others brighten with a gold line on hover), badges, the release line, the description and the passive ("Passive" in gold display face). Opening a page focuses the name; prose is held to 60ch. Then **Abilities** (rows: a 40px icon in a small cut-corner frame, the key number in gold, the name, the description, and a two-column numbers list: Cost, Strength, Duration, Range, Other; tabular digits; one column on phones), **Augments**, **Stats and polarities** (definition list; "(450 at rank 30)" in Dim Readout where the wiki differs), **How to get it** (the goal planner's best drop/relic per part, "To craft" materials, "To build" resources, then **Add as goal** or "In your goals"/"Built") and **Your progress**. A small muted credit line closes the page (wiki CC BY-SA, warframestat.us, Digital Extremes).
+The app's full column (Overview and Builds share it, so nothing jumps between them).
 
-### Builds section (Warframe page, after Abilities)
+- **Header panel** (gold accent):
+  - **On Overview**, the full header: the portrait in a cut-corner frame (10rem; 8rem and stacked on phones), the name (gold page title), the **version switch** (a segmented radio group in the button style: the chosen version gold on a gold-tinted fill; the others brighten with a gold line on hover), badges, the release line, the description, and the passive ("Passive" in gold display face).
+  - **On Builds**, one line: a 3.5rem portrait, the name of the version that owns the builds, and its badges. There's no switch, because builds belong to that version.
+  - The page opens on that version and focuses the name; the focus is quiet on headings, which aren't controls. Prose is held to 60ch.
+- **Page tabs** right under the header: **Overview** · **Builds** with a count chip.
+  - They're links with `aria-current`, not ARIA tabs: each page has its own address.
+  - Rajdhani 600 at 1.2rem; the current one is gold with a 2px gold underline, and a seam line runs under both.
+- **Overview:**
+  - **Abilities:** rows with a 40px icon in a small cut-corner frame, the key number in gold, the name, the description, and a two-column numbers list (Cost, Strength, Duration, Range, Other) in tabular digits; one column on phones.
+  - **Augments.**
+  - **Stats and polarities:** a definition list, with "(450 at rank 30)" in Dim Readout where the wiki differs.
+  - **How to get it:** the goal planner's best drop or relic per part, "To craft" materials and "To build" resources, then **Add as goal**, "In your goals" or "Built".
+  - **Your progress.**
+- A small muted credit line closes the page (wiki CC BY-SA, warframestat.us, Digital Extremes).
 
-A gold-ticked frame: "Builds" (gold) with a teal **Add a build** link on the right. Only the version that owns the builds shows them (the Prime, or Excalibur Umbra; the page opens on it); any other version shows one muted line, "Builds are on Mesa Prime.", with a text button that switches to it. Empty: "No builds yet. Save one you found on Overframe, YouTube or anywhere."
+### Builds page (`#/warframes/{slug}/builds`, `…/builds/{id}`)
 
-- **Tabs**, one per build in your order: the version switch's segmented look, but build names stay in **sentence case** (0.9rem, Rajdhani, 0.03em), because they're the user's words, not labels. Real ARIA tabs (arrows, Home, End). The last tab opened is remembered per Warframe. Two 32px **‹ ›** icon buttons right after the tabs move the selected build earlier or later (they point the way the tabs run; a `title` says so).
-- **Source line**, muted, joined by "·" (drawn by CSS, not read out): "From Test · Update 41 · Saved 13 Nov 2026 · overframe.gg" (the host is a teal external link). On the right: a "How to play" text button that scrolls to the guide and focuses its heading (smooth only without reduced motion), and **Edit**.
-- **Mods**: small Label headings (Mods, Arcanes, Archon Shards, Helminth, Weapons, How to play); a group only shows when it has something. Aura and Exilus side by side, then the 8 slots, as a **seam grid**: cells on the surface colour with 1px seam-coloured gaps (one mod-screen block, not separate cards). 4 columns on desktop, 2 under 48rem, 1 under 24rem; empty slots stay, a step darker, saying "Empty".
-- **Mod Tile**: a 36px picture in a small cut-corner frame (**Mod Pic**), the name (600), "R5 · Madurai" (rank in tabular digits), the effect at that rank (Dim Readout, lines kept), and the note after a small gold **NOTE** label. A mod the data no longer has keeps its saved name and says "Not in the game data now".
-- **Shard rows**: a small rotated-square gem in the shard colour (its colour name is read out), the stat, a muted "Tauforged" badge, the note under it. **Helminth**: "Replaces Ballistic Battery: **Roar** (Rhino) · Wiki". **Weapons**: name (600) and note.
-- **Guide**: the build's light Markdown (escaped first; headings, lists, bold, italic, code, http(s) links), held to 64ch. Its headings are content, so they're **Readout White** (h5, 1.05rem) and Dim Readout (h6, 0.9rem), never gold. When the guide opens with its own heading, the "How to play" label is kept for screen readers only.
+Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the list becomes a wrapping row above it.
+
+- **Build list** (gold-ticked frame, a `nav`):
+  - **Entries** are links in your order, each showing:
+    - the name (600 weight; gold when open);
+    - "author · update" in Dim Readout;
+    - a row of **marks** that tell builds apart: the arcane and Helminth pictures (26px) and the shards (20px).
+  - **The open entry** has a gold border, a 10% gold tint and `aria-current`.
+  - **The footer:**
+    - "MOVE" with 32px ↑/↓ that move the open build;
+    - a teal **Add a build**;
+    - a muted hint: "Keys [ and ] open the previous and next build".
+- **The open build** (frame):
+  - **Title row:**
+    - the name (gold page title);
+    - a meta line joined by "·": author, update, saved date, and the source host as a teal link;
+    - on the right, a "How to play" jump and **Edit**, a gold-outlined link-button.
+  - **Mods first** (Aura and Exilus in a pair, then 8 slots, 4 per row, 2 under 64rem, 1 under 24rem) as **Mod Cards** on one seam.
+  - **Loadout:** from 75rem it is a 19rem column beside the mods; narrower, a strip above them. It holds seam-joined cells on the inset colour:
+    - **Arcanes:** a 48px picture, the name with "R5/5", and the effect, which shows 2 lines and opens fully when pressed (a real button with `aria-expanded`);
+    - **Archon Shards:** rows with a **Shard Pic**, the stat, then the colour in words and a visible **TAUFORGED** tag; "2 of 5 sockets empty" when there are fewer than five;
+    - **Helminth:** the icon, "**Roar** (Rhino)", "replaces Ballistic Battery", and "Roar on the wiki".
+  - **Weapons** (56px pictures, name, note) and **How to play** run under both columns, so the two columns end together.
+  - The guide's headings are content: Readout White h5 (1.05rem) and Dim Readout h6 (0.9rem), never gold. When the guide opens with its own heading, the "How to play" label stays for screen readers only.
+- **Mod Card:**
+  - the mod's art as a wide crop (5.5rem tall, cut on the top-right; "AURA"/"EXILUS" on a solid panel tab over the art's corner, never on the picture);
+  - the name (600) with the rank "R5/5" in gold tabular digits (read out as "Rank 5 of 5");
+  - the **Polarity Mark**;
+  - the effect at that rank (Dim Readout, lines kept);
+  - a gold **NOTE** label with your note.
+  - An empty slot keeps its place, a step darker, saying "Empty". A mod the data no longer has keeps its saved name and says "Not in the game data now".
+- **Empty:** "No builds yet. Save one you found on Overframe, YouTube or anywhere.", a teal outlined **Add a build** button, and for Excalibur a muted line saying why the builds go on Umbra.
+- **Unknown id:** a rose alert, "No build 999 for this Warframe. Pick one from the list."
 
 ### Build edit page
 
-The Warframe page's column: "← Back to Mesa Prime", the page title ("New build for Mesa Prime" / "Edit Steel Path Peacemaker"), then frame panels: **About** (Name, Source link, Author, Game update; "(optional)" in the label), **Mods** and **Arcanes** (the seam grid, 2 columns, 1 on phones; a cell shows its Label, then "Choose a mod" as a teal button, or the chosen mod's picture, name, a Rank select, its effect, a note field and Change / Remove), **Archon Shards** (rows: a stat select grouped by colour that shows the Tauforged values when that box is ticked, the Tauforged checkbox, a note, Remove; "Add a shard" up to 5), **Helminth**, **Weapons** (the item search, weapons only) and **How to play** (Write / Preview toggle in the version-switch style, a textarea, one muted hint line). Save (primary), Cancel (link), and on edit a danger **Delete build** with the inline confirm. Errors show as a rose alert at the top (focused) and again above Save.
+The full column. The back link names where it goes: "← Back to {build}", or "Back to Builds" for a new one. Then the page title ("New build for Mesa Prime" / "Edit Steel Path Peacemaker") and these frame panels:
 
-- **Picker**: opens inside the slot (no modal) with a teal outline on the inset colour: a labelled text field ("Find a mod for Slot 3") with Close, a muted match count (only "Nothing matches" is announced), and a listbox (the ARIA combobox pattern: arrows, Enter, Esc returns focus). Options show a 28px Mod Pic, the name, and polarity + effect at max rank; the active option gets a teal tint and a teal name. It offers only what fits the slot (auras in Aura, Exilus mods in Exilus, never a mod already used), matches names first and then effect text ("strength"), and lists this Warframe's augments first when nothing is typed. After filling an empty slot, focus moves to the next empty one.
-- **Leave bar**: with unsaved changes, any move away (links, the nav, browser Back) is held and a sticky gold-outlined bar appears at the top: "Leave without saving? Your changes to this build will be lost." with **Keep editing** (primary, focused) and **Leave** (danger). Closing the tab gets the browser's own warning.
+- **About:** Name, Source link, Author, Game update; "(optional)" in the label.
+- **Mods** and **Arcanes:** the seam grid; mods 4 per row (2 under 64rem, 1 on phones), Aura/Exilus and the arcanes in pairs. A cell shows its Label, then either "Choose a mod" as a teal button, or the chosen mod: its art band (the Mod Card's crop, 4.5rem) or the arcane's 56px picture, the name, a Rank select, its effect, a note field, and Change / Remove.
+- **Archon Shards:** rows with:
+  - the shard as it will look (a 52px **Shard Pic**, Tauforged included);
+  - the six colours as plain 30px shard pictures in a radio group, the chosen one gold-bordered on a gold tint;
+  - the stat select for that colour, showing the Tauforged values when that box is ticked;
+  - the Tauforged checkbox, a note, Remove;
+  - "Add a shard", up to 5.
+- **Helminth:** the ability's picture and name, and a "Replaces" select.
+- **Weapons:** the item search (weapons only) with pictures.
+- **How to play:** a Write / Preview toggle in the version-switch style, a textarea, and one muted hint line.
+
+Save (primary), Cancel (link), and on edit a danger **Delete build** with the inline confirm. Errors show as a rose alert at the top (focused) and again above Save.
+
+- **Picker:** opens inside the slot (no modal), with a teal outline on the inset colour.
+  - It has a labelled text field ("Find a mod for Slot 3") with Close, a muted match count (only "Nothing matches" is announced), and a listbox (the ARIA combobox pattern: arrows, Enter, and Esc returns focus).
+  - Options show a 36px picture (art cropped, icons whole), the name, and the polarity plus the effect at max rank. The active option gets a teal tint and a teal name.
+  - It offers only what fits the slot (auras in Aura, Exilus mods in Exilus, never a mod already used), matches names first and then effect text ("strength"), and lists this Warframe's augments first when nothing is typed.
+  - After filling an empty slot, focus moves to the next empty one.
+- **Leave bar:** with unsaved changes, any move away (links, the nav, browser Back) is held, and a sticky gold-outlined bar appears at the top: "Leave without saving? Your changes to this build will be lost." with **Keep editing** (primary, focused) and **Leave** (danger). Closing the tab gets the browser's own warning.
 
 ### DE images
 
-Portraits, ability icons, and mod and arcane pictures in builds (since 13 Nov 2026) are **content**, never decoration: always inside a thin frame on the surface colour, with fixed width and height (no layout shift), no filters, tints or glows, never as a background. A portrait has alt text with the Warframe's name; an ability icon next to its name is decorative (`alt=""`). A failed image leaves its frame empty at the same size.
+These are **content**, never decoration: portraits, ability icons, and in builds (since 13 Nov 2026) mod, arcane, Archon Shard and weapon pictures and the polarity symbols.
+
+- **Framing:** always inside a thin cut-corner frame on the inset colour, at a fixed size (no layout shift), never as a background. **Mod Pic** is the shared frame: a size in px, with art cropped to fill and icons kept whole.
+- **Alt text:** a portrait has alt text with the Warframe's name; a picture next to its name is decorative (`alt=""`).
+- **Failure:** a failed image leaves its frame empty at the same size.
+- **No changes to the pictures:** no filters, tints or glows, with two deliberate exceptions.
+  - **Shard Pic:** the data's Tauforged picture is only the glow, so a Tauforged shard is the normal shard with DE's glow laid over it, as in the game.
+  - **Polarity Mark:** the wiki draws the symbols in black, so the SVG is a **CSS mask** filled with Dim Readout (0.95rem) and followed by the word. The shape stays DE's; Universal and Aura show the word only.
+
+### Browser surfaces
+
+The parts the browser draws use the console's colours too:
+
+- **Text selection:** a 35% teal tint.
+- **Scrollbars:** Strong Seam on Void Black.
+- **Text caret:** teal.
+- **Focused headings:** headings that take focus after a page change (so screen readers start there) show no ring, because they aren't controls. Every control keeps its teal ring.
 
 ### Icons
 

@@ -161,7 +161,20 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
       - `critique`: dual-agent, 28/40. Alex chose to fix all 5 issues and the small ones: the leave guard, effect search with pictures and next-slot focus, quieter guide headings with a jump link, edit/read consistency, and ‹ › reorder;
       - `audit`: 18/20; all page scans 0 at 1280 and 390 px.
 
-      The Warframe page now opens on the version that owns the builds. The Chrome extension wasn't connected, so screenshots and scripted flows used headless Chrome over CDP.
+      The Warframe page now opens on the version that owns the builds. The Chrome extension wasn't connected, so screenshots and scripted flows used headless Chrome over CDP. Merged as #29.
+
+    - **The Builds page** (13 Nov 2026, Alex's request; branch `builds-page`): builds moved to their own page, as important as the Overview.
+      - Page tabs **Overview · Builds (n)** under a shared header (compact on Builds).
+      - A build list with marks (arcanes, Helminth, shards), ↑/↓, and the `[` / `]` keys.
+      - Mods first, as picture-led cards with DE polarity symbols, with the loadout (arcanes, shards, Helminth) in a column beside them on wide screens.
+      - The edit page uses the same pictures; shards are picked by their colour pictures.
+      - New pictures: Archon Shards (Tauforged = shard + DE glow), weapons, Helminth icons, and polarity SVGs from the wiki (the one place the app calls the wiki; scripted SVGs refused, served sandboxed, used as a CSS mask).
+      - Addresses: `…/builds`, `…/builds/{id}`, `…/builds/{id}/edit`, `…/builds/new`.
+      - Impeccable 4.9.0:
+        - brief "Addendum 2";
+        - `critique`: dual-agent, 27/40. Alex chose to fix everything: the loadout beside the mods, both tabs full width, visible Tauforged, R5/5 ranks, wayfinding and the empty state;
+        - a scan finding (unbalanced columns) was fixed;
+        - all page scans 0.
   - **Follow-up** (branch `goals-part-recipes`, Alex's requests): per-part crafting materials (DE public export, saved in `apps/api/data/part-recipes.json`, refresh with `npm run update-part-recipes`), a note per part for parts with no drop data ("Get another way"), and those materials counting in the shopping list until the part is owned. Migration `0004`. UI went through Impeccable again (brief addendum, dual-agent critique, audit).
   - **Header** (11 Nov 2026, PR #27): the "Weekly Tracker" tagline is gone; the mark and the WarframeHub name are one gold link home (`#/`). `DESIGN.md` updated.
   - Impeccable 4.8.2 has no `audit-storage` command (its own reference mentions one), so audit reports go in the PR description.

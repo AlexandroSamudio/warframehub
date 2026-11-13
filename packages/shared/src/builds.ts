@@ -177,6 +177,41 @@ export const SHARD_STATS: readonly ShardStat[] = [
 
 export const SHARD_SLOTS = 5;
 
+/**
+ * The game's shard pictures on warframestat.us's image CDN (item search "archon shard",
+ * checked 13 Nov 2026). Tauforged shards have their own glowing picture.
+ */
+export const SHARD_IMAGES: Record<ShardColor, { normal: string; tauforged: string }> = {
+  crimson: { normal: 'ArchonShardAmar.png', tauforged: 'ArchonShardAmarMythicGlow.png' },
+  amber: { normal: 'ArchonShardNira.png', tauforged: 'ArchonShardNiraMythicGlow.png' },
+  azure: { normal: 'ArchonShardBoreal.png', tauforged: 'ArchonShardBorealMythicGlow.png' },
+  emerald: { normal: 'ArchonShardGreen.png', tauforged: 'ArchonShardMythicGreenGlow.png' },
+  topaz: { normal: 'ArchonShardOrange.png', tauforged: 'ArchonShardOrangeMythicGlow.png' },
+  violet: { normal: 'ArchonShardViolet.png', tauforged: 'ArchonShardVioletMythicGlow.png' },
+};
+
+export function shardImage(color: ShardColor, tauforged: boolean): string {
+  return SHARD_IMAGES[color][tauforged ? 'tauforged' : 'normal'];
+}
+
+/**
+ * Polarities with a symbol on the Warframe wiki (`Madurai_Pol.svg`…, checked 13 Nov 2026),
+ * served by `GET /api/polarities/:name`. "universal" and "aura" have none: shown as words.
+ */
+export const POLARITY_SYMBOLS = [
+  'madurai',
+  'vazarin',
+  'naramon',
+  'zenurik',
+  'unairu',
+  'penjaga',
+  'umbra',
+] as const;
+
+export function hasPolaritySymbol(polarity: string): boolean {
+  return (POLARITY_SYMBOLS as readonly string[]).includes(polarity);
+}
+
 export function shardStat(key: string): ShardStat | undefined {
   return SHARD_STATS.find((s) => s.key === key);
 }
@@ -303,7 +338,12 @@ export const ResolvedSlot = BuildSlot.extend({
 });
 export type ResolvedSlot = z.infer<typeof ResolvedSlot>;
 
-export const ResolvedShard = BuildShard.extend({ color: ShardColor, text: z.string() });
+export const ResolvedShard = BuildShard.extend({
+  color: ShardColor,
+  text: z.string(),
+  /** The shard's picture (the glowing one when Tauforged). */
+  image: z.string(),
+});
 export type ResolvedShard = z.infer<typeof ResolvedShard>;
 
 export const ResolvedHelminth = BuildHelminth.extend({
@@ -323,6 +363,8 @@ export const BuildView = Build.extend({
   arcanes: z.array(ResolvedSlot.nullable()),
   shards: z.array(ResolvedShard),
   helminth: ResolvedHelminth.nullable(),
+  /** The weapons with their pictures, from the item data the search saved. */
+  weapons: z.array(BuildWeapon.extend({ image: z.string().nullable() })),
 });
 export type BuildView = z.infer<typeof BuildView>;
 

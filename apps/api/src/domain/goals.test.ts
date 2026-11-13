@@ -11,6 +11,7 @@ function recipe(
 ): ItemRecipe {
   return {
     uniqueName: `/Lotus/${name}`,
+    image: null,
     name,
     category: 'warframe',
     type: 'Warframe',

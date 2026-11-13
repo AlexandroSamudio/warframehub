@@ -16,13 +16,15 @@
     choices: (query: string) => T[];
     /** One option's second line (polarity, effect, "from Rhino"). */
     detail?: Snippet<[T]>;
-    /** One option's picture, when it has one (mods, arcanes). */
+    /** One option's picture, when it has one (mods, arcanes, abilities). */
     image?: (item: T) => string | null;
+    /** Art is cropped to fill; icons (arcanes, abilities) are kept whole. */
+    imageFit?: 'cover' | 'contain';
     onPick: (item: T) => void;
     onClose: () => void;
   }
 
-  let { id, label, choices, detail, image, onPick, onClose }: Props = $props();
+  let { id, label, choices, detail, image, imageFit = 'cover', onPick, onClose }: Props = $props();
 
   /** Enough to scan; typing narrows the rest. */
   const SHOWN = 40;
@@ -103,7 +105,7 @@
         onclick={() => onPick(item)}
         onmousemove={() => (active = i)}
       >
-        {#if image}<ModPic image={image(item)} size="small" />{/if}
+        {#if image}<ModPic image={image(item)} size={36} fit={imageFit} />{/if}
         <span class="text">
           <span class="name">{item.name}</span>
           {#if detail}<span class="detail">{@render detail(item)}</span>{/if}

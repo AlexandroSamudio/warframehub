@@ -2,6 +2,7 @@ import {
   Build,
   BuildContent,
   BuildOptionsResponse,
+  BuildView,
   CreateBuildRequest,
   ReorderBuildsRequest,
   UpdateBuildRequest,
@@ -17,6 +18,7 @@ import {
   getBuild,
   listBuilds,
   reorderBuilds,
+  resolveBuild,
   updateBuild,
 } from '../db/builds.js';
 import type { Db } from '../db/client.js';
@@ -63,9 +65,12 @@ export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps):
     });
   });
 
-  app.get('/api/builds/:id', async (request): Promise<Build> => {
+  /** One build with its pictures and effects (the edit page shows them too). */
+  app.get('/api/builds/:id', async (request): Promise<BuildView> => {
     const { id } = IdParams.parse(request.params);
-    return Build.parse(getBuild(db, userId, id));
+    const saved = getBuild(db, userId, id);
+    const { state, group, helminth } = await rulesFor(saved.slug);
+    return BuildView.parse(resolveBuild(db, saved, buildRules(state, group, helminth)));
   });
 
   app.post('/api/builds', async (request, reply) => {
