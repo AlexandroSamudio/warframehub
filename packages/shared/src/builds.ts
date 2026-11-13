@@ -277,6 +277,8 @@ export const BuildContent = z.object({
   author: z.string().trim().max(80).default(''),
   /** The update it was made for, e.g. "Update 41" or "Nov 2026". */
   patch: z.string().trim().max(40).default(''),
+  /** A brief description of the build: what it's for (plain text). */
+  description: z.string().trim().max(300).default(''),
   /** How to play it: a small Markdown subset (headings, lists, bold, italic, links). */
   guide: z.string().max(20_000).default(''),
   aura: BuildSlot.nullable().default(null),

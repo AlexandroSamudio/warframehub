@@ -95,6 +95,7 @@ export function emptyContent(): BuildContent {
     sourceUrl: '',
     author: '',
     patch: '',
+    description: '',
     guide: '',
     aura: null,
     exilus: null,
