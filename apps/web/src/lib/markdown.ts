@@ -49,6 +49,7 @@ const NUMBERED = /^\d{1,3}[.)]\s+(.*)$/;
 export function renderGuide(source: string, newTabLabel: string): string {
   const blocks: Block[] = [];
   const last = () => blocks[blocks.length - 1];
+  let seenH5 = false;
   for (const raw of source.replace(/\r\n?/g, '\n').split('\n')) {
     const line = raw.trim();
     if (line === '') {
@@ -59,8 +60,11 @@ export function renderGuide(source: string, newTabLabel: string): string {
     const bullet = BULLET.exec(line);
     const numbered = NUMBERED.exec(line);
     if (heading) {
-      // The guide sits under the page's h3 (Builds) and h4 (How to play).
-      blocks.push({ kind: heading[1]!.length === 3 ? 'h6' : 'h5', text: heading[2]! });
+      // The guide sits under the page's h3 (the build) and h4 (How to play). `###` is a
+      // sub-heading (h6) only under an h5, so levels never skip.
+      const kind = heading[1]!.length === 3 && seenH5 ? 'h6' : 'h5';
+      if (kind === 'h5') seenH5 = true;
+      blocks.push({ kind, text: heading[2]! });
     } else if (bullet || numbered) {
       const kind = bullet ? 'ul' : 'ol';
       const item = (bullet ?? numbered)![1]!;

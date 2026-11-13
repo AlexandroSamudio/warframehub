@@ -408,6 +408,7 @@ Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the
 - **Build list** (gold-ticked frame, a `nav`):
   - **Entries** are links in your order, each showing:
     - the name (600 weight; gold when open);
+    - the description's first line (Readout White, 0.85rem, one line);
     - "author · update" in Dim Readout;
     - a row of **marks** that tell builds apart: the arcane and Helminth pictures (26px) and the shards (20px).
   - **The open entry** has a gold border, a 10% gold tint and `aria-current`.
@@ -415,18 +416,20 @@ Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the
     - "MOVE" with 32px ↑/↓ that move the open build;
     - a teal **Add a build**;
     - a muted hint: "Keys [ and ] open the previous and next build".
-- **The open build** (frame):
-  - **Title row:**
+- **The open build** is two halves of equal weight (Alex, 13 Nov 2026):
+  - **Top** (no frame):
     - the name (gold page title);
     - a meta line joined by "·": author, update, saved date, and the source host as a teal link;
+    - the **description** as a lead paragraph (body size, Readout White, 70ch);
     - on the right, a "How to play" jump and **Edit**, a gold-outlined link-button.
-  - **Mods first** (Aura and Exilus in a pair, then 8 slots, 4 per row, 2 under 64rem, 1 under 24rem) as **Mod Cards** on one seam.
-  - **Loadout:** from 75rem it is a 19rem column beside the mods; narrower, a strip above them. It holds seam-joined cells on the inset colour:
+  - **Mods** and **How to play** are two framed sections with the **same gold-ticked frame and the same gold section title** (Rajdhani 600, 1.2rem), so neither reads as a footnote to the other.
+    - **Mods:** Aura and Exilus in a pair, then 8 slots (4 per row, 2 under 64rem, 1 under 24rem) as **Mod Cards** on one seam.
+    - **How to play:** the guide at 72ch. It is always shown, with "No guide yet. Add how to play this build from Edit." when empty. A leading guide heading that just says "How to play" is skipped, since the section already says it. The guide's own headings are content: Readout White h5 (1.05rem) and Dim Readout h6 (0.9rem); `###` is an h6 only under an h5, so levels never skip.
+  - **Loadout** (beside the Mods frame from 75rem, a 19rem column; above it when narrower) holds seam-joined cells on the inset colour:
     - **Arcanes:** a 48px picture, the name with "R5/5", and the effect, which shows 2 lines and opens fully when pressed (a real button with `aria-expanded`);
     - **Archon Shards:** rows with a **Shard Pic**, the stat, then the colour in words and a visible **TAUFORGED** tag; "2 of 5 sockets empty" when there are fewer than five;
-    - **Helminth:** the icon, "**Roar** (Rhino)", "replaces Ballistic Battery", and "Roar on the wiki".
-  - **Weapons** (56px pictures, name, note) and **How to play** run under both columns, so the two columns end together.
-  - The guide's headings are content: Readout White h5 (1.05rem) and Dim Readout h6 (0.9rem), never gold. When the guide opens with its own heading, the "How to play" label stays for screen readers only.
+    - **Helminth:** the icon, "**Roar** (Rhino)", "replaces Ballistic Battery", and "Roar on the wiki";
+    - **Weapons:** a 48px picture, the name and the note.
 - **Mod Card:**
   - the mod's art as a wide crop (5.5rem tall, cut on the top-right; "AURA"/"EXILUS" on a solid panel tab over the art's corner, never on the picture);
   - the name (600) with the rank "R5/5" in gold tabular digits (read out as "Rank 5 of 5");
@@ -441,7 +444,7 @@ Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the
 
 The full column. The back link names where it goes: "← Back to {build}", or "Back to Builds" for a new one. Then the page title ("New build for Mesa Prime" / "Edit Steel Path Peacemaker") and these frame panels:
 
-- **About:** Name, Source link, Author, Game update; "(optional)" in the label.
+- **About:** Name, Description (a 2-line textarea, up to 300 characters), Source link, Author, Game update; "(optional)" in the label.
 - **Mods** and **Arcanes:** the seam grid; mods 4 per row (2 under 64rem, 1 on phones), Aura/Exilus and the arcanes in pairs. A cell shows its Label, then either "Choose a mod" as a teal button, or the chosen mod: its art band (the Mod Card's crop, 4.5rem) or the arcane's 56px picture, the name, a Rank select, its effect, a note field, and Change / Remove.
 - **Archon Shards:** rows with:
   - the shard as it will look (a 52px **Shard Pic**, Tauforged included);

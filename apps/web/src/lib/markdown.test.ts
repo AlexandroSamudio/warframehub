@@ -10,7 +10,9 @@ describe('renderGuide', () => {
     ).toBe(
       '<h5>How to play</h5><p>Cast 3 first.<br>Then hold 4.</p><ul><li>one</li><li>two</li></ul><ol><li>a</li><li>b</li></ol>',
     );
-    expect(html('### Small')).toBe('<h6>Small</h6>');
+    // ### is h6 only under an h5; on its own it's h5, so levels never skip.
+    expect(html('## Big\n\n### Small')).toBe('<h5>Big</h5><h6>Small</h6>');
+    expect(html('### Small')).toBe('<h5>Small</h5>');
   });
 
   it('marks bold, italic and code', () => {

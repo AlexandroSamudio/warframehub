@@ -126,6 +126,10 @@
               aria-current={on ? 'page' : undefined}
             >
               <span class="entry-name">{b.name}</span>
+              <!-- The open build shows its description in full beside the list. -->
+              {#if b.content.description && !on}
+                <span class="entry-desc">{b.content.description}</span>
+              {/if}
               {#if b.content.author || b.content.patch}
                 <span class="entry-meta"
                   >{[b.content.author, b.content.patch].filter(Boolean).join(' · ')}</span
@@ -254,6 +258,18 @@
   .entry-meta {
     font-size: 0.8rem;
     color: var(--muted);
+  }
+
+  /* The build's description, one line: what it's for, before you open it. */
+  .entry-desc {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: var(--fg);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
   }
 
   .marks {

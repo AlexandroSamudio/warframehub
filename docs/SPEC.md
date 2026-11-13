@@ -465,7 +465,7 @@ Each phase ends with something you can run and check.
 
 ### 14.1 Builds (13 Nov 2026, Alex's request)
 
-- **What:** not a build editor. A personal library of builds Alex finds on Overframe, YouTube or anywhere else, entered by hand: the mods (aura, Exilus, 8 slots, each with its rank and an optional note), up to 2 arcanes, up to 5 Archon Shards (stat, Tauforged), a Helminth ability (which ability it replaces), weapons (from the item search), the source (link, author, patch) and a written guide in light Markdown. No capacity, Forma or stat maths.
+- **What:** not a build editor. A personal library of builds Alex finds on Overframe, YouTube or anywhere else, entered by hand: the mods (aura, Exilus, 8 slots, each with its rank and an optional note), up to 2 arcanes, up to 5 Archon Shards (stat, Tauforged), a Helminth ability (which ability it replaces), weapons (from the item search), the source (link, author, patch), a short **description** (up to 300 characters: what the build is for) and a written guide in light Markdown. No capacity, Forma or stat maths.
 - **Which version owns them:** the Prime if it can be obtained, else the normal version (`buildsVariant` in `apps/api/src/sources/build-data.ts`). Excalibur Prime was a Founders' exclusive (`UNOBTAINABLE`), so Excalibur's builds go to Excalibur Umbra. Other versions link to that one.
 - **Data:** the Warframe catalog (§14) also keeps `warframes:mods` (from `/mods`: type "Warframe Mod" with `compatName` WARFRAME, AURA or a Warframe's name for augments; the Flawed `Beginner`/`Intermediate` copies and Conclave-only `PvPMods` are left out; when two mods share a name the `/Mods/Warframe/` one wins, so the stray `Expert` "Intensify" goes while Primed mods stay) and `warframes:arcanes` (from `/items/search/arcane?by=category`: "Warframe Arcane" plus the older "Arcane" type; the `/arcanes` endpoint is out of date). Checked on 13 Nov 2026: 368 mods (113 general, 36 auras, 33 that fit the Exilus slot, 219 augments) and 71 arcanes. Helminth choices: abilities the wiki marks as subsumable plus Helminth's own (77). Archon Shard stats are a checked constant (`SHARD_STATS` in `packages/shared/src/builds.ts`, from the wiki's Shard Buffs table).
 - **Storage:** table `builds` (migration `0007`): one row per build, `content_json` is the whole `BuildContent`, saved whole. Each reference keeps its name, so a build still reads if the data drops a mod; such a mod is also kept when the build is edited.
@@ -476,10 +476,15 @@ Each phase ends with something you can run and check.
   - **The Warframe page** has two page tabs under its header: **Overview** (`#/warframes/{slug}`) and **Builds (n)** (`…/builds`, `…/builds/{id}`). On Builds the header shrinks to one line and always shows the version that owns the builds. The page opens on that version.
   - **The Builds page:**
     - a build list on the left: name, author · update, 4 mod thumbnails; the open one in gold; ↑/↓; Add a build. It becomes a row above the build under 60rem.
-    - The open build has a title row (meta line, How to play, Edit), a **loadout strip** (arcane pictures with effect, shard rows with pictures, the Helminth icon "Roar (Rhino) · replaces …"), **picture-led mod cards** (art, name and rank, polarity symbol and word, effect at that rank, note), weapons with pictures, and the guide.
+    - The open build has a title row (meta line, the **description** as a lead, How to play, Edit). Below it are **two halves of equal weight**, each a framed section with the same gold title:
+      - **Mods:** picture-led mod cards (art, name and rank, polarity symbol and word, effect at that rank, note).
+      - **How to play:** the guide.
+
+      Beside the Mods frame on wide screens (above it on narrow ones) is the **loadout**: arcane pictures with their effect, shard rows with pictures, the Helminth icon ("Roar (Rhino) · replaces …") and weapons with pictures. The build list shows each build's description as one line.
+
     - `…/builds` opens the build opened last (or the first). An unknown id says so and links back.
   - **The edit page** (`…/builds/new`, `…/builds/{id}/edit`) shows the same pictures. Shards are picked by their colour pictures, then the stat. Back and Cancel return to the build; Save opens it; Delete returns to the list. The pickers, next-empty-slot focus and the leave guard are as before.
-- **Guide format** (`apps/web/src/lib/markdown.ts`, no dependency): everything is escaped first, then `#`/`##` become h5 and `###` h6, along with paragraphs, `-`/`1.` lists, bold, italic, code and http(s) links (new tab). Marks never reach into code or link addresses.
+- **Guide format** (`apps/web/src/lib/markdown.ts`, no dependency): everything is escaped first, then `#`/`##` become h5 and `###` h6 (an h5 when no h5 came before, so levels never skip); a leading heading that just says "How to play" is skipped on the Builds page, along with paragraphs, `-`/`1.` lists, bold, italic, code and http(s) links (new tab). Marks never reach into code or link addresses.
 
 ---
 

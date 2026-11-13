@@ -532,6 +532,22 @@
             />
           </label>
           <label class="wide">
+            <span>{t('build.description')} <i>{t('build.optional')}</i></span>
+            <textarea
+              rows="2"
+              maxlength="300"
+              aria-describedby="description-count"
+              placeholder={t('build.descriptionPlaceholder')}
+              bind:value={content.description}></textarea>
+            <!-- How much of the 300 is used, so the limit never cuts typing off silently. -->
+            <small
+              id="description-count"
+              class="count num"
+              class:full={content.description.length >= 300}
+              >{t('build.count', { n: content.description.length, max: 300 })}</small
+            >
+          </label>
+          <label class="wide">
             <span>{t('build.source')} <i>{t('build.optional')}</i></span>
             <input
               type="url"
@@ -952,8 +968,22 @@
     grid-column: 1 / -1;
   }
 
-  .fields input {
+  .fields input,
+  .fields textarea {
     width: 100%;
+  }
+
+  .count {
+    display: block;
+    margin-top: 0.2rem;
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .count.full {
+    color: var(--gold);
   }
 
   /* Slots: cells on one seam, like the Builds section's mod grid. */

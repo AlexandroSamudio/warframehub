@@ -10,9 +10,9 @@
   import { SvelteSet } from 'svelte/reactivity';
 
   /**
-   * One build, open on the Builds page (SPEC §14.1). The mods lead; on wide screens the
-   * loadout (arcanes, Archon Shards, Helminth) is a column beside them, so all ten mods
-   * are on the first screen.
+   * One build, open on the Builds page (SPEC §14.1). Two halves of equal weight: **Mods**
+   * (with the loadout and weapons beside them on wide screens) and **How to play**, each
+   * its own framed section with the same gold title.
    */
   interface Props {
     slug: string;
@@ -25,9 +25,18 @@
 
   const c = $derived(b.content);
   const arcanes = $derived(b.arcanes.filter((a) => a !== null));
-  const hasGuide = $derived(c.guide.trim() !== '');
-  const guideHasHeading = $derived(/^#{1,3}\s/.test(c.guide.trim()));
-  const hasLoadout = $derived(arcanes.length > 0 || b.shards.length > 0 || b.helminth !== null);
+  // The section is already titled "How to play": a guide that opens with that same heading
+  // (as many copied guides do) starts with its text instead.
+  const guideSource = $derived.by(() => {
+    const lines = c.guide.trim().split('\n');
+    const first = /^#{1,3}\s+(.*)$/.exec(lines[0] ?? '');
+    const same = first && first[1]!.trim().toLowerCase() === t('build.guide').toLowerCase();
+    return same ? lines.slice(1).join('\n').trim() : c.guide.trim();
+  });
+  const hasGuide = $derived(guideSource !== '');
+  const hasSide = $derived(
+    arcanes.length > 0 || b.shards.length > 0 || b.helminth !== null || b.weapons.length > 0,
+  );
   let guideEl = $state<HTMLHeadingElement | null>(null);
 
   /** Arcanes whose whole effect is shown (they start at two lines). */
@@ -37,7 +46,7 @@
     if (!expanded.delete(uniqueName)) expanded.add(uniqueName);
   }
 
-  /** "How to play" at the top: the guide is last, under the setup. */
+  /** "How to play" at the top jumps to its section. */
   function toGuide() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     guideEl?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
@@ -45,7 +54,7 @@
   }
 </script>
 
-<article class="build frame" class:with-loadout={hasLoadout} aria-labelledby="build-name">
+<article class="build" class:with-side={hasSide} aria-labelledby="build-name">
   <header class="top">
     <div class="titles">
       <h3 id="build-name" tabindex="-1">{b.name}</h3>
@@ -61,6 +70,7 @@
           >
         {/if}
       </p>
+      {#if c.description}<p class="description">{c.description}</p>{/if}
     </div>
     <div class="actions">
       {#if hasGuide}
@@ -72,58 +82,21 @@
     </div>
   </header>
 
-  <div class="main">
-    <section class="mods-area" aria-labelledby="build-mods">
-      <h4 class="group" id="build-mods">{t('build.mods')}</h4>
-      <ul class="mods special">
-        <ModCard slot={b.aura} label={t('build.aura')} />
-        <ModCard slot={b.exilus} label={t('build.exilus')} />
-      </ul>
-      <ul class="mods">
-        {#each b.slots as s, i (i)}
-          <ModCard slot={s} />
-        {/each}
-      </ul>
-    </section>
-  </div>
+  <!-- The build's first half: the mods. -->
+  <section class="half mods-half frame accent" aria-labelledby="build-mods">
+    <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
+    <ul class="mods special">
+      <ModCard slot={b.aura} label={t('build.aura')} />
+      <ModCard slot={b.exilus} label={t('build.exilus')} />
+    </ul>
+    <ul class="mods">
+      {#each b.slots as s, i (i)}
+        <ModCard slot={s} />
+      {/each}
+    </ul>
+  </section>
 
-  <!-- Weapons and the guide run under both columns, so the two columns end together. -->
-  <div class="rest">
-    {#if b.weapons.length > 0}
-      <section aria-labelledby="build-weapons">
-        <h4 class="group" id="build-weapons">{t('build.weapons')}</h4>
-        <ul class="weapons">
-          {#each b.weapons as w (w.uniqueName)}
-            <li>
-              <ModPic image={w.image} size={56} fit="contain" />
-              <div class="id">
-                <span class="name">{w.name}</span>
-                {#if w.note}<span class="note">{w.note}</span>{/if}
-              </div>
-            </li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
-
-    {#if hasGuide}
-      <section aria-labelledby="build-guide">
-        <!-- A guide that opens with its own heading doesn't need the label repeated. -->
-        <h4
-          class="group"
-          class:sr-only={guideHasHeading}
-          id="build-guide"
-          tabindex="-1"
-          bind:this={guideEl}
-        >
-          {t('build.guide')}
-        </h4>
-        <Guide source={c.guide} />
-      </section>
-    {/if}
-  </div>
-
-  {#if hasLoadout}
+  {#if hasSide}
     <aside class="loadout" aria-label={t('build.loadout')}>
       {#if arcanes.length > 0}
         <section class="cell">
@@ -191,53 +164,79 @@
         {@const h = b.helminth}
         <section class="cell">
           <h4 class="group">{t('build.helminth')}</h4>
-          <div class="rows">
-            <div class="row">
-              <ModPic image={h.image} size={48} fit="contain" />
-              <div class="id">
-                <span class="name"
-                  >{h.name}{#if h.from && h.from !== 'Helminth'}<span class="small from"
-                      >{t('build.fromFrame', { from: h.from })}</span
-                    >{/if}</span
+          <div class="row">
+            <ModPic image={h.image} size={48} fit="contain" />
+            <div class="id">
+              <span class="name"
+                >{h.name}{#if h.from && h.from !== 'Helminth'}<span class="small from"
+                    >{t('build.fromFrame', { from: h.from })}</span
+                  >{/if}</span
+              >
+              <span class="small"
+                >{t('build.replacesShort', {
+                  ability: abilityNames.get(h.replacesKey) ?? String(h.replacesKey),
+                })}</span
+              >
+              {#if h.page}
+                <a class="small" href={h.page} target="_blank" rel="noopener noreferrer"
+                  >{t('build.onWiki', { name: h.name })}<span class="sr-only">
+                    {t('part.opensNewTab')}</span
+                  ></a
                 >
-                <span class="small"
-                  >{t('build.replacesShort', {
-                    ability: abilityNames.get(h.replacesKey) ?? String(h.replacesKey),
-                  })}</span
-                >
-                {#if h.page}
-                  <a class="small" href={h.page} target="_blank" rel="noopener noreferrer"
-                    >{t('build.onWiki', { name: h.name })}<span class="sr-only">
-                      {t('part.opensNewTab')}</span
-                    ></a
-                  >
-                {/if}
-                {#if h.note}<span class="note">{h.note}</span>{/if}
-              </div>
+              {/if}
+              {#if h.note}<span class="note">{h.note}</span>{/if}
             </div>
           </div>
         </section>
       {/if}
+
+      {#if b.weapons.length > 0}
+        <section class="cell">
+          <h4 class="group">{t('build.weapons')}</h4>
+          <ul class="rows">
+            {#each b.weapons as w (w.uniqueName)}
+              <li>
+                <!-- A weapon the search never saw has no picture: no empty frame for it. -->
+                {#if w.image}<ModPic image={w.image} size={48} fit="contain" />{/if}
+                <div class="id">
+                  <span class="name">{w.name}</span>
+                  {#if w.note}<span class="note">{w.note}</span>{/if}
+                </div>
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
     </aside>
   {/if}
+
+  <!-- The build's second half: how to play it, as important as the mods. -->
+  <section class="half how-to frame accent" aria-labelledby="build-guide">
+    <h4 class="section-title" id="build-guide" tabindex="-1" bind:this={guideEl}>
+      {t('build.guide')}
+    </h4>
+    {#if hasGuide}
+      <Guide source={guideSource} />
+    {:else}
+      <p class="small">{t('build.guideNone')}</p>
+    {/if}
+  </section>
 </article>
 
 <style>
   /*
-   * Narrow: title, loadout, mods, weapons, guide in one column. Wide (the build panel
-   * past ~70rem of screen): mods and the rest on the left, the loadout as a column on
-   * the right, so the mods start right under the title.
+   * Narrow: the two halves first (Mods, How to play), the loadout after them.
+   * Wide (75rem+): the loadout as a column beside Mods; How to play under both.
    */
   .build {
-    padding: 1.1rem 1.25rem 1.3rem;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       'top'
-      'loadout'
-      'main'
-      'rest';
-    gap: 1.2rem 1.4rem;
+      'mods'
+      'howto'
+      'side';
+    gap: 1rem;
     min-width: 0;
   }
 
@@ -245,36 +244,28 @@
     grid-area: top;
   }
 
-  .main {
-    grid-area: main;
-    min-width: 0;
+  .mods-half {
+    grid-area: mods;
   }
 
-  .rest {
-    grid-area: rest;
-    display: grid;
-    gap: 1.4rem;
-    min-width: 0;
-  }
-
-  .rest:empty {
-    display: none;
+  .how-to {
+    grid-area: howto;
   }
 
   .loadout {
-    grid-area: loadout;
+    grid-area: side;
   }
 
   @media (min-width: 75rem) {
-    .build.with-loadout {
+    .build.with-side {
       grid-template-columns: minmax(0, 1fr) 19rem;
       grid-template-areas:
         'top top'
-        'main loadout'
-        'rest rest';
+        'mods side'
+        'howto howto';
     }
 
-    .build.with-loadout .loadout {
+    .build.with-side .loadout {
       align-self: start;
       grid-template-columns: minmax(0, 1fr);
     }
@@ -285,17 +276,19 @@
     text-underline-offset: 0.2em;
   }
 
+  /* The build's name and what it is: no frame, the two halves below carry the frames. */
   .top {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.6rem 1.2rem;
+    padding: 0.2rem 0.1rem 0;
   }
 
   .titles {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.3rem;
     min-width: 0;
   }
 
@@ -315,10 +308,21 @@
     flex-wrap: wrap;
   }
 
-  /* "From Test · Update 41 · Saved 13 Nov 2026 · overframe.gg" */
-  .meta > span + span::before {
+  /*
+   * "From Test · Update 41 · Saved 13 Nov 2026 · overframe.gg". The dot trails each item,
+   * so a wrapped line never starts with one.
+   */
+  .meta > span:not(:last-child)::after {
     content: '·' / '';
     margin: 0 0.5em;
+  }
+
+  /* The description: a lead paragraph, the first thing you read about the build. */
+  .description {
+    margin: 0.2rem 0 0;
+    max-width: 70ch;
+    line-height: 1.5;
+    white-space: pre-line;
   }
 
   .actions {
@@ -363,6 +367,33 @@
     color: var(--fg);
   }
 
+  /*
+   * The two halves (Mods, How to play): the same gold-ticked frame and the same gold
+   * section title, so neither reads as a footnote to the other.
+   */
+  .half {
+    padding: 1rem 1.15rem 1.2rem;
+    min-width: 0;
+  }
+
+  .section-title {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+  }
+
+  .section-title:focus {
+    outline: none;
+  }
+
+  /* The guide reads at a comfortable measure inside its wide frame. */
+  .how-to :global(.guide) {
+    max-width: 72ch;
+  }
+
   .group {
     margin: 0 0 0.55rem;
     font-family: var(--font-display);
@@ -388,6 +419,11 @@
     font-size: 0.8rem;
     color: var(--muted);
     white-space: pre-line;
+  }
+
+  p.small {
+    margin: 0;
+    font-size: 0.9rem;
   }
 
   .note {
@@ -434,8 +470,7 @@
   }
 
   .rows li,
-  .row,
-  .weapons li {
+  .row {
     display: flex;
     align-items: flex-start;
     gap: 0.65rem;
@@ -510,12 +545,6 @@
     margin-bottom: 0.75rem;
   }
 
-  .weapons {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
-    gap: 0.8rem 1.4rem;
-  }
-
   @media (max-width: 64rem) {
     .mods {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -523,8 +552,8 @@
   }
 
   @media (max-width: 30rem) {
-    .build {
-      padding: 0.9rem 0.85rem 1rem;
+    .half {
+      padding: 0.85rem 0.8rem 1rem;
     }
   }
 

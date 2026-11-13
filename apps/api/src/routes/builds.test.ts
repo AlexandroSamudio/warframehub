@@ -76,6 +76,7 @@ function mesaBuild(): Partial<BuildContent> {
     sourceUrl: 'https://overframe.gg/build/123/',
     author: 'Someone',
     patch: 'Update 41',
+    description: 'Peacemaker nuke for Steel Path survival.',
     guide: '## How to play\n\nPress **4**.',
     aura: slot(GROWING_POWER, 'Growing Power', 5),
     exilus: slot(MESAS_WALTZ, "Mesa's Waltz", 3, 'Move while shooting'),
@@ -165,13 +166,20 @@ describe('builds', () => {
       page: expect.stringContaining('wiki'),
     });
     expect(view!.content.guide).toContain('**4**');
+    expect(view!.content.description).toBe('Peacemaker nuke for Steel Path survival.');
   });
 
   it('fills in defaults for parts left out', async () => {
     const saved = Build.parse((await create(ctx, {})).json());
     expect(saved.content.slots).toEqual(Array(8).fill(null));
     expect(saved.content.arcanes).toEqual([null, null]);
-    expect(saved.content).toMatchObject({ aura: null, shards: [], weapons: [], sourceUrl: '' });
+    expect(saved.content).toMatchObject({
+      aura: null,
+      shards: [],
+      weapons: [],
+      sourceUrl: '',
+      description: '',
+    });
   });
 
   it('serves mod and arcane images once the data lists them', async () => {
