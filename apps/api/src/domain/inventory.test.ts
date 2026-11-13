@@ -28,6 +28,7 @@ function inv(parts: Partial<Record<keyof Inventory, [string, number][]>> = {}): 
 }
 
 const RECIPE: ItemRecipe = {
+  image: null,
   uniqueName: '/W/NidusPrime',
   name: 'Nidus Prime',
   category: 'warframe',

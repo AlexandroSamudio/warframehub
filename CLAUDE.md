@@ -37,7 +37,7 @@ WarframeHub: a personal Warframe companion that runs locally (`127.0.0.1`). v1 =
 
 - **Warframe accuracy.** Anything patch-sensitive (vendors, prices, rotations, reset times) must be checked against the Warframe wiki, DE patch notes or the live API, not memory. Unconfirmed facts get `verify: true` in the seed.
 - **No cosmetic content** in the checklist (decorations, furniture, skins).
-- **Images:** DE's Warframe images (portraits, ability icons; mod and arcane images for Builds since 13 Nov 2026) are allowed for personal use in the Warframes section (Alex, 11 Nov 2026): fetched from cdn.warframestat.us once, cached in the data folder, never committed. No DE logos or copied UI anywhere.
+- **Images:** DE's Warframe images are allowed for personal use in the Warframes section (Alex, 11 Nov 2026): portraits and ability icons, and since 13 Nov 2026 for Builds also mod, arcane, Archon Shard and weapon pictures and the polarity symbols. They are fetched from cdn.warframestat.us once, cached in the data folder, never committed. The polarity symbols are the one exception to "the app never calls the wiki": they exist only on wiki.warframe.com (7 small SVGs, fetched once, scripted SVGs refused, served sandboxed). No DE logos or other copied UI anywhere.
 - **Time:** compute and store in UTC; display in the user's zone (default `America/Argentina/Buenos_Aires`, GMT-3) with UTC alongside. The **server** computes period keys; the client never does.
 - Period/reset logic lives in `apps/api/src/domain/periods.ts` as pure functions with tests. Any change there needs tests at the boundaries (00:00 UTC, Monday, 8-hour marks).
 - Never overwrite user-edited checklist items when the seed changes (see SPEC §5.1).

@@ -1,5 +1,5 @@
 import { ApiError, GoalsResponse, WarframeDetail, WarframesResponse } from '@warframehub/shared';
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -7,7 +7,8 @@ import { buildApp } from '../app.js';
 import { openDatabase } from '../db/client.js';
 import { initDatabase } from '../db/init.js';
 import { loadSeed } from '../domain/seed.js';
-import { ImageCache } from './images.js';
+import { POLARITY_FILES } from '../routes/warframes.js';
+import { ImageCache, WIKI_FILES } from './images.js';
 import { fixture } from './test-fixtures.js';
 import {
   augmentsOf,
@@ -80,6 +81,13 @@ function fakeUpstream() {
         headers: { 'content-type': 'image/png' },
       });
     }
+    if (u.hostname === 'wiki.warframe.com') {
+      // Umbra's symbol is "poisoned" to check that scripted SVGs are refused.
+      const svg = u.pathname.endsWith('Umbra_Pol.svg')
+        ? '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><path d="M0 0"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h8v8z"/></svg>';
+      return new Response(svg, { headers: { 'content-type': 'image/svg+xml' } });
+    }
     const body = u.pathname === '/warframes' ? LIST() : u.pathname === '/mods' ? MODS() : [];
     return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
   };
@@ -102,7 +110,13 @@ async function setup(dir: string) {
     images: new ImageCache({
       dir: join(dir, 'images'),
       fetch: up.fetchFn,
-      allowed: (n) => catalog.cachedImageNames().has(n),
+      allowed: (n) => catalog.cachedImageNames().has(n) || n === 'ArchonShardAmar.png',
+    }),
+    polarities: new ImageCache({
+      dir: join(dir, 'images'),
+      base: WIKI_FILES,
+      fetch: up.fetchFn,
+      allowed: (n) => POLARITY_FILES.has(n),
     }),
   });
   const get = (url: string) => app.inject({ method: 'GET', url });
@@ -227,5 +241,30 @@ describe('Warframes routes', () => {
     expect((await ctx.get('/api/images/Unknown.png')).statusCode).toBe(404);
     expect((await ctx.get('/api/images/..%2Fwarframehub.db')).statusCode).toBe(404);
     expect(ctx.up.state.calls.filter((c) => c.includes('cdn.'))).toHaveLength(0);
+  });
+
+  it('serves mod and shard pictures once the data lists them', async () => {
+    await ctx.get('/api/warframes');
+    expect((await ctx.get('/api/images/AbilityStrengthMod.jpg')).statusCode).toBe(200);
+    expect((await ctx.get('/api/images/ArchonShardAmar.png')).statusCode).toBe(200);
+  });
+
+  it('serves the polarity symbols from the wiki, sandboxed, once', async () => {
+    const res = await ctx.get('/api/polarities/madurai');
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['content-type']).toBe('image/svg+xml');
+    expect(res.headers['content-security-policy']).toContain('sandbox');
+    expect(ctx.up.state.calls).toContain(
+      'https://wiki.warframe.com/w/Special:FilePath/Madurai_Pol.svg',
+    );
+    ctx.up.state.online = false;
+    expect((await ctx.get('/api/polarities/madurai')).statusCode).toBe(200);
+  });
+
+  it('refuses unknown polarities and SVGs with scripts', async () => {
+    expect((await ctx.get('/api/polarities/universal')).statusCode).toBe(400);
+    expect((await ctx.get('/api/polarities/..%2Fx')).statusCode).toBe(400);
+    expect((await ctx.get('/api/polarities/umbra')).statusCode).toBe(404);
+    expect(existsSync(join(dir, 'images', 'Umbra_Pol.svg'))).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import {
   BuildContent,
+  shardImage,
   shardStat,
   type ArcaneOption,
   type Build,
@@ -15,7 +16,7 @@ import { HttpError } from '../http-error.js';
 import { abilityStats } from '../sources/ability-stats.js';
 import type { CatalogState, WarframeGroup } from '../sources/warframes.js';
 import type { Db } from './client.js';
-import { builds } from './schema.js';
+import { builds, itemCache } from './schema.js';
 
 /** Builds (SPEC §14.1): stored whole, checked against the game data when saved. */
 
@@ -272,7 +273,23 @@ function resolveSlot(
 }
 
 /** A saved build with what the data says about its mods, arcanes, shards and Helminth. */
-export function resolveBuild(build: Build, rules: BuildRules): BuildView {
+/** A weapon's picture, from the item data the search saved (null if never seen). */
+function weaponImage(db: Db, uniqueName: string): string | null {
+  const row = db
+    .select({ payloadJson: itemCache.payloadJson })
+    .from(itemCache)
+    .where(eq(itemCache.key, `item:${uniqueName}`))
+    .get();
+  if (!row) return null;
+  try {
+    const raw = JSON.parse(row.payloadJson) as { imageName?: unknown };
+    return typeof raw.imageName === 'string' ? raw.imageName : null;
+  } catch {
+    return null;
+  }
+}
+
+export function resolveBuild(db: Db, build: Build, rules: BuildRules): BuildView {
   const c = build.content;
   const mod = (s: BuildSlot | null) => resolveSlot(s, s ? rules.mods.get(s.uniqueName) : undefined);
   const arcane = (s: BuildSlot | null) =>
@@ -286,8 +303,14 @@ export function resolveBuild(build: Build, rules: BuildRules): BuildView {
     arcanes: c.arcanes.map(arcane),
     shards: c.shards.map((s) => {
       const stat = shardStat(s.stat)!;
-      return { ...s, color: stat.color, text: s.tauforged ? stat.tauforged : stat.normal };
+      return {
+        ...s,
+        color: stat.color,
+        text: s.tauforged ? stat.tauforged : stat.normal,
+        image: shardImage(stat.color, s.tauforged),
+      };
     }),
+    weapons: c.weapons.map((w) => ({ ...w, image: weaponImage(db, w.uniqueName) })),
     helminth: h
       ? {
           ...h,

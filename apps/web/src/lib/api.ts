@@ -2,6 +2,7 @@ import {
   ApiError,
   Build,
   BuildOptionsResponse,
+  BuildView,
   ChecklistResponse,
   ClearSectionResponse,
   GoalsResponse,
@@ -250,6 +251,11 @@ export function refreshWarframes(): Promise<WarframesResponse> {
 }
 
 /** Where a Warframe image is served from (downloaded once, then local). */
+/** A polarity symbol (DE's, from the Warframe wiki, cached by the API). */
+export function polarityUrl(polarity: string): string {
+  return `/api/polarities/${encodeURIComponent(polarity)}`;
+}
+
 export function imageUrl(file: string): string {
   return `/api/images/${encodeURIComponent(file)}`;
 }
@@ -260,8 +266,9 @@ export function getBuildOptions(slug: string): Promise<BuildOptionsResponse> {
   return request(BuildOptionsResponse, `/api/builds/options?slug=${encodeURIComponent(slug)}`);
 }
 
-export function getBuild(id: number): Promise<Build> {
-  return request(Build, `/api/builds/${id}`);
+/** One build with its pictures and effects (as on the Builds page). */
+export function getBuild(id: number): Promise<BuildView> {
+  return request(BuildView, `/api/builds/${id}`);
 }
 
 export function createBuild(slug: string, name: string, content: BuildContent): Promise<Build> {

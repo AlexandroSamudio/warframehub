@@ -4,24 +4,33 @@ import { join } from 'node:path';
 import { FETCH_TIMEOUT_MS, USER_AGENT, type FetchFn } from './worldstate.js';
 
 /**
- * DE's Warframe images (portraits, ability icons), allowed for personal use (Alex,
- * 11 Nov 2026). Each one is downloaded from warframestat.us's CDN the first time it's
- * asked for and kept in the data folder (`$DATA/images/`), never in the repo. After that
- * it's served from disk, also offline.
+ * DE's Warframe images (portraits, ability icons; for builds also mods, arcanes, Archon
+ * Shards, weapons and the polarity symbols), allowed for personal use (Alex, 11 and
+ * 13 Nov 2026). Each one is downloaded the first time it's asked for and kept in the data
+ * folder (`$DATA/images/`), never in the repo. After that it's served from disk, also
+ * offline.
  */
 export const IMAGE_CDN = 'https://cdn.warframestat.us/img';
-const NAME = /^[\w.-]+\.(png|jpg|jpeg|webp)$/i;
+/**
+ * The polarity symbols (SPEC §14.1) come from the Warframe wiki instead: the CDN has none.
+ * `Special:FilePath` redirects to the file itself.
+ */
+export const WIKI_FILES = 'https://wiki.warframe.com/w/Special:FilePath';
+const NAME = /^[\w.-]+\.(png|jpg|jpeg|webp|svg)$/i;
 const MAX_BYTES = 2 * 1024 * 1024;
 const TYPES: Record<string, string> = {
   png: 'image/png',
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   webp: 'image/webp',
+  svg: 'image/svg+xml',
 };
 
 export interface ImageCacheOptions {
   /** Folder for the files. Without one (tests), nothing is stored and nothing is served. */
   dir?: string;
+  /** Where files are downloaded from (default: warframestat.us's CDN). */
+  base?: string;
   fetch?: FetchFn;
   /** Only names this returns true for are fetched (the names the cached data mentions). */
   allowed: (name: string) => boolean;
@@ -54,7 +63,8 @@ export class ImageCache {
 
   private async download(dir: string, name: string, file: string): Promise<Buffer | null> {
     try {
-      const res = await this.fetchFn(`${IMAGE_CDN}/${encodeURIComponent(name)}`, {
+      const base = this.options.base ?? IMAGE_CDN;
+      const res = await this.fetchFn(`${base}/${encodeURIComponent(name)}`, {
         headers: { 'user-agent': USER_AGENT, accept: 'image/*' },
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
@@ -63,6 +73,13 @@ export class ImageCache {
         throw new Error(`CDN answered ${res.status} ${type}`);
       const body = Buffer.from(await res.arrayBuffer());
       if (body.length === 0 || body.length > MAX_BYTES) throw new Error(`bad size ${body.length}`);
+      // An SVG is a document: refuse any with scripts or event handlers, whatever the source.
+      if (
+        name.toLowerCase().endsWith('.svg') &&
+        /<script|\son[a-z]+\s*=|javascript:/i.test(body.toString('utf8'))
+      ) {
+        throw new Error('SVG with script content');
+      }
       await mkdir(dir, { recursive: true });
       // Written next to it first, so a half-written file is never served.
       const tmp = `${file}.part`;

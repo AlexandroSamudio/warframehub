@@ -42,23 +42,33 @@ describe('paramFromHash', () => {
 });
 
 describe('subFromHash', () => {
-  it('reads the new-build and edit-build pages under a Warframe', () => {
+  it('reads the Builds page, one build, and the edit pages under a Warframe', () => {
+    expect(subFromHash('#/warframes/mesa/builds')).toEqual({ kind: 'list' });
+    expect(subFromHash('#/warframes/mesa/builds/12')).toEqual({ kind: 'view', id: 12 });
+    expect(subFromHash('#/warframes/mesa/builds/12/edit')).toEqual({ kind: 'edit', id: 12 });
     expect(subFromHash('#/warframes/mesa/builds/new')).toEqual({ kind: 'new' });
-    expect(subFromHash('#/warframes/mesa/builds/12')).toEqual({ kind: 'edit', id: 12 });
-    expect(paramFromHash('#/warframes/mesa/builds/12')).toBe('mesa');
-    expect(routeFromHash('#/warframes/mesa/builds/new')).toBe('warframes');
+    expect(paramFromHash('#/warframes/mesa/builds/12/edit')).toBe('mesa');
+    expect(routeFromHash('#/warframes/mesa/builds')).toBe('warframes');
   });
 
   it('ignores anything else', () => {
     expect(subFromHash('#/warframes/mesa')).toBeNull();
-    expect(subFromHash('#/warframes/mesa/builds')).toBeNull();
     expect(subFromHash('#/warframes/mesa/builds/0')).toBeNull();
     expect(subFromHash('#/warframes/mesa/builds/x1')).toBeNull();
+    expect(subFromHash('#/warframes/mesa/builds/12/delete')).toBeNull();
+    expect(subFromHash('#/warframes/mesa/builds/new/edit')).toBeNull();
     expect(subFromHash('#/goals/mesa/builds/new')).toBeNull();
   });
 
   it('builds the addresses back', () => {
-    expect(subFromHash(buildHref('mesa'))).toEqual({ kind: 'new' });
-    expect(subFromHash(buildHref('mesa', 7))).toEqual({ kind: 'edit', id: 7 });
+    for (const sub of [
+      { kind: 'list' },
+      { kind: 'new' },
+      { kind: 'view', id: 7 },
+      { kind: 'edit', id: 7 },
+    ] as const) {
+      expect(subFromHash(buildHref('mesa', sub))).toEqual(sub);
+    }
+    expect(buildHref('mesa')).toBe('#/warframes/mesa/builds');
   });
 });

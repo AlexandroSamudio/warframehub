@@ -159,7 +159,7 @@ export function warframeDetail(
     augments: state.augments[group.name] ?? [],
     augmentShops: warframeWiki(group.variants[0]!.raw.uniqueName)?.augmentShops ?? [],
     buildsVariant: buildsVariant(group).raw.name,
-    builds: listBuilds(db, userId, group.slug).map((b) => resolveBuild(b, rules)),
+    builds: listBuilds(db, userId, group.slug).map((b) => resolveBuild(db, b, rules)),
     ...freshness(state, nextRefreshAt),
   };
 }

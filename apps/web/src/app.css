@@ -60,6 +60,31 @@ body {
   line-height: 1.5;
 }
 
+/* The parts the browser draws carry the console too: selection, scrollbars, the caret. */
+::selection {
+  background: color-mix(in srgb, var(--teal) 35%, transparent);
+  color: var(--fg);
+}
+
+html {
+  scrollbar-color: var(--line-strong) var(--bg);
+}
+
+input,
+textarea {
+  caret-color: var(--teal);
+}
+
+/*
+ * Headings that get focus after a page change (so screen readers start reading there)
+ * aren't controls: no ring on them. Every control keeps its teal focus ring.
+ */
+h2[tabindex='-1']:focus,
+h3[tabindex='-1']:focus,
+h4[tabindex='-1']:focus {
+  outline: none;
+}
+
 /* No lone word on the last line of body text (found by the Impeccable detector). */
 p,
 li,

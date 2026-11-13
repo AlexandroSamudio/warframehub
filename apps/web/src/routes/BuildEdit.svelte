@@ -2,6 +2,8 @@
   import {
     MAX_BUILD_WEAPONS,
     SHARD_SLOTS,
+    shardStat,
+    type ShardColor,
     type ArcaneOption,
     type BuildContent,
     type BuildOptionsResponse,
@@ -14,6 +16,7 @@
   import Icon from '../components/Icon.svelte';
   import ModPic from '../components/ModPic.svelte';
   import Picker from '../components/Picker.svelte';
+  import ShardPic from '../components/ShardPic.svelte';
   import * as api from '../lib/api.ts';
   import {
     arcaneChoices,
@@ -25,7 +28,7 @@
     type SlotKind,
   } from '../lib/builds.ts';
   import { t } from '../lib/i18n/index.ts';
-  import { hrefFor, leave, setLeaveGuard, type BuildSub } from '../lib/route.svelte.ts';
+  import { buildHref, leave, setLeaveGuard, type BuildSub } from '../lib/route.svelte.ts';
   import { polarityName } from '../lib/warframes.ts';
   import { tick } from 'svelte';
 
@@ -91,7 +94,10 @@
 
   const mods = $derived(new Map(options?.mods.map((m) => [m.uniqueName, m]) ?? []));
   const arcanes = $derived(new Map(options?.arcanes.map((a) => [a.uniqueName, a]) ?? []));
-  const back = $derived(hrefFor('warframes', slug));
+  // Back to the build being edited, or to the Builds page for a new one.
+  const back = $derived(
+    sub.kind === 'edit' ? buildHref(slug, { kind: 'view', id: sub.id }) : buildHref(slug),
+  );
   const ownerName = $derived(options?.buildsVariant ?? '');
 
   async function load() {
@@ -110,6 +116,7 @@
       name = build?.name ?? '';
       savedName = build?.name ?? '';
       content = build ? structuredClone(build.content) : emptyContent();
+      weaponImages = Object.fromEntries(build?.weapons.map((w) => [w.uniqueName, w.image]) ?? []);
       saved = JSON.stringify({ name, content });
       leaving = null;
       options = o;
@@ -238,6 +245,10 @@
 
   const groups = shardGroups();
 
+  function colorOf(stat: string): ShardColor {
+    return shardStat(stat)?.color ?? 'crimson';
+  }
+
   function addShard() {
     content.shards.push({ stat: groups[0]!.stats[0]!.key, tauforged: false, note: '' });
   }
@@ -266,6 +277,8 @@
 
   let weaponQuery = $state('');
   let weaponResults = $state<ItemSearchResult[]>([]);
+  /** Weapon pictures by uniqueName: from the loaded build, then from search results. */
+  let weaponImages = $state<Record<string, string | null>>({});
   let weaponSearching = $state(false);
   let weaponError = $state<string | null>(null);
   let weaponTimer: ReturnType<typeof setTimeout> | undefined;
@@ -303,6 +316,7 @@
   function addWeapon(item: ItemSearchResult) {
     if (content.weapons.some((w) => w.uniqueName === item.uniqueName)) return;
     content.weapons.push({ uniqueName: item.uniqueName, name: item.name, note: '' });
+    weaponImages[item.uniqueName] = item.image;
   }
 
   async function removeWeapon(i: number) {
@@ -336,7 +350,7 @@
           : await api.createBuild(slug, name, $state.snapshot(content));
       rememberTab(slug, build.id);
       saved = current;
-      leave(back);
+      leave(buildHref(slug, { kind: 'view', id: build.id }));
     } catch (e) {
       await showError(
         t('build.saveError', {
@@ -365,7 +379,7 @@
     deleting = true;
     try {
       await api.deleteBuild(sub.id);
-      leave(back);
+      leave(buildHref(slug)); // the build is gone: back to the list
     } catch (e) {
       confirmDelete = false;
       await showError(
@@ -397,6 +411,7 @@
           choices={(q) => arcaneChoices(options?.arcanes ?? [], usedArcanes(key), q)}
           detail={arcaneDetail}
           image={(a) => a.image}
+          imageFit="contain"
           onPick={(item) => pick(key, item)}
           onClose={() => closePicker(key)}
         />
@@ -412,8 +427,21 @@
         />
       {/if}
     {:else if slot}
+      {@const art = imageOf(key, slot)}
+      {#if kind !== 'arcane'}
+        <!-- The mod's art, as on the Builds page: what you enter is what you'll see. -->
+        <div class="art">
+          {#if art}<img
+              src={api.imageUrl(art)}
+              alt=""
+              width="256"
+              height="128"
+              loading="lazy"
+            />{/if}
+        </div>
+      {/if}
       <div class="chosen">
-        <ModPic image={imageOf(key, slot)} />
+        {#if kind === 'arcane'}<ModPic image={art} size={56} fit="contain" />{/if}
         <span class="chosen-name">{slot.name}</span>
         <label class="rank">
           <span class="sr-only">{t('build.rankLabel', { name: slot.name })}</span>
@@ -456,7 +484,9 @@
 <div class="page">
   <a class="back" href={back}>
     <span class="flip"><Icon name="chevron" size={12} /></span>
-    {t('build.backTo', { name: ownerName || slug })}
+    {sub.kind === 'edit' && savedName
+      ? t('build.backTo', { name: savedName })
+      : t('build.backToBuilds')}
   </a>
 
   {#if options}
@@ -553,16 +583,37 @@
         {#if content.shards.length === 0}<p class="hint">{t('build.shardNone')}</p>{/if}
         <ul class="list">
           {#each content.shards as shard, i (i)}
+            {@const color = colorOf(shard.stat)}
             <li class="shard-row">
-              <label>
+              <ShardPic {color} tauforged={shard.tauforged} size={52} />
+              <fieldset class="colors">
+                <legend class="sr-only"
+                  >{t('build.pickColor')} ({t('build.shardN', { n: i + 1 })})</legend
+                >
+                {#each groups as g (g.color)}
+                  <label
+                    class="color"
+                    class:on={g.color === color}
+                    title={t(`build.shardColor.${g.color}`)}
+                  >
+                    <input
+                      type="radio"
+                      name="shard-color-{i}"
+                      value={g.color}
+                      checked={g.color === color}
+                      onchange={() => (shard.stat = g.stats[0]!.key)}
+                    />
+                    <!-- The colours as plain shards; the big picture shows Tauforged. -->
+                    <ShardPic color={g.color} size={30} />
+                    <span class="sr-only">{t(`build.shardColor.${g.color}`)}</span>
+                  </label>
+                {/each}
+              </fieldset>
+              <label class="stat">
                 <span class="sr-only">{t('build.shardStat', { n: i + 1 })}</span>
                 <select bind:value={shard.stat}>
-                  {#each groups as g (g.color)}
-                    <optgroup label={t(`build.shardColor.${g.color}`)}>
-                      {#each g.stats as s (s.key)}
-                        <option value={s.key}>{shard.tauforged ? s.tauforged : s.normal}</option>
-                      {/each}
-                    </optgroup>
+                  {#each groups.find((g) => g.color === color)?.stats ?? [] as s (s.key)}
+                    <option value={s.key}>{shard.tauforged ? s.tauforged : s.normal}</option>
                   {/each}
                 </select>
               </label>
@@ -608,13 +659,21 @@
             label={t('build.chooseAbility')}
             choices={(q) => searchByName(options?.helminth ?? [], q)}
             detail={helminthDetail}
+            image={(h) => h.image}
+            imageFit="contain"
             onPick={pickHelminth}
             onClose={() => closePicker('helminth')}
           />
         {:else if content.helminth}
           {@const h = content.helminth}
           <div class="helminth">
-            <span class="chosen-name">{h.name}</span>
+            <span class="chosen-name with-pic"
+              ><ModPic
+                image={options.helminth.find((o) => o.uniqueName === h.uniqueName)?.image ?? null}
+                size={56}
+                fit="contain"
+              />{h.name}</span
+            >
             <label>
               <span>{t('build.helminthReplaces')}</span>
               <select bind:value={h.replacesKey}>
@@ -659,7 +718,13 @@
           <ul class="list">
             {#each content.weapons as w, i (w.uniqueName)}
               <li class="weapon-row">
-                <span class="chosen-name">{w.name}</span>
+                <span class="chosen-name with-pic"
+                  ><ModPic
+                    image={weaponImages[w.uniqueName] ?? null}
+                    size={48}
+                    fit="contain"
+                  />{w.name}</span
+                >
                 <label class="row-note">
                   <span class="sr-only">{t('build.noteLabel', { name: w.name })}</span>
                   <input
@@ -695,7 +760,9 @@
               {#each weaponResults as r (r.uniqueName)}
                 {@const added = content.weapons.some((w) => w.uniqueName === r.uniqueName)}
                 <li class="weapon-row">
-                  <span>{r.name}</span>
+                  <span class="with-pic"
+                    ><ModPic image={r.image} size={40} fit="contain" />{r.name}</span
+                  >
                   <button type="button" class="teal" disabled={added} onclick={() => addWeapon(r)}
                     >{t('build.weaponAddShort')}<span class="sr-only"> {r.name}</span></button
                   >
@@ -785,10 +852,29 @@
 </div>
 
 <style>
+  /* The same full column as the Builds page, so the mods can sit four to a row. */
   .page {
-    max-width: 56rem;
     display: grid;
     gap: 0.9rem;
+  }
+
+  /* A chosen mod's art: the Builds page's card band, at the top of its cell. */
+  .art {
+    height: 4.5rem;
+    margin: 0 -0.7rem;
+    background: var(--surface-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    overflow: hidden;
+  }
+
+  .art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
   }
 
   form {
@@ -876,7 +962,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1px;
     background: var(--line);
     border: 1px solid var(--line);
@@ -959,11 +1045,85 @@
     border-bottom: 0;
   }
 
+  .with-pic {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* Picture · colour pictures · stat · Tauforged / note · Remove */
   .shard-row {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) auto minmax(0, 1fr) auto;
+    grid-template-columns: auto auto minmax(12rem, 1fr) auto;
+    grid-template-areas:
+      'pic colors stat check'
+      'pic note note remove';
     align-items: center;
     gap: 0.5rem 0.7rem;
+  }
+
+  .shard-row > :global(.shard) {
+    grid-area: pic;
+  }
+
+  .shard-row .colors {
+    grid-area: colors;
+  }
+
+  .shard-row .stat {
+    grid-area: stat;
+  }
+
+  .shard-row .check {
+    grid-area: check;
+  }
+
+  .shard-row .row-note {
+    grid-area: note;
+  }
+
+  .shard-row > button {
+    grid-area: remove;
+  }
+
+  /* The six colours as their shard pictures: a radio group, the chosen one in gold. */
+  .colors {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .color {
+    position: relative;
+    display: grid;
+    padding: 2px;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .color:hover {
+    border-color: var(--line-strong);
+  }
+
+  .color.on {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+
+  .color input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .color:has(input:focus-visible) {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
   }
 
   .shard-row select {
@@ -1114,21 +1274,43 @@
     margin: 0;
   }
 
+  /* Aura + Exilus, and the two arcanes: a pair. */
+  .cells.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 64rem) {
+    .cells {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 36rem) {
     .fields,
-    .cells {
+    .cells,
+    .cells.two {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .shard-row,
     .weapon-row {
       grid-template-columns: minmax(0, 1fr) auto;
     }
 
-    .shard-row label:first-child,
-    .shard-row .row-note,
     .weapon-row .row-note {
       grid-column: 1 / -1;
+    }
+
+    .shard-row {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        'pic colors'
+        'stat stat'
+        'check remove'
+        'note note';
+    }
+
+    .shard-row > button {
+      justify-self: end;
     }
   }
 </style>

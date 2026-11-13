@@ -66,10 +66,10 @@
       </section>
     {:else if router.route === 'goals'}
       <Goals />
-    {:else if router.route === 'warframes' && router.param && router.sub}
+    {:else if router.route === 'warframes' && router.param && (router.sub?.kind === 'new' || router.sub?.kind === 'edit')}
       <BuildEdit slug={router.param} sub={router.sub} />
     {:else if router.route === 'warframes' && router.param}
-      <WarframePage slug={router.param} />
+      <WarframePage slug={router.param} sub={router.sub} />
     {:else if router.route === 'warframes'}
       <Warframes />
     {:else if router.route === 'inventory'}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-13T17:12:13Z",
+  "generatedAt": "2026-11-13T18:30:15Z",
   "title": "Design System: WarframeHub",
   "extensions": {
     "colorMeta": {
@@ -420,20 +420,6 @@
       "description": "Compact frame: label, large tabular countdown, local time with UTC.",
       "html": "<div class=\"ds-clock\"><span class=\"ds-clock-label\">Daily</span><span class=\"ds-clock-count\">8h 5m</span><span class=\"ds-clock-at\">Tue 21:00 · 00:00 UTC</span></div>",
       "css": ".ds-clock { --cut: 10px; position: relative; isolation: isolate; background: var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); padding: 0.65rem 0.9rem; display: grid; gap: 0.05rem; max-width: 12rem; color: var(--fg, #e6e9ef); font-family: var(--font-body, Inter, sans-serif); } .ds-clock::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--surface, #10151e); clip-path: inherit; } .ds-clock::after { content: ''; position: absolute; top: 0; left: 0; width: 2.5rem; height: 2px; background: var(--gold, #d6b465); } .ds-clock::after { display: none; } .ds-clock-label { font: 600 0.8rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted, #9ba7ba); } .ds-clock-count { font: 600 1.6rem/1.15 var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; } .ds-clock-at { font: 500 0.85rem var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; color: var(--muted, #9ba7ba); }"
-    },
-    {
-      "name": "Build Tabs",
-      "kind": "custom",
-      "description": "One tab per build in the segmented version-switch look; build names stay sentence case (user's words). Selected tab gold on a gold tint.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\" class=\"on\">Steel Path Peacemaker</button><button role=\"tab\" aria-selected=\"false\">Starter</button></div>",
-      "css": ".ds-tabs { display: flex; flex-wrap: wrap; } .ds-tabs button { font: 600 0.9rem var(--font-display, Rajdhani, sans-serif); letter-spacing: 0.03em; text-transform: none; color: var(--muted, #9ba7ba); background: transparent; border: 1px solid var(--line-strong, #5a6b88); border-radius: 0; margin: 0 0 -1px -1px; padding: 0.3rem 0.8rem; cursor: pointer; } .ds-tabs button:first-child { margin-left: 0; } .ds-tabs button:not(.on):hover { color: var(--fg, #e6e9ef); } .ds-tabs button.on { position: relative; z-index: 1; border-color: var(--gold, #d6b465); color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 12%, transparent); } .ds-tabs button:focus-visible { z-index: 2; outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; }"
-    },
-    {
-      "name": "Mod Tile",
-      "kind": "custom",
-      "description": "A cell in the seam grid (surface cells, 1px seam gaps): cut-corner Mod Pic, name, rank and polarity, effect; empty slots a step darker.",
-      "html": "<div class=\"ds-modgrid\"><div class=\"ds-tile\"><span class=\"ds-pic\"></span><b>Intensify</b><span class=\"ds-meta\">R5 · Madurai</span><span class=\"ds-meta\">+30% Ability Strength</span></div><div class=\"ds-tile ds-empty\"><span class=\"ds-meta\">Empty</span></div></div>",
-      "css": ".ds-modgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line, #2c3749); border: 1px solid var(--line, #2c3749); } .ds-tile { background: var(--surface, #10151e); padding: 0.6rem 0.7rem 0.7rem; display: grid; align-content: start; gap: 0.35rem; color: var(--fg, #e6e9ef); font: 400 0.9rem var(--font-body, Inter, sans-serif); } .ds-tile b { font-weight: 600; } .ds-empty { background: color-mix(in srgb, var(--surface, #10151e) 60%, var(--bg, #07090d)); } .ds-meta { color: var(--muted, #9ba7ba); font-size: 0.85rem; font-variant-numeric: tabular-nums; } .ds-pic { width: 2.75rem; height: 2.75rem; background: var(--surface-2, #171e2a); border: 1px solid var(--line-strong, #5a6b88); clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 0 100%); }"
     }
   ],
   "narrative": {

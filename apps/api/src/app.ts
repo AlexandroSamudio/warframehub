@@ -1,4 +1,4 @@
-import { HealthResponse, type ApiError } from '@warframehub/shared';
+import { HealthResponse, SHARD_IMAGES, type ApiError } from '@warframehub/shared';
 import { join } from 'node:path';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
@@ -12,7 +12,8 @@ import { registerGoalRoutes } from './routes/goals.js';
 import { registerProfileRoutes } from './routes/profile.js';
 import { registerWarframeRoutes } from './routes/warframes.js';
 import { ItemCatalog } from './sources/items.js';
-import { ImageCache } from './sources/images.js';
+import { ImageCache, WIKI_FILES } from './sources/images.js';
+import { POLARITY_FILES } from './routes/warframes.js';
 import { ProfileService } from './sources/profile.js';
 import { WarframeCatalog } from './sources/warframes.js';
 import { registerSystemRoutes } from './routes/system.js';
@@ -21,6 +22,10 @@ import { registerWebApp } from './routes/web.js';
 import { registerWorldstateRoutes } from './routes/worldstate.js';
 import { WorldstateService } from './sources/worldstate.js';
 import { APP_VERSION } from './version.js';
+
+const SHARD_IMAGE_NAMES = new Set(
+  Object.values(SHARD_IMAGES).flatMap((s) => [s.normal, s.tauforged]),
+);
 
 export interface AppOptions {
   db: Db;
@@ -39,6 +44,8 @@ export interface AppOptions {
   warframes?: WarframeCatalog;
   /** DE images, cached in the data folder. Created with defaults if not given. */
   images?: ImageCache;
+  /** The polarity symbols from the Warframe wiki, cached the same way. */
+  polarities?: ImageCache;
   /** DE public profile import. Created with defaults if not given. */
   profile?: ProfileService;
   /** The default checklist, for "Restore defaults". Read from disk when not given. */
@@ -134,17 +141,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   });
   registerWorldstateRoutes(app, { worldstate, now });
 
-  registerGoalRoutes(app, {
-    db: options.db,
-    userId: options.userId,
-    now,
-    items:
-      options.items ??
-      new ItemCatalog(options.db, {
-        now,
-        onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
-      }),
-  });
+  const items =
+    options.items ??
+    new ItemCatalog(options.db, {
+      now,
+      onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
+    });
+  registerGoalRoutes(app, { db: options.db, userId: options.userId, now, items });
 
   const warframes =
     options.warframes ??
@@ -160,8 +163,20 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       options.images ??
       new ImageCache({
         ...(options.dataDir ? { dir: join(options.dataDir, 'images') } : {}),
-        allowed: (name) => warframes.cachedImageNames().has(name),
+        // Only names the cached data mentions: Warframes, mods, arcanes, shards, weapons.
+        allowed: (name) =>
+          warframes.cachedImageNames().has(name) ||
+          SHARD_IMAGE_NAMES.has(name) ||
+          items.knowsImage(name),
         onError: (name, error) => app.log.warn({ name, err: error }, 'image fetch failed'),
+      }),
+    polarities:
+      options.polarities ??
+      new ImageCache({
+        ...(options.dataDir ? { dir: join(options.dataDir, 'images') } : {}),
+        base: WIKI_FILES,
+        allowed: (name) => POLARITY_FILES.has(name),
+        onError: (name, error) => app.log.warn({ name, err: error }, 'polarity fetch failed'),
       }),
   });
   registerBuildRoutes(app, { db: options.db, userId: options.userId, now, catalog: warframes });

@@ -27,19 +27,40 @@ export function paramFromHash(hash: string): string | null {
   return decodeURIComponent(second).toLowerCase().slice(0, 60);
 }
 
-/** A build page under a Warframe: `#/warframes/mesa/builds/new` or `…/builds/12`. */
-export type BuildSub = { kind: 'new' } | { kind: 'edit'; id: number };
+/**
+ * The Builds part of a Warframe (SPEC §14.1):
+ * - `#/warframes/mesa/builds`: the Builds page (the remembered build open);
+ * - `…/builds/12`: that build open;
+ * - `…/builds/new`, `…/builds/12/edit`: the edit page.
+ */
+export type BuildSub =
+  { kind: 'list' } | { kind: 'view'; id: number } | { kind: 'new' } | { kind: 'edit'; id: number };
+
+const ID = /^[1-9]\d{0,8}$/;
 
 export function subFromHash(hash: string): BuildSub | null {
-  const [first, second, third, fourth] = segments(hash);
-  if (first !== 'warframes' || !second || third !== 'builds' || !fourth) return null;
-  if (fourth === 'new') return { kind: 'new' };
-  return /^[1-9]\d{0,8}$/.test(fourth) ? { kind: 'edit', id: Number(fourth) } : null;
+  const [first, second, third, fourth, fifth] = segments(hash);
+  if (first !== 'warframes' || !second || third !== 'builds') return null;
+  if (!fourth) return { kind: 'list' };
+  if (fourth === 'new') return fifth ? null : { kind: 'new' };
+  if (!ID.test(fourth)) return null;
+  if (!fifth) return { kind: 'view', id: Number(fourth) };
+  return fifth === 'edit' ? { kind: 'edit', id: Number(fourth) } : null;
 }
 
-/** The address of a Warframe's new-build page, or of one build's edit page. */
-export function buildHref(slug: string, id?: number): string {
-  return `#/warframes/${slug}/builds/${id ?? 'new'}`;
+/** The address of a Warframe's Builds page, one build, or its edit page. */
+export function buildHref(slug: string, sub: BuildSub = { kind: 'list' }): string {
+  const base = `#/warframes/${slug}/builds`;
+  switch (sub.kind) {
+    case 'list':
+      return base;
+    case 'new':
+      return `${base}/new`;
+    case 'view':
+      return `${base}/${sub.id}`;
+    case 'edit':
+      return `${base}/${sub.id}/edit`;
+  }
 }
 
 export function hrefFor(route: Route, param?: string): string {

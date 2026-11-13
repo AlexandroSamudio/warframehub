@@ -7,7 +7,7 @@ import type {
   RecipeComponent,
   RecipePart,
 } from '@warframehub/shared';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, like } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
 import { itemCache } from '../db/schema.js';
@@ -56,6 +56,7 @@ const RawItem = z.looseObject({
   buildPrice: z.int().min(0).optional(),
   consumeOnBuild: z.boolean().optional(),
   buildTime: z.int().min(0).optional(),
+  imageName: z.string().optional(),
   components: z.array(RawComponent).default([]),
 });
 type RawItem = z.infer<typeof RawItem>;
@@ -132,6 +133,7 @@ export function normaliseItem(raw: unknown): ItemRecipe | null {
     blueprintReusable: item.consumeOnBuild === false,
     parts: parts.sort(byGameOrder),
     resources: resources.sort(byGameOrder),
+    image: item.imageName ?? null,
   };
 }
 
@@ -155,6 +157,7 @@ export function toSearchResult(r: ItemRecipe): ItemSearchResult {
     type: r.type,
     isPrime: r.isPrime,
     vaulted: r.vaulted,
+    image: r.image,
   };
 }
 
@@ -242,6 +245,22 @@ export class ItemCatalog {
     }
     const { uniqueNames } = JSON.parse(this.row(`search:${query}`)!.payloadJson) as CachedSearch;
     return uniqueNames.includes(uniqueName) ? this.get(uniqueName) : null;
+  }
+
+  /**
+   * Is this picture named by an item the app has seen (a weapon picked for a build)? For
+   * the image allowlist: only names the cached data mentions are ever downloaded.
+   */
+  knowsImage(name: string): boolean {
+    if (!/^[\w.-]+$/.test(name)) return false;
+    const needle = `%"imageName":"${name}"%`;
+    return (
+      this.db
+        .select({ key: itemCache.key })
+        .from(itemCache)
+        .where(and(like(itemCache.key, 'item:%'), like(itemCache.payloadJson, needle)))
+        .get() !== undefined
+    );
   }
 
   /** A cached recipe, or null if this item was never seen in a search. */
