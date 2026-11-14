@@ -129,7 +129,7 @@
         {/if}
       </div>
     </div>
-  {:else if !p.craft && category === 'warframe' && p.name !== 'Blueprint' && !done}
+  {:else if !p.craft && category === 'warframe' && !p.key.endsWith('Blueprint') && !done}
     <p class="craft-none">{t('part.craftMissing')}</p>
   {/if}
 

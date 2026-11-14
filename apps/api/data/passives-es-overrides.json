@@ -1,0 +1,11 @@
+{
+  "/Lotus/Powersuits/SiriusOrion/SiriusSuit": "Alternar entre ellos otorga un 45 % de eficiencia de habilidad para los 2 siguientes lanzamientos. Cuando la energía está por debajo de 50, Sirius & Orion se robarán energía mutuamente.",
+  "/Lotus/Powersuits/SiriusOrion/OrionSuit": "Alternar entre ellos otorga un 45 % de eficiencia de habilidad para los 2 siguientes lanzamientos. Cuando la energía está por debajo de 50, Sirius & Orion se robarán energía mutuamente.",
+  "/Lotus/Powersuits/Sentient/Sentient": "Los aliados dentro del rango de afinidad obtienen resistencia a los tipos de daño que están recibiendo actualmente.",
+  "/Lotus/Powersuits/Sentient/CalibanPrime": "Los aliados dentro del rango de afinidad obtienen resistencia a los tipos de daño que están recibiendo actualmente.",
+  "/Lotus/Powersuits/Paladin/Paladin": "Oberon se otorga Negación justa a sí mismo y a sus aliados dentro del rango de afinidad al recoger orbes de salud, protegiendo a los jugadores del siguiente daño. Se acumula hasta 3 veces.",
+  "/Lotus/Powersuits/Paladin/PaladinPrime": "Oberon se otorga Negación justa a sí mismo y a sus aliados dentro del rango de afinidad al recoger orbes de salud, protegiendo a los jugadores del siguiente daño. Se acumula hasta 3 veces.",
+  "/Lotus/Powersuits/Duelist/Duelist": "Cada acumulación de efecto de estado de frío en los enemigos aumenta la probabilidad de que aparezca un hallazgo de Sangodae en un 1 %, otorgando daño extra de frío en armas primarias y secundarias durante 10 s. Narin también obtiene daño de frío para sus habilidades.",
+  "/Lotus/Powersuits/Banshee/Banshee": "Banshee perfora los oídos de los enemigos en un radio de 20 m al usar habilidades, aplicando el efecto de estado de perforación máximo. Además, el ruido del arma de Banshee es silencioso.",
+  "/Lotus/Powersuits/Banshee/BansheePrime": "Banshee perfora los oídos de los enemigos en un radio de 20 m al usar habilidades, aplicando el efecto de estado de perforación máximo. Además, el ruido del arma de Banshee es silencioso."
+}

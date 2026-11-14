@@ -88,6 +88,26 @@ describe('goals', () => {
     expect(ctx.api.state.calls).toHaveLength(2); // just the one search (Warframes + weapons)
   });
 
+  it("speaks the game's Spanish and finds items by their Spanish name", async () => {
+    await call(ctx, 'PATCH', '/api/settings', { language: 'es' });
+    // warframestat.us only knows English names: "braton vándalo" is also searched as
+    // "Braton Vandal" (the Boar fixture stands in for its answer).
+    ctx.api.state.override.set('weapons/braton vandal', itemsFixture('weapons_search_boar'));
+    const search = ItemSearchResponse.parse(
+      (await call(ctx, 'GET', '/api/goals/search?q=braton%20v%C3%A1ndalo')).json(),
+    );
+    expect(ctx.api.state.calls).toContain('/weapons/search/braton%20vandal');
+    expect(search.results.map((r) => r.name)).toContain('Boar');
+
+    const g = await add(ctx, 'nidus', 'Nidus Prime');
+    expect(g.parts.map((p) => p.name)).toEqual(['Plano', 'Chasis', 'Neurópticas', 'Sistemas']);
+    expect(g.resources.map((r) => r.name)).toContain('Célula orokin');
+    expect(g.resources.map((r) => r.name)).toContain('Créditos');
+    expect(part(g, 'Chasis').drops[0]!.relic).toBe(true);
+    const list = await goals(ctx);
+    expect(list.shoppingList.map((r) => r.name)).toContain('Célula orokin');
+  });
+
   it('refuses unknown items and active duplicates', async () => {
     const unknown = await call(ctx, 'POST', '/api/goals', { uniqueName: '/Lotus/Nope' });
     expect(unknown.statusCode).toBe(404);

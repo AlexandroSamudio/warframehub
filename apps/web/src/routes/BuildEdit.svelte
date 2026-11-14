@@ -3,6 +3,7 @@
     MAX_BUILD_WEAPONS,
     SHARD_SLOTS,
     shardStat,
+    shardText,
     type ShardColor,
     type ArcaneOption,
     type BuildContent,
@@ -27,7 +28,7 @@
     shardGroups,
     type SlotKind,
   } from '../lib/builds.ts';
-  import { t } from '../lib/i18n/index.ts';
+  import { language, t } from '../lib/i18n/index.ts';
   import { buildHref, leave, setLeaveGuard, type BuildSub } from '../lib/route.svelte.ts';
   import { polarityName } from '../lib/warframes.ts';
   import { tick } from 'svelte';
@@ -629,7 +630,7 @@
                 <span class="sr-only">{t('build.shardStat', { n: i + 1 })}</span>
                 <select bind:value={shard.stat}>
                   {#each groups.find((g) => g.color === color)?.stats ?? [] as s (s.key)}
-                    <option value={s.key}>{shard.tauforged ? s.tauforged : s.normal}</option>
+                    <option value={s.key}>{shardText(s, shard.tauforged, language.current)}</option>
                   {/each}
                 </select>
               </label>

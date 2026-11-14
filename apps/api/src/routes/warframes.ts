@@ -2,7 +2,9 @@ import { POLARITY_SYMBOLS, WarframeDetail, WarframesResponse } from '@warframehu
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
+import { userLanguage } from '../db/tracker.js';
 import { warframeDetail, warframeList } from '../db/warframes.js';
+import type { GameNames } from '../game-names.js';
 import type { ImageCache } from '../sources/images.js';
 import type { WarframeCatalog } from '../sources/warframes.js';
 
@@ -10,6 +12,7 @@ export interface WarframeRouteDeps {
   db: Db;
   userId: number;
   catalog: WarframeCatalog;
+  names: GameNames;
   images: ImageCache;
   polarities: ImageCache;
 }
@@ -27,13 +30,14 @@ const FileParams = z.object({ file: z.string().max(120) });
 
 /** The Warframes section (SPEC §14), and the local image cache it uses. */
 export function registerWarframeRoutes(app: FastifyInstance, deps: WarframeRouteDeps): void {
-  const { db, userId, catalog, images, polarities } = deps;
+  const { db, userId, catalog, names, images, polarities } = deps;
+  const lang = () => userLanguage(db, userId);
 
   app.get('/api/warframes', async (): Promise<WarframesResponse> => {
     const state = await catalog.state();
     const { groups } = catalog.groups(state);
     return WarframesResponse.parse(
-      warframeList(db, userId, state, groups, catalog.nextRefreshAt()),
+      names.warframes(warframeList(db, userId, state, groups, catalog.nextRefreshAt()), lang()),
     );
   });
 
@@ -42,7 +46,11 @@ export function registerWarframeRoutes(app: FastifyInstance, deps: WarframeRoute
     const state = await catalog.state();
     const { groups } = catalog.groups(state);
     return WarframeDetail.parse(
-      warframeDetail(db, userId, state, groups, slug, catalog.nextRefreshAt()),
+      names.warframe(
+        warframeDetail(db, userId, state, groups, slug, catalog.nextRefreshAt()),
+        lang(),
+        state.mods,
+      ),
     );
   });
 
@@ -51,7 +59,7 @@ export function registerWarframeRoutes(app: FastifyInstance, deps: WarframeRoute
     const state = await catalog.refresh();
     const { groups } = catalog.groups(state);
     return WarframesResponse.parse(
-      warframeList(db, userId, state, groups, catalog.nextRefreshAt()),
+      names.warframes(warframeList(db, userId, state, groups, catalog.nextRefreshAt()), lang()),
     );
   });
 

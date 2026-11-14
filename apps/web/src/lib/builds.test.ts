@@ -141,3 +141,17 @@ describe('remembered tab', () => {
     expect(rememberedTab('mesa')).toBeNull();
   });
 });
+
+describe('search in both languages', () => {
+  it('finds a Spanish-named mod by its English name too', () => {
+    const mods = [
+      mod('Intensificación', { alias: 'Intensify' }),
+      mod('Flujo', { alias: 'Flow' }),
+      mod('Flujo primordial', { alias: 'Primed Flow' }),
+    ];
+    const names = (q: string) => modChoices(mods, 'slot', new Set(), q).map((m) => m.name);
+    expect(names('intens')).toEqual(['Intensificación']);
+    expect(names('flujo')).toEqual(['Flujo', 'Flujo primordial']);
+    expect(names('flow')).toEqual(['Flujo', 'Flujo primordial']);
+  });
+});

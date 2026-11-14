@@ -24,17 +24,21 @@ export function fitsSlot(mod: ModOption, kind: SlotKind): boolean {
 /**
  * Names starting with the query first ("flow" → Flow, Primed Flow), then names containing
  * it, then items whose effect mentions it ("strength" → Intensify, Transient Fortitude…).
+ * The English name (`alias`) counts as a name, so "intensify" finds "Intensificación".
  */
-function byQuery<T extends { name: string; effects?: string[] }>(items: T[], query: string): T[] {
+function byQuery<T extends { name: string; alias?: string | null; effects?: string[] }>(
+  items: T[],
+  query: string,
+): T[] {
   const q = query.trim().toLowerCase();
   if (q === '') return items;
   const starts: T[] = [];
   const contains: T[] = [];
   const effect: T[] = [];
   for (const item of items) {
-    const name = item.name.toLowerCase();
-    if (name.startsWith(q)) starts.push(item);
-    else if (name.includes(q)) contains.push(item);
+    const names = [item.name, item.alias ?? ''].map((n) => n.toLowerCase());
+    if (names.some((n) => n.startsWith(q))) starts.push(item);
+    else if (names.some((n) => n !== '' && n.includes(q))) contains.push(item);
     else if (item.effects?.at(-1)?.toLowerCase().includes(q)) effect.push(item);
   }
   return [...starts, ...contains, ...effect];

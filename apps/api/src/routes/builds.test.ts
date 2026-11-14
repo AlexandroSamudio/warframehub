@@ -212,6 +212,33 @@ describe('builds', () => {
     expect(options.helminth.some((h) => h.uniqueName === PEACEMAKER)).toBe(false); // her own
   });
 
+  it("shows builds and choices in the game's Spanish, with English names kept for search", async () => {
+    await create(ctx, mesaBuild());
+    await ctx.call('PATCH', '/api/settings', { language: 'es' });
+    const options = BuildOptionsResponse.parse(
+      (await ctx.call('GET', '/api/builds/options?slug=mesa')).json(),
+    );
+    expect(options.abilities[3]!.name).toBe('Pacificadora');
+    const intensify = options.mods.find((m) => m.uniqueName === INTENSIFY)!;
+    expect(intensify).toMatchObject({ name: 'Intensificación', alias: 'Intensify' });
+    expect(intensify.effects.at(-1)).toContain('Fuerza de habilidad');
+    expect(options.helminth.find((h) => h.uniqueName === LARVA)).toMatchObject({
+      name: 'Larva',
+      from: 'Nidus',
+    });
+
+    const [view] = (await detail(ctx, 'mesa')).builds;
+    expect(view!.slots[0]).toMatchObject({
+      name: 'Intensificación',
+      effect: '+30% Fuerza de habilidad',
+    });
+    expect(view!.arcanes[0]!.name).toBe('Energizar Arcano');
+    expect(view!.shards[0]!.text).toBe('+15 % de fuerza de habilidad');
+    // The edit page reads the content: same names, though the build was saved in English.
+    expect(view!.content.slots[0]!.name).toBe('Intensificación');
+    expect(view!.content.arcanes[0]!.name).toBe('Energizar Arcano');
+  });
+
   it('refuses what the game would not allow', async () => {
     const cases: [Partial<BuildContent>, string][] = [
       [{ aura: slot(INTENSIFY, 'Intensify', 5) }, "isn't an aura mod"],

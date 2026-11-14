@@ -145,6 +145,7 @@ describe('Warframes routes', () => {
   });
 
   it('gives a page with abilities, stats, augments and the goal recipe', async () => {
+    await ctx.app.inject({ method: 'PATCH', url: '/api/settings', payload: { language: 'en' } });
     const d = WarframeDetail.parse((await ctx.get('/api/warframes/nidus')).json());
     const [nidus, prime] = d.variants;
     expect(nidus!.abilities.map((a) => [a.key, a.name])).toEqual([
@@ -166,6 +167,43 @@ describe('Warframes routes', () => {
     expect(d.augments.map((a) => a.name)).toContain('Larva Burst');
     expect(nidus!.goal).toBeNull();
     expect((await ctx.get('/api/warframes/nope')).statusCode).toBe(404);
+  });
+
+  it("speaks the game's Spanish by default: abilities, parts, augments, drops", async () => {
+    const d = WarframeDetail.parse((await ctx.get('/api/warframes/nidus')).json());
+    const [nidus, prime] = d.variants;
+    expect(nidus!.abilities.map((a) => a.name)).toEqual([
+      'Virulencia',
+      'Larva',
+      'Enlace parasitario',
+      'Voracidad',
+    ]);
+    expect(nidus!.description).not.toBe('');
+    expect(nidus!.recipe?.parts.map((p) => p.name)).toEqual([
+      'Plano',
+      'Chasis',
+      'Neurópticas',
+      'Sistemas',
+    ]);
+    expect(nidus!.recipe?.parts[1]!.drops[0]?.location).toMatch(
+      /^Eris\/Oestrus \(Salvamento infestado\), Rotación [ABC]$/,
+    );
+    // Relic drops stay as the data words them: the web groups them and labels refinements.
+    expect(prime!.recipe?.parts[1]!.drops[0]?.location).toMatch(/^\w+ \w+ Relic \(Radiant\)$/);
+    expect(nidus!.abilities[0]!.numbers!.costType).toBe('energía');
+    expect(d.augments.map((a) => a.name)).not.toContain('Larva Burst');
+    expect(d.augmentShops.length).toBeGreaterThan(0);
+    for (const shop of d.augmentShops) {
+      expect([
+        'Árbitros de Hexis',
+        'Céfalon Suda',
+        'Nuevo Loka',
+        'Velo Rojo',
+        'Meridiano de Acero',
+        'La Secuencia Perrin',
+      ]).toContain(shop);
+    }
+    expect(nidus!.abilities[0]!.numbers!.range).toEqual(['10 / 11 / 13 / 16 m']);
   });
 
   it('adds the wiki numbers, passive, augment shops and rank-30 stats', async () => {

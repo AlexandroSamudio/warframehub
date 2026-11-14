@@ -26,6 +26,8 @@ import {
   setStock,
   undoLast,
 } from '../db/goals.js';
+import { userLanguage } from '../db/tracker.js';
+import type { GameNames } from '../game-names.js';
 import type { ItemCatalog } from '../sources/items.js';
 
 export interface GoalRouteDeps {
@@ -33,6 +35,7 @@ export interface GoalRouteDeps {
   userId: number;
   now: () => Date;
   items: ItemCatalog;
+  names: GameNames;
 }
 
 const SearchQuery = z.object({ q: z.string().max(80).default('') });
@@ -40,13 +43,30 @@ const IdParams = z.object({ id: z.coerce.number().int().positive() });
 
 /** Goal planner routes (SPEC §13). Every change answers with the full `GoalsResponse`. */
 export function registerGoalRoutes(app: FastifyInstance, deps: GoalRouteDeps): void {
-  const { db, userId, now, items } = deps;
-  const current = (): GoalsResponse => GoalsResponse.parse(loadGoals(db, userId, now()));
+  const { db, userId, now, items, names } = deps;
+  const current = (): GoalsResponse =>
+    GoalsResponse.parse(names.goals(loadGoals(db, userId, now()), userLanguage(db, userId)));
 
-  /** Warframes and weapons matching `q`, from warframestat.us (cached for a day). */
+  /**
+   * Warframes and weapons matching `q`, from warframestat.us (cached for a day). Spanish
+   * names match too: "espada de plasma" also searches for "Plasma Sword" (SPEC §8.3).
+   */
   app.get('/api/goals/search', async (request): Promise<ItemSearchResponse> => {
     const { q } = SearchQuery.parse(request.query);
-    return ItemSearchResponse.parse(await items.search(q));
+    const lang = userLanguage(db, userId);
+    const first = await items.search(q);
+    const extra = await Promise.all(
+      names.englishFor(q).map((en) => items.search(en).catch(() => null)),
+    );
+    const seen = new Set(first.results.map((r) => r.uniqueName));
+    const more = extra
+      .flatMap((r) => r?.results ?? [])
+      .filter((r) => !seen.has(r.uniqueName) && seen.add(r.uniqueName));
+    const results = more.length > 0 ? [...first.results, ...more] : first.results;
+    return ItemSearchResponse.parse({
+      ...first,
+      results: names.searchResults(results, lang),
+    });
   });
 
   app.get('/api/goals', async () => current());

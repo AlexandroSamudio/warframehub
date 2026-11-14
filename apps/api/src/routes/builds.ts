@@ -22,6 +22,8 @@ import {
   updateBuild,
 } from '../db/builds.js';
 import type { Db } from '../db/client.js';
+import { userLanguage } from '../db/tracker.js';
+import type { GameNames } from '../game-names.js';
 import { HttpError } from '../http-error.js';
 import { buildsVariant, helminthOptions } from '../sources/build-data.js';
 import { abilitiesOf, type WarframeCatalog } from '../sources/warframes.js';
@@ -31,6 +33,7 @@ export interface BuildRouteDeps {
   userId: number;
   now: () => Date;
   catalog: WarframeCatalog;
+  names: GameNames;
 }
 
 const Slug = z.string().regex(/^[a-z0-9-]{1,40}$/);
@@ -38,7 +41,8 @@ const IdParams = z.object({ id: z.coerce.number().int().positive() });
 
 /** Builds (SPEC §14.1). Shown on `GET /api/warframes/:slug`; saved and changed here. */
 export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps): void {
-  const { db, userId, now, catalog } = deps;
+  const { db, userId, now, catalog, names } = deps;
+  const lang = () => userLanguage(db, userId);
 
   /** The catalog, this Warframe's group and what its builds may hold. */
   async function rulesFor(slug: string) {
@@ -55,14 +59,21 @@ export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps):
     const { state, group, helminth } = await rulesFor(slug);
     const owner = buildsVariant(group);
     const own = new Set(group.variants.flatMap((v) => v.raw.abilities.map((a) => a.uniqueName)));
-    return BuildOptionsResponse.parse({
-      slug,
-      buildsVariant: owner.raw.name,
-      abilities: abilitiesOf(owner.raw).map((a) => ({ key: a.key, name: a.name })),
-      mods: state.mods.filter((m) => augmentFits(m, group)),
-      arcanes: state.arcanes,
-      helminth: helminth.filter((h) => !own.has(h.uniqueName)),
-    });
+    const abilities = abilitiesOf(owner.raw);
+    return BuildOptionsResponse.parse(
+      names.buildOptions(
+        {
+          slug,
+          buildsVariant: owner.raw.name,
+          abilities: abilities.map((a) => ({ key: a.key, name: a.name })),
+          mods: state.mods.filter((m) => augmentFits(m, group)),
+          arcanes: state.arcanes,
+          helminth: helminth.filter((h) => !own.has(h.uniqueName)),
+        },
+        lang(),
+        abilities.map((a) => a.uniqueName),
+      ),
+    );
   });
 
   /** One build with its pictures and effects (the edit page shows them too). */
@@ -70,7 +81,9 @@ export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps):
     const { id } = IdParams.parse(request.params);
     const saved = getBuild(db, userId, id);
     const { state, group, helminth } = await rulesFor(saved.slug);
-    return BuildView.parse(resolveBuild(db, saved, buildRules(state, group, helminth)));
+    return BuildView.parse(
+      names.build(resolveBuild(db, saved, buildRules(state, group, helminth)), lang()),
+    );
   });
 
   app.post('/api/builds', async (request, reply) => {

@@ -13,6 +13,7 @@ import type { LiveTimes } from './db/tracker.js';
 import { HttpError } from './http-error.js';
 import { isServerMessageKey, message, type ServerMessageKey } from './i18n.js';
 import { userLanguage } from './db/tracker.js';
+import { GameNames } from './game-names.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerBuildRoutes } from './routes/builds.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
@@ -62,6 +63,8 @@ export interface AppOptions {
   liveTimes?: () => LiveTimes | Promise<LiveTimes>;
   /** Built web app to serve on the same port (SPEC §3.2). Skipped if missing. */
   webRoot?: string;
+  /** The game's Spanish names (names-es.json). Read from disk when not given. */
+  gameNames?: GameNames;
   /** Called on every request, for idle shutdown (SPEC §9.2). */
   onActivity?: () => void;
   /** Minutes without a page before the server stops (shown in Settings). 0 = never. */
@@ -178,7 +181,8 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       now,
       onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
     });
-  registerGoalRoutes(app, { db: options.db, userId: options.userId, now, items });
+  const names = options.gameNames ?? GameNames.load();
+  registerGoalRoutes(app, { db: options.db, userId: options.userId, now, items, names });
 
   const warframes =
     options.warframes ??
@@ -190,6 +194,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     db: options.db,
     userId: options.userId,
     catalog: warframes,
+    names,
     images:
       options.images ??
       new ImageCache({
@@ -210,7 +215,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         onError: (name, error) => app.log.warn({ name, err: error }, 'polarity fetch failed'),
       }),
   });
-  registerBuildRoutes(app, { db: options.db, userId: options.userId, now, catalog: warframes });
+  registerBuildRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    now,
+    catalog: warframes,
+    names,
+  });
 
   registerProfileRoutes(
     app,
