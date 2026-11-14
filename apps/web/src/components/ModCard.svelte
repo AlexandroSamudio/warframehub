@@ -113,17 +113,20 @@
     padding: 0.55rem 0.7rem 0.75rem;
   }
 
+  /*
+   * The rank always sits under the name, the same spot on every card, so the grid reads
+   * at a glance and long Spanish names keep the full width to stay whole words.
+   */
   .title {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
+    display: grid;
+    gap: 0.1rem;
   }
 
   .name {
     font-weight: 600;
     line-height: 1.25;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .rank {

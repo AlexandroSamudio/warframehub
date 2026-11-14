@@ -291,7 +291,34 @@ function weaponImage(db: Db, uniqueName: string): string | null {
   }
 }
 
+/**
+ * Copies the names shown into the build's own content, so the edit page names each mod,
+ * arcane, weapon and Helminth ability like the build page does (in the user's language),
+ * whatever language it was saved in.
+ */
+export function withContentNames(view: BuildView): BuildView {
+  const named = <T extends { name: string }>(saved: T | null, shown: { name: string } | null) =>
+    saved && shown ? { ...saved, name: shown.name } : saved;
+  const c = view.content;
+  return {
+    ...view,
+    content: {
+      ...c,
+      aura: named(c.aura, view.aura),
+      exilus: named(c.exilus, view.exilus),
+      slots: c.slots.map((s, i) => named(s, view.slots[i] ?? null)),
+      arcanes: c.arcanes.map((s, i) => named(s, view.arcanes[i] ?? null)),
+      helminth: named(c.helminth, view.helminth),
+      weapons: c.weapons.map((w, i) => named(w, view.weapons[i] ?? null)!),
+    },
+  };
+}
+
 export function resolveBuild(db: Db, build: Build, rules: BuildRules): BuildView {
+  return withContentNames(resolveParts(db, build, rules));
+}
+
+function resolveParts(db: Db, build: Build, rules: BuildRules): BuildView {
   const c = build.content;
   const mod = (s: BuildSlot | null) => resolveSlot(s, s ? rules.mods.get(s.uniqueName) : undefined);
   const arcane = (s: BuildSlot | null) =>
@@ -316,6 +343,7 @@ export function resolveBuild(db: Db, build: Build, rules: BuildRules): BuildView
     helminth: h
       ? {
           ...h,
+          name: rules.helminth.get(h.uniqueName)?.name ?? h.name,
           image: rules.helminth.get(h.uniqueName)?.image ?? null,
           from: rules.helminth.get(h.uniqueName)?.from ?? null,
           page: abilityStats(h.uniqueName)?.page ?? null,

@@ -158,6 +158,7 @@ export const en = {
   'nav.settings': 'Settings',
 
   'goals.title': 'Goals',
+  'goals.credits': 'Credits',
   'goals.loading': 'Loading your goals…',
   'goals.loadError': "Can't load your goals. Is WarframeHub still running?",
   'goals.saveError': "Couldn't save that change: {message}",
@@ -275,7 +276,7 @@ export const en = {
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.languageHint':
-    'Changes the whole app, including its messages. Item, mod and ability names and the default checklist are still in English for now.',
+    'Changes the whole app, including its messages and the game names (as the game itself words them). The default checklist and the live rotations are still in English for now.',
   'settings.languageError': "Couldn't save the language: {message}",
   'settings.timeZone': 'Display time zone',
   'settings.timeZoneHint':

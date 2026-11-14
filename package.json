@@ -25,7 +25,8 @@
     "install-launcher": "node scripts/install-launcher.mjs",
     "update-part-recipes": "tsx --conditions=source scripts/update-part-recipes.ts",
     "update-part-sources": "tsx --conditions=source scripts/update-part-sources.ts",
-    "update-ability-stats": "tsx --conditions=source scripts/update-ability-stats.ts"
+    "update-ability-stats": "tsx --conditions=source scripts/update-ability-stats.ts",
+    "update-names": "tsx --conditions=source scripts/update-names.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

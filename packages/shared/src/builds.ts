@@ -175,6 +175,123 @@ export const SHARD_STATS: readonly ShardStat[] = [
   },
 ];
 
+/**
+ * The shard stats in Spanish. DE's export has no shard texts, so these are our own
+ * translation (docs/GLOSSARY-es.md), worded with the export's mod terms.
+ */
+export const SHARD_STATS_ES: Record<string, { normal: string; tauforged: string }> = {
+  'crimson.melee_crit_damage': {
+    normal: '+25 % de daño crítico cuerpo a cuerpo',
+    tauforged: '+37.5 % de daño crítico cuerpo a cuerpo',
+  },
+  'crimson.primary_status_chance': {
+    normal: '+25 % de probabilidad de estado de arma primaria',
+    tauforged: '+37.5 % de probabilidad de estado de arma primaria',
+  },
+  'crimson.secondary_crit_chance': {
+    normal: '+25 % de probabilidad crítica de arma secundaria',
+    tauforged: '+37.5 % de probabilidad crítica de arma secundaria',
+  },
+  'crimson.ability_strength': {
+    normal: '+10 % de fuerza de habilidad',
+    tauforged: '+15 % de fuerza de habilidad',
+  },
+  'crimson.ability_duration': {
+    normal: '+10 % de duración de habilidad',
+    tauforged: '+15 % de duración de habilidad',
+  },
+  'amber.energy_on_spawn': {
+    normal: '+30 % de energía máxima al aparecer',
+    tauforged: '+45 % de energía máxima al aparecer',
+  },
+  'amber.health_orbs': {
+    normal: '+100 % de efectividad de los orbes de salud',
+    tauforged: '+150 % de efectividad de los orbes de salud',
+  },
+  'amber.energy_orbs': {
+    normal: '+50 % de efectividad de los orbes de energía',
+    tauforged: '+75 % de efectividad de los orbes de energía',
+  },
+  'amber.casting_speed': {
+    normal: '+25 % de velocidad de lanzamiento',
+    tauforged: '+37.5 % de velocidad de lanzamiento',
+  },
+  'amber.parkour_velocity': {
+    normal: '+15 % de velocidad de parkour',
+    tauforged: '+22.5 % de velocidad de parkour',
+  },
+  'azure.health': { normal: '+150 de salud máxima', tauforged: '+225 de salud máxima' },
+  'azure.shield': {
+    normal: '+150 de capacidad de escudo',
+    tauforged: '+225 de capacidad de escudo',
+  },
+  'azure.energy': { normal: '+50 de energía máxima', tauforged: '+75 de energía máxima' },
+  'azure.armor': { normal: '+150 de armadura', tauforged: '+225 de armadura' },
+  'azure.health_regen': {
+    normal: '+5 de salud regenerada/s',
+    tauforged: '+7.5 de salud regenerada/s',
+  },
+  'emerald.toxin_damage': {
+    normal: 'Los efectos de estado de toxina infligen +30 % de daño',
+    tauforged: 'Los efectos de estado de toxina infligen +45 % de daño',
+  },
+  'emerald.toxin_health': {
+    normal: '+2 de salud cada vez que los enemigos reciben daño de estado de toxina',
+    tauforged: '+3 de salud cada vez que los enemigos reciben daño de estado de toxina',
+  },
+  'emerald.corrosion_ability_damage': {
+    normal: '+10 % de daño de habilidad contra enemigos con estado corrosivo',
+    tauforged: '+15 % de daño de habilidad contra enemigos con estado corrosivo',
+  },
+  'emerald.corrosion_stacks': {
+    normal: '+2 acumulaciones máximas de estado corrosivo',
+    tauforged: '+3 acumulaciones máximas de estado corrosivo',
+  },
+  'topaz.blast_health': {
+    normal: '+1 de salud máxima por asesinato con explosión (máx. 300)',
+    tauforged: '+2 de salud máxima por asesinato con explosión (máx. 450)',
+  },
+  'topaz.blast_shield': {
+    normal: '+5 de escudo regenerado por asesinato con explosión',
+    tauforged: '+7.5 de escudo regenerado por asesinato con explosión',
+  },
+  'topaz.heat_secondary_crit': {
+    normal: '+1 % de probabilidad crítica de arma secundaria por asesinato con calor (máx. 50 %)',
+    tauforged:
+      '+1.5 % de probabilidad crítica de arma secundaria por asesinato con calor (máx. 75 %)',
+  },
+  'topaz.radiation_ability_damage': {
+    normal: '+10 % de daño de habilidad contra enemigos con estado de radiación',
+    tauforged: '+15 % de daño de habilidad contra enemigos con estado de radiación',
+  },
+  'violet.electricity_ability_damage': {
+    normal: '+10 % de daño de habilidad contra enemigos con estado de electricidad',
+    tauforged: '+15 % de daño de habilidad contra enemigos con estado de electricidad',
+  },
+  'violet.primary_electricity': {
+    normal:
+      '+30 % de daño de electricidad de arma primaria, +10 % por cada fragmento Carmesí, Celeste o Violeta',
+    tauforged:
+      '+45 % de daño de electricidad de arma primaria, +15 % por cada fragmento Carmesí, Celeste o Violeta',
+  },
+  'violet.melee_crit_damage': {
+    normal: '+25 % de daño crítico cuerpo a cuerpo (se duplica con más de 500 de energía máxima)',
+    tauforged:
+      '+37.5 % de daño crítico cuerpo a cuerpo (se duplica con más de 500 de energía máxima)',
+  },
+  'violet.orb_conversion': {
+    normal: 'Los orbes de salud dan +20 % de energía y los de energía, +20 % de salud',
+    tauforged: 'Los orbes de salud dan +30 % de energía y los de energía, +30 % de salud',
+  },
+};
+
+/** A shard stat's text in the given language ("es" or "en"). */
+export function shardText(stat: ShardStat, tauforged: boolean, lang: 'es' | 'en'): string {
+  const es = lang === 'es' ? SHARD_STATS_ES[stat.key] : undefined;
+  const words = es ?? stat;
+  return tauforged ? words.tauforged : words.normal;
+}
+
 export const SHARD_SLOTS = 5;
 
 /**
@@ -388,6 +505,8 @@ export const ModOption = z.object({
   augmentFor: z.string().nullable(),
   /** The effect at each rank, 0 first. */
   effects: z.array(z.string()),
+  /** The English name when the name shown is Spanish, so search finds both. */
+  alias: z.string().nullable().optional(),
 });
 export type ModOption = z.infer<typeof ModOption>;
 
@@ -398,6 +517,8 @@ export const ArcaneOption = z.object({
   image: z.string().nullable(),
   maxRank: z.int().min(0),
   effects: z.array(z.string()),
+  /** The English name when the name shown is Spanish, so search finds both. */
+  alias: z.string().nullable().optional(),
 });
 export type ArcaneOption = z.infer<typeof ArcaneOption>;
 
@@ -407,6 +528,8 @@ export const HelminthOption = z.object({
   /** The Warframe it comes from, or "Helminth" for Helminth's own abilities. */
   from: z.string(),
   image: z.string().nullable(),
+  /** The English name when the name shown is Spanish, so search finds both. */
+  alias: z.string().nullable().optional(),
 });
 export type HelminthOption = z.infer<typeof HelminthOption>;
 

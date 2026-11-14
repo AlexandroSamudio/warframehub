@@ -432,7 +432,7 @@ Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the
     - **Weapons:** a 48px picture, the name and the note.
 - **Mod Card:**
   - the mod's art as a wide crop (5.5rem tall, cut on the top-right; "AURA"/"EXILUS" on a solid panel tab over the art's corner, never on the picture);
-  - the name (600) with the rank "R5/5" in gold tabular digits (read out as "Rank 5 of 5");
+  - the name (600, whole words; Spanish hyphenates only when a word is wider than the card), with the rank "R5/5" always on the line under it in gold tabular digits (read out as "Rank 5 of 5");
   - the **Polarity Mark**;
   - the effect at that rank (Dim Readout, lines kept);
   - a gold **NOTE** label with your note.

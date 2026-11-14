@@ -8,7 +8,7 @@ import type {
   Shortfall,
   ShoppingRow,
 } from '@warframehub/shared';
-import { locale } from './i18n/index.ts';
+import { locale, t } from './i18n/index.ts';
 
 /** One missing part in the "What to farm next" list. Parts belong to one goal. */
 export interface MissingPart {
@@ -170,7 +170,7 @@ export function materialList(craft: PartCraft): { count: number; name: string }[
   const lines = craft.ingredients
     .map((i) => ({ count: i.count, name: i.name }))
     .sort((a, b) => a.name.localeCompare(b.name));
-  if (craft.credits > 0) lines.unshift({ count: craft.credits, name: 'Credits' });
+  if (craft.credits > 0) lines.unshift({ count: craft.credits, name: t('goals.credits') });
   return lines;
 }
 
@@ -193,7 +193,7 @@ export function materialsWithStock(
   if (craft.credits > 0) {
     lines.unshift({
       key: 'credits',
-      name: 'Credits',
+      name: t('goals.credits'),
       need: craft.credits,
       have: have.get('credits') ?? 0,
     });

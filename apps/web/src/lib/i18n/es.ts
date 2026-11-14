@@ -166,6 +166,7 @@ export const es: Record<MessageKey, string> = {
   'nav.settings': 'Ajustes',
 
   'goals.title': 'Objetivos',
+  'goals.credits': 'Créditos',
   'goals.loading': 'Cargando tus objetivos…',
   'goals.loadError': 'No se pueden cargar tus objetivos. ¿Sigue en marcha WarframeHub?',
   'goals.saveError': 'No se pudo guardar ese cambio: {message}',
@@ -283,7 +284,7 @@ export const es: Record<MessageKey, string> = {
   'settings.title': 'Ajustes',
   'settings.language': 'Idioma',
   'settings.languageHint':
-    'Cambia toda la app, incluidos los avisos. Los nombres de objetos, mods y habilidades y la lista predeterminada siguen en inglés por ahora.',
+    'Cambia toda la app, incluidos los avisos y los nombres del juego (como los dice el propio juego). La lista predeterminada y las rotaciones en vivo siguen en inglés por ahora.',
   'settings.languageError': 'No se pudo guardar el idioma: {message}',
   'settings.timeZone': 'Zona horaria',
   'settings.timeZoneHint':
