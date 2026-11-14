@@ -15,7 +15,13 @@ import {
   type TrackerSection,
 } from '@warframehub/shared';
 import { and, asc, eq, inArray, lt, ne, sql } from 'drizzle-orm';
-import { liveSortieExpiry, nextReset, periodKey, type PeriodContext } from '../domain/periods.js';
+import {
+  baroNextArrival,
+  liveSortieExpiry,
+  nextReset,
+  periodKey,
+  type PeriodContext,
+} from '../domain/periods.js';
 import { HttpError } from '../http-error.js';
 import type { Db } from './client.js';
 import { DEFAULT_SETTINGS, SEED_NOTICE_KEY, type SeedNotice } from './init.js';
@@ -41,6 +47,7 @@ const PRUNE_BY_AGE_MS: Partial<Record<PeriodType, number>> = {
 
 function isEstimated(period: PeriodType, now: Date, live: LiveTimes): boolean {
   if (period === 'sortie') return liveSortieExpiry(now, live) === null;
+  if (period === 'baro') return baroNextArrival(now, live)?.estimated ?? false;
   return false;
 }
 

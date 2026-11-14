@@ -76,7 +76,7 @@ export function periodKey(period: PeriodType, now: Date, ctx: PeriodContext = {}
 
 /**
  * When the current period ends, or `null` if that isn't known
- * (`manual` periods, and `baro` while Baro is visiting or there is no live data).
+ * (`manual` periods, and `baro` with no usable live data).
  */
 export function nextReset(period: PeriodType, now: Date, ctx: PeriodContext = {}): Date | null {
   assertValid(now);
@@ -91,15 +91,31 @@ export function nextReset(period: PeriodType, now: Date, ctx: PeriodContext = {}
       return new Date(startOfFourDayBlock(now).getTime() + FOUR_DAYS_MS);
     case 'sortie':
       return sortieEnd(now, ctx);
-    case 'baro': {
-      // Ticks clear when the next visit starts. While Baro is here, the API only
-      // knows when he leaves, not when he comes back.
-      const activation = ctx.baroActivation;
-      return activation && isValid(activation) && activation > now ? activation : null;
-    }
+    case 'baro':
+      return baroNextArrival(now, ctx)?.at ?? null;
     case 'manual':
       return null;
   }
+}
+
+/** Baro comes back every two weeks (SPEC §4.1). */
+const BARO_CYCLE_MS = 14 * DAY_MS;
+
+/**
+ * When Baro next arrives. While he's away the API says so (`estimated: false`). While he's
+ * here it only knows when he leaves, so the next visit is worked out as two weeks after
+ * this one's arrival (`estimated: true`). Null with no live data, or when the data is
+ * older than one cycle (then it can't be trusted).
+ */
+export function baroNextArrival(
+  now: Date,
+  ctx: PeriodContext,
+): { at: Date; estimated: boolean } | null {
+  const activation = ctx.baroActivation;
+  if (!activation || !isValid(activation)) return null;
+  if (activation > now) return { at: activation, estimated: false };
+  const next = new Date(activation.getTime() + BARO_CYCLE_MS);
+  return next > now ? { at: next, estimated: true } : null;
 }
 
 /** The live Sortie expiry if it's usable (in the future, within about a day), else null. */

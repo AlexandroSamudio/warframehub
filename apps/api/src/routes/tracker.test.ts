@@ -137,6 +137,23 @@ describe('GET /api/tracker', () => {
     expect(body.sections.find((s) => s.slug === 'baro')!.periodKey).toBe(
       'baro:2026-11-13T13:00:00.000Z',
     );
+    // Baro isn't here yet on 9 Nov: the arrival is the API's own, not an estimate.
+    expect(body.clocks.find((c) => c.id === 'baro')).toEqual({
+      id: 'baro',
+      nextReset: '2026-11-13T13:00:00.000Z',
+      estimated: false,
+    });
+  });
+
+  it('while Baro is here, the clock counts to his next visit, marked as estimated', async () => {
+    ctx.state.now = new Date('2026-11-14T00:00:00.000Z');
+    ctx.state.live = { baroActivation: new Date('2026-11-13T13:00:00.000Z') };
+    const body = await tracker(ctx.app);
+    expect(body.clocks.find((c) => c.id === 'baro')).toEqual({
+      id: 'baro',
+      nextReset: '2026-11-27T13:00:00.000Z',
+      estimated: true,
+    });
   });
 
   it('leaves out hidden items and sections', async () => {

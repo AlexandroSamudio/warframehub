@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  baroNextArrival,
   EIGHT_HOUR_FIRST_UTC_HOUR,
   FOUR_DAY_ANCHOR,
   nextReset,
@@ -242,13 +243,32 @@ describe('baro', () => {
     );
   });
 
-  it('next reset is the next arrival while he is away, unknown while he is here', () => {
-    expect(iso(nextReset('baro', at('2026-11-12T00:00:00Z'), { baroActivation: activation }))).toBe(
+  it('next reset is the next arrival while he is away', () => {
+    const ctx = { baroActivation: activation };
+    expect(iso(nextReset('baro', at('2026-11-12T00:00:00Z'), ctx))).toBe(
       '2026-11-13T13:00:00.000Z',
     );
-    expect(
-      nextReset('baro', at('2026-11-13T13:00:00Z'), { baroActivation: activation }),
-    ).toBeNull();
+    expect(baroNextArrival(at('2026-11-12T00:00:00Z'), ctx)?.estimated).toBe(false);
+  });
+
+  it('while he is here, the next arrival is two weeks after this one (estimated)', () => {
+    const ctx = { baroActivation: activation };
+    // At the arrival instant, midway, and the last moment before he comes back.
+    for (const now of ['2026-11-13T13:00:00Z', '2026-11-20T00:00:00Z', '2026-11-27T12:59:59Z']) {
+      expect(baroNextArrival(at(now), ctx)).toEqual({
+        at: at('2026-11-27T13:00:00.000Z'),
+        estimated: true,
+      });
+    }
+    expect(iso(nextReset('baro', at('2026-11-14T00:00:00Z'), ctx))).toBe(
+      '2026-11-27T13:00:00.000Z',
+    );
+  });
+
+  it('data older than one cycle is not trusted', () => {
+    const ctx = { baroActivation: activation };
+    expect(baroNextArrival(at('2026-11-27T13:00:00Z'), ctx)).toBeNull();
+    expect(nextReset('baro', at('2026-12-30T00:00:00Z'), ctx)).toBeNull();
   });
 
   it('without live data the key is "baro:unknown" and the reset is unknown', () => {

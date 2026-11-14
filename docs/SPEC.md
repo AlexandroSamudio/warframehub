@@ -137,6 +137,7 @@ Ticks are stored against a **period key**, a string that identifies the current 
 - `eight_hour:2026-11-09T12` (the block's start; between 00:00 and 04:00 UTC the key carries the previous day's `T20`)
 - `sortie:2026-11-10`: the UTC date the Sortie **ends** (live `sortie.expiry`, or the next 16:00 UTC without live data), so live and fallback keys match for most of the day
 - `baro:<activation ISO>` (fallback `baro:unknown` when there is no live data)
+- **Baro's clock:** while he's away it counts to the API's arrival. While he's here the API only gives his departure, so it counts to the next visit worked out as two weeks after this arrival, shown as estimated (≈). Live data older than one cycle shows "waiting for live data".
 - `manual:<counter>`, where the counter goes up by one each time the user presses Clear
 
 **Resets need no timer or background job.** When the period changes, the key changes, so the old ticks stop matching and the list shows as unticked. Old tick rows are deleted on startup and once a day; history is not kept by design.
