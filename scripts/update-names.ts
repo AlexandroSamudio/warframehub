@@ -3,7 +3,8 @@
  * (SPEC §8.3): names, descriptions, passives and mod/arcane effects from DE's public export
  * (`_en` and `_es` files, matched by uniqueName), passive numbers from the English wiki data
  * we already keep (ability-stats.json), and the hand-kept mission-type names
- * (mission-types-es.json, checked against the Spanish wiki). Needs the `xz` tool. Run it after game updates,
+ * (mission-types-es.json, checked against the Spanish wiki), plus the Sortie modifiers'
+ * Spanish from warframestat.us's data package (DE's export has none). Needs the `xz` tool. Run it after game updates,
  * review the diff, commit the file. The app never calls DE or the wiki for this.
  */
 import { spawnSync } from 'node:child_process';
@@ -50,6 +51,8 @@ async function exportsFor(lang: 'en' | 'es'): Promise<Record<string, unknown>> {
     'ExportResources',
     'ExportRecipes',
     'ExportRegions',
+    'ExportGear',
+    'ExportSentinels',
   ];
   const out: Record<string, unknown> = {};
   for (const name of wanted) {
@@ -61,6 +64,14 @@ async function exportsFor(lang: 'en' | 'es'): Promise<Record<string, unknown>> {
 }
 
 const [en, es] = await Promise.all([exportsFor('en'), exportsFor('es')]);
+// Sortie modifiers: DE's export has none; warframestat.us's data package has the game's
+// Spanish for them. Pinned to a version, so a refresh is a deliberate change.
+const WORLDSTATE_DATA = 'https://cdn.jsdelivr.net/npm/warframe-worldstate-data@3.19.3/dist/data';
+const [sortieEn, sortieEs] = await Promise.all(
+  ['sortieData.json', 'es/sortieData.json'].map(async (f) =>
+    JSON.parse((await get(`${WORLDSTATE_DATA}/${f}`)).toString('utf8')),
+  ),
+);
 // Mission types: checked against the Spanish wiki's page titles; the few with no page are
 // our own translation (docs/GLOSSARY-es.md). Kept by hand in mission-types-es.json.
 const types = JSON.parse(readFileSync(MISSION_TYPES_FILE, 'utf8')) as Record<string, string>;
@@ -82,6 +93,11 @@ const { file, unfilledPassives } = buildSpanishNames(
     ),
     passiveOverrides: overrides,
     missionTypes: types,
+    extra: [
+      { en: en.ExportGear, es: es.ExportGear },
+      { en: en.ExportSentinels, es: es.ExportSentinels },
+    ],
+    sortie: { en: sortieEn, es: sortieEs },
   },
   new Date(),
 );
@@ -90,7 +106,8 @@ console.log(
   `Wrote names-es.json: ${Object.keys(file.names).length} names, ${Object.keys(file.abilities).length} abilities, ` +
     `${Object.keys(file.effects).length} effects, ${Object.keys(file.parts).length} part words, ` +
     `${Object.keys(file.relics).length} relics, ${Object.keys(file.nodes).length} nodes, ` +
-    `${Object.keys(file.missionTypes).length} mission types.`,
+    `${Object.keys(file.missionTypes).length} mission types, ${Object.keys(file.english).length} other names, ` +
+    `${Object.keys(file.sortieModifiers).length} sortie texts.`,
 );
 if (unfilledPassives.length > 0) {
   console.log(

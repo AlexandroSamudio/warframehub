@@ -31,6 +31,8 @@ async function setup(file = ':memory:', start = '2026-11-09T12:00:00.000Z') {
     now: () => state.now,
     liveTimes: () => state.live,
   });
+  // These tests read the seed's English (Spanish is the default; see checklist.test.ts).
+  await app.inject({ method: 'PATCH', url: '/api/settings', payload: { language: 'en' } });
   const itemId = (seedId: string) =>
     database.db.select().from(items).where(eq(items.seedId, seedId)).get()!.id;
   const sectionId = (seedId: string) =>

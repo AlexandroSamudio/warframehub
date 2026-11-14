@@ -34,6 +34,13 @@ export const NamesFile = z.object({
    * for part names ("Nidus Prime Chassis") and for searching in Spanish.
    */
   items: z.record(z.string(), z.string()),
+  /**
+   * Any other export name by English name, where the Spanish differs ("Kitgun Riven Mod" →
+   * "Mod agrietado de kitgun"): for the live rotations' rewards and deals.
+   */
+  english: z.record(z.string(), z.string()),
+  /** Sortie modifiers and their descriptions, English → Spanish (worldstate-data's `es`). */
+  sortieModifiers: z.record(z.string(), z.string()),
 });
 export type NamesFile = z.infer<typeof NamesFile>;
 
@@ -143,6 +150,10 @@ export interface NamesInput {
   /** Hand translations for passives the numbers can't be lined up for. */
   passiveOverrides: Record<string, string>;
   missionTypes: Record<string, string>;
+  /** More export files, only for the `english` names (gear, companions). */
+  extra: ExportPair[];
+  /** worldstate-data's `sortieData.json`, English and Spanish. */
+  sortie: ExportPair;
 }
 
 /** Recipe result folders whose ingredients the app shows (Warframes, weapons, their parts). */
@@ -326,6 +337,29 @@ export function buildSpanishNames(
     nodes[clean(enKey)] = clean(`${String(es.systemName ?? '')}/${String(es.name ?? '')}`);
   }
 
+  // Every other name, by English name, for the rotations (rewards, Darvo's deal…).
+  const english: NamesFile['english'] = {};
+  const everything = [
+    input.warframes,
+    input.upgrades,
+    input.arcanes,
+    input.weapons,
+    input.resources,
+    ...input.extra,
+  ];
+  for (const pair of everything) {
+    const keys = Object.keys(ExportFile.parse(pair.en));
+    const en = byUnique(pair.en, ...keys);
+    const es = byUnique(pair.es, ...keys);
+    for (const [u, e] of en) {
+      const enName = e.name ? clean(e.name) : '';
+      const esName = name(es, u);
+      // Skip all-caps internal labels ("ARCHON SHARD") and names that don't change.
+      if (!enName || !esName || enName === esName || enName === enName.toUpperCase()) continue;
+      english[enName] ??= esName;
+    }
+  }
+
   return {
     file: {
       source:
@@ -340,7 +374,28 @@ export function buildSpanishNames(
       nodes,
       missionTypes: input.missionTypes,
       items,
+      english,
+      sortieModifiers: sortieModifiers(input.sortie),
     },
     unfilledPassives,
   };
+}
+
+const SortieData = z.looseObject({
+  modifierTypes: z.record(z.string(), z.string()),
+  modifierDescriptions: z.record(z.string(), z.string()),
+});
+
+/** "Environmental Hazard: Fire" → its Spanish, matched by worldstate-data's keys. */
+function sortieModifiers(pair: ExportPair): Record<string, string> {
+  const en = SortieData.parse(pair.en);
+  const es = SortieData.parse(pair.es);
+  const out: Record<string, string> = {};
+  for (const field of ['modifierTypes', 'modifierDescriptions'] as const) {
+    for (const [key, text] of Object.entries(en[field])) {
+      const spanish = es[field][key];
+      if (spanish && spanish !== text) out[text] = spanish;
+    }
+  }
+  return out;
 }

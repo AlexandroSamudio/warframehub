@@ -14,6 +14,8 @@ import { HttpError } from './http-error.js';
 import { isServerMessageKey, message, type ServerMessageKey } from './i18n.js';
 import { userLanguage } from './db/tracker.js';
 import { GameNames } from './game-names.js';
+import { RotationNames } from './rotation-names.js';
+import { SeedText } from './domain/seed-text.js';
 import { loadSeed, type SeedFile } from './domain/seed.js';
 import { registerBuildRoutes } from './routes/builds.js';
 import { registerChecklistRoutes } from './routes/checklist.js';
@@ -161,10 +163,17 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         app.log.warn({ endpoint, err: error }, 'worldstate fetch failed'),
     });
 
+  // The default checklist, read once when first needed; its Spanish for unedited defaults.
+  let seed = options.seed;
+  const getSeed = () => (seed ??= loadSeed());
+  let seedText: SeedText | undefined;
+  const text = () => (seedText ??= new SeedText(getSeed()));
+
   registerTrackerRoutes(app, {
     db: options.db,
     userId: options.userId,
     now,
+    text,
     liveTimes:
       options.liveTimes ??
       (async () => {
@@ -173,7 +182,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         return worldstate.liveTimes();
       }),
   });
-  registerWorldstateRoutes(app, { worldstate, now });
+  const names = options.gameNames ?? GameNames.load();
+  const rotations = RotationNames.load(names.data);
+  registerWorldstateRoutes(app, {
+    worldstate,
+    now,
+    localize: (cards) => rotations.cards(cards, userLanguage(options.db, options.userId)),
+  });
 
   const items =
     options.items ??
@@ -181,7 +196,6 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       now,
       onError: (query, error) => app.log.warn({ query, err: error }, 'item search failed'),
     });
-  const names = options.gameNames ?? GameNames.load();
   registerGoalRoutes(app, { db: options.db, userId: options.userId, now, items, names });
 
   const warframes =
@@ -240,12 +254,12 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     onShutdown: options.onShutdown ?? (() => {}),
   });
 
-  let seed = options.seed;
   registerChecklistRoutes(app, {
     db: options.db,
     userId: options.userId,
     now,
-    seed: () => (seed ??= loadSeed()),
+    seed: getSeed,
+    text,
   });
 
   // Last, so every /api route wins over the catch-all.

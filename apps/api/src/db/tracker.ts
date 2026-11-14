@@ -1,3 +1,4 @@
+import type { SeedText } from '../domain/seed-text.js';
 import {
   DEFAULT_LANGUAGE,
   ItemSlots,
@@ -112,7 +113,9 @@ export function loadTracker(
   userId: number,
   now: Date,
   live: LiveTimes = {},
+  text?: SeedText,
 ): TrackerResponse {
+  const lang = userLanguage(db, userId);
   const counters = manualCounterMap(db, userId);
   const sectionRows = db
     .select()
@@ -157,8 +160,7 @@ export function loadTracker(
     const list = itemsBySection.get(row.sectionId) ?? [];
     list.push({
       id: row.id,
-      title: row.title,
-      description: row.description,
+      ...(text ? text.item(row, lang) : { title: row.title, description: row.description }),
       kind: row.kind,
       slots,
       slotCount: count,
@@ -172,7 +174,7 @@ export function loadTracker(
   const trackerSections: TrackerSection[] = sectionRows.map((s) => ({
     id: s.id,
     slug: s.slug,
-    title: s.title,
+    title: text ? text.sectionTitle(s, lang) : s.title,
     period: s.period,
     periodKey: keyBySection.get(s.id) as string,
     nextReset: toIso(nextReset(s.period, now, contextFor(s.id, live, counters))),

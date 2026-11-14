@@ -284,7 +284,7 @@ export const es: Record<MessageKey, string> = {
   'settings.title': 'Ajustes',
   'settings.language': 'Idioma',
   'settings.languageHint':
-    'Cambia toda la app, incluidos los avisos y los nombres del juego (como los dice el propio juego). La lista predeterminada y las rotaciones en vivo siguen en inglés por ahora.',
+    'Cambia toda la app: avisos, nombres del juego (como los dice el propio juego), la lista predeterminada y las rotaciones en vivo. Lo que editaste queda como lo escribiste.',
   'settings.languageError': 'No se pudo guardar el idioma: {message}',
   'settings.timeZone': 'Zona horaria',
   'settings.timeZoneHint':

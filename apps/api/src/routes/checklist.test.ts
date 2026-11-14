@@ -24,6 +24,8 @@ beforeEach(async () => {
   database = openDatabase(':memory:');
   userId = initDatabase(database.db, seed, NOW).userId;
   app = await buildApp({ db: database.db, userId, now: () => NOW, seed, liveTimes: () => ({}) });
+  // These tests read the seed's English (Spanish is the default; see the Spanish tests below).
+  await app.inject({ method: 'PATCH', url: '/api/settings', payload: { language: 'en' } });
 });
 afterEach(async () => {
   await app.close();
@@ -331,5 +333,55 @@ describe('restore defaults', () => {
     // The app is still on the shipped seed here, which has the item: restore uses that file.
     await call('POST', '/api/checklist/restore-defaults');
     expect((await tracker()).notice).toBeNull();
+  });
+});
+
+describe('the default checklist in Spanish (SPEC §8.3)', () => {
+  beforeEach(async () => {
+    await call('PATCH', '/api/settings', { language: 'es' });
+  });
+
+  it('has Spanish for every default section and item', () => {
+    for (const s of seed.sections) {
+      expect(s.es?.title, s.seedId).toBeTruthy();
+      for (const i of s.items) {
+        expect(i.es?.title, i.seedId).toBeTruthy();
+        if (i.description) expect(i.es?.description, i.seedId).toBeTruthy();
+      }
+    }
+  });
+
+  it('shows unedited defaults in Spanish and keeps the English stored', async () => {
+    const t = await tracker();
+    const sortie = t.sections.find((s) => s.slug === 'sortie')!;
+    expect(sortie.title).toBe('Incursión');
+    expect(sortie.items[0]).toMatchObject({ title: 'Incursión', description: '3 misiones' });
+    const stored = database.db.select().from(items).where(eq(items.seedId, 'sortie.sortie')).get()!;
+    expect(stored.title).toBe('Sortie');
+  });
+
+  it('saving the Spanish text unchanged is not an edit', async () => {
+    const item = await itemByTitle('Incursión');
+    await call('PATCH', `/api/items/${item.id}`, {
+      title: 'Incursión',
+      description: '3 misiones',
+      verify: item.verify,
+    });
+    const after = (await checklist()).sections
+      .flatMap((s) => s.items)
+      .find((i) => i.id === item.id)!;
+    expect(after).toMatchObject({ title: 'Incursión', edited: false });
+    const section = await sectionBySlug('sortie');
+    await call('PATCH', `/api/sections/${section.id}`, { title: 'Incursión' });
+    expect((await sectionBySlug('sortie')).edited).toBe(false);
+  });
+
+  it('an edited default shows the user’s text in both languages', async () => {
+    const item = await itemByTitle('Incursión');
+    await call('PATCH', `/api/items/${item.id}`, { title: 'Incursión diaria' });
+    expect((await itemByTitle('Incursión diaria')).edited).toBe(true);
+    await call('PATCH', '/api/settings', { language: 'en' });
+    expect(await itemByTitle('Incursión diaria')).toBeDefined();
+    expect(seedId(item.id)).toBe('sortie.sortie'); // still the default, just edited
   });
 });

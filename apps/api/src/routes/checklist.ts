@@ -23,6 +23,7 @@ import {
 } from '../db/checklist.js';
 import type { Db } from '../db/client.js';
 import { restoreDefaults } from '../db/init.js';
+import type { SeedText } from '../domain/seed-text.js';
 import type { SeedFile } from '../domain/seed.js';
 
 export interface ChecklistRouteDeps {
@@ -30,14 +31,17 @@ export interface ChecklistRouteDeps {
   userId: number;
   now: () => Date;
   seed: () => SeedFile;
+  /** The default checklist's Spanish (SPEC §8.3). */
+  text: () => SeedText;
 }
 
 const IdParams = z.object({ id: z.coerce.number().int().positive() });
 
 /** Edit-mode routes (SPEC §6). Every change answers with the full checklist. */
 export function registerChecklistRoutes(app: FastifyInstance, deps: ChecklistRouteDeps): void {
-  const { db, userId, now, seed } = deps;
-  const checklist = (): ChecklistResponse => ChecklistResponse.parse(loadChecklist(db, userId));
+  const { db, userId, now, seed, text } = deps;
+  const checklist = (): ChecklistResponse =>
+    ChecklistResponse.parse(loadChecklist(db, userId, text()));
 
   app.get('/api/sections', async () => checklist());
 
@@ -48,7 +52,7 @@ export function registerChecklistRoutes(app: FastifyInstance, deps: ChecklistRou
 
   app.patch('/api/sections/:id', async (request) => {
     const { id } = IdParams.parse(request.params);
-    updateSection(db, userId, id, UpdateSectionRequest.parse(request.body));
+    updateSection(db, userId, id, UpdateSectionRequest.parse(request.body), text());
     return checklist();
   });
 
@@ -70,7 +74,7 @@ export function registerChecklistRoutes(app: FastifyInstance, deps: ChecklistRou
 
   app.patch('/api/items/:id', async (request) => {
     const { id } = IdParams.parse(request.params);
-    updateItem(db, userId, id, UpdateItemRequest.parse(request.body), now());
+    updateItem(db, userId, id, UpdateItemRequest.parse(request.body), now(), text());
     return checklist();
   });
 

@@ -10,12 +10,18 @@
         {
           "seedId": "daily.core.login",
           "title": "Daily login reward",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Tributo diario"
+          }
         },
         {
           "seedId": "daily.core.first-win",
           "title": "First Win of the Day",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Primera victoria del día"
+          }
         },
         {
           "seedId": "daily.core.sp-incursions",
@@ -24,20 +30,34 @@
           "kind": "counter",
           "slots": {
             "count": 6
+          },
+          "es": {
+            "title": "Incursiones del Camino de Acero",
+            "description": "5 de Esencia de Acero cada una"
           }
         },
         {
           "seedId": "daily.core.circuit",
           "title": "The Circuit: 4 stages",
           "description": "530 points with the daily bonus",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "El Circuito: 4 etapas",
+            "description": "530 puntos con la bonificación diaria"
+          }
         },
         {
           "seedId": "daily.core.simaris",
           "title": "Simaris daily target",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Objetivo diario de Simaris"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Diario: lo básico"
+      }
     },
     {
       "seedId": "daily.quick",
@@ -48,30 +68,49 @@
         {
           "seedId": "daily.quick.syndicate-standing",
           "title": "Spend Syndicate standing if capped",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Gasta la reputación de sindicato si llegaste al tope"
+          }
         },
         {
           "seedId": "daily.quick.darvo",
           "title": "Darvo's Daily Deal",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Oferta diaria de Darvo"
+          }
         },
         {
           "seedId": "daily.quick.todays-special",
           "title": "\"Today's Special\" vendors",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Vendedores con \"Especial del día\""
+          }
         },
         {
           "seedId": "daily.quick.acrithis",
           "title": "Acrithis daily shop",
           "description": "Pathos Clamps",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Tienda diaria de Acrithis",
+            "description": "Abrazaderas de Pathos"
+          }
         },
         {
           "seedId": "daily.quick.marie-leroux",
           "title": "Marie Leroux's daily shop",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Tienda diaria de Marie Leroux"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Diario: visitas rápidas"
+      }
     },
     {
       "seedId": "sortie",
@@ -83,9 +122,16 @@
           "seedId": "sortie.sortie",
           "title": "Sortie",
           "description": "3 missions",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Incursión",
+            "description": "3 misiones"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Incursión"
+      }
     },
     {
       "seedId": "eight-hour",
@@ -97,21 +143,36 @@
           "seedId": "eight-hour.loid",
           "title": "Loid",
           "description": "Entrati lab materials",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Loid",
+            "description": "Materiales del laboratorio Entrati"
+          }
         },
         {
           "seedId": "eight-hour.grandmother",
           "title": "Grandmother (Necralisk)",
           "description": "Token deals",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Abuela (Necralisk)",
+            "description": "Ofertas de símbolos"
+          }
         },
         {
           "seedId": "eight-hour.yonta",
           "title": "Archimedean Yonta",
           "description": "Voidplume Pinion",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Arquimediana Yonta",
+            "description": "Rémige de Pluma del Vacío"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Vendedores cada 8 horas"
+      }
     },
     {
       "seedId": "four-day",
@@ -123,15 +184,26 @@
           "seedId": "four-day.ergo-glast",
           "title": "Ergo Glast",
           "description": "Tenet weapons",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Ergo Glast",
+            "description": "Armas Tenet"
+          }
         },
         {
           "seedId": "four-day.eleanor",
           "title": "Eleanor Nightingale",
           "description": "Tenet A/B rotation",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Eleanor Nightingale",
+            "description": "Rotación Tenet A/B"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Cada 4 días"
+      }
     },
     {
       "seedId": "weekly.minor",
@@ -142,15 +214,25 @@
         {
           "seedId": "weekly.minor.darvo",
           "title": "Darvo's weekly mission",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Misión semanal de Darvo"
+          }
         },
         {
           "seedId": "weekly.minor.maroo",
           "title": "Maroo's weekly mission",
           "description": "Ayatan Sculpture",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Misión semanal de Maroo",
+            "description": "Escultura Ayatan"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Semanal: misiones menores"
+      }
     },
     {
       "seedId": "weekly.passes",
@@ -161,14 +243,23 @@
         {
           "seedId": "weekly.passes.nightwave",
           "title": "Nightwave weekly missions + shop",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Misiones semanales y tienda de Onda Nocturna"
+          }
         },
         {
           "seedId": "weekly.passes.calendar-1999",
           "title": "1999 Calendar",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Calendario de 1999"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Semanal: pases"
+      }
     },
     {
       "seedId": "weekly.kuva",
@@ -180,19 +271,31 @@
           "seedId": "weekly.kuva.yonta",
           "title": "Archimedean Yonta",
           "description": "35,000 Kuva for 5 Voidplume Pinions",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Arquimediana Yonta",
+            "description": "35.000 de Kuva por 5 Rémiges de Pluma del Vacío"
+          }
         },
         {
           "seedId": "weekly.kuva.palladino",
           "title": "Palladino",
           "description": "35,000 Kuva for 10 Riven Slivers",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Palladino",
+            "description": "35.000 de Kuva por 10 Fragmentos de Agrietado"
+          }
         },
         {
           "seedId": "weekly.kuva.acrithis",
           "title": "Acrithis",
           "description": "10,000 Kuva for 10 Pathos Clamps",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Acrithis",
+            "description": "10.000 de Kuva por 10 Abrazaderas de Pathos"
+          }
         },
         {
           "seedId": "weekly.kuva.hunhow",
@@ -201,20 +304,34 @@
           "kind": "counter",
           "slots": {
             "count": 3
+          },
+          "es": {
+            "title": "Hunhow",
+            "description": "17.000 de Kuva cada vez"
           }
         },
         {
           "seedId": "weekly.kuva.teshin",
           "title": "Teshin",
           "description": "Kuva for Steel Essence",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Teshin",
+            "description": "Kuva por Esencia de Acero"
+          }
         },
         {
           "seedId": "weekly.kuva.nightwave-arbitrations",
           "title": "Nightwave / Arbitrations Kuva",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Kuva de Onda Nocturna / Arbitramento"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Semanal: ruta del Kuva"
+      }
     },
     {
       "seedId": "weekly.vendors",
@@ -225,17 +342,26 @@
         {
           "seedId": "weekly.vendors.acrithis",
           "title": "Acrithis weekly rotation",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Rotación semanal de Acrithis"
+          }
         },
         {
           "seedId": "weekly.vendors.palladino",
           "title": "Palladino",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Palladino"
+          }
         },
         {
           "seedId": "weekly.vendors.teshin",
           "title": "Teshin: spend Steel Essence",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Teshin: gasta la Esencia de Acero"
+          }
         },
         {
           "seedId": "weekly.vendors.vosfor",
@@ -244,27 +370,46 @@
           "kind": "subticks",
           "slots": {
             "labels": ["Vendetta", "Radiation", "Ignition"]
+          },
+          "es": {
+            "title": "Arcanos por Vósforo",
+            "description": "Loid, Sanctum Anatomica"
           }
         },
         {
           "seedId": "weekly.vendors.kahl",
           "title": "Kahl-175 weekly mission",
           "description": "Stock",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Misión semanal de Kahl-175",
+            "description": "Stock"
+          }
         },
         {
           "seedId": "weekly.vendors.chipper",
           "title": "Bird 3: 1 Archon Shard",
           "description": "30,000 Cavia standing",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Bird 3: 1 Fragmento de Arconte",
+            "description": "30.000 de reputación con Cavia"
+          }
         },
         {
           "seedId": "weekly.vendors.cavalero",
           "title": "Cavalero",
           "description": "This week's Incarnon adapters (Platinum)",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Cavalero",
+            "description": "Los adaptadores Incarnon de esta semana (platino)"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Semanal: vendedores principales"
+      }
     },
     {
       "seedId": "weekly.endgame",
@@ -275,7 +420,10 @@
         {
           "seedId": "weekly.endgame.archon-hunt",
           "title": "Archon Hunt",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Cacería de Arconte"
+          }
         },
         {
           "seedId": "weekly.endgame.search-pulses",
@@ -283,48 +431,79 @@
           "kind": "counter",
           "slots": {
             "count": 5
+          },
+          "es": {
+            "title": "Pulsos de búsqueda"
           }
         },
         {
           "seedId": "weekly.endgame.netracells",
           "title": "Netracell run(s)",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Netracélulas"
+          }
         },
         {
           "seedId": "weekly.endgame.deep-archimedea",
           "title": "Deep Archimedea (Elite)",
           "description": "Aim for 34 points",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Arquimedea Profunda (Élite)",
+            "description": "Apunta a 34 puntos"
+          }
         },
         {
           "seedId": "weekly.endgame.temporal-archimedea",
           "title": "Temporal Archimedea",
           "description": "Go for all 37 points",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Arquimedea Temporal",
+            "description": "Apunta a los 37 puntos"
+          }
         },
         {
           "seedId": "weekly.endgame.descendia",
           "title": "Descendia: normal",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Descendia: normal"
+          }
         },
         {
           "seedId": "weekly.endgame.descendia-sp",
           "title": "Descendia: Steel Path",
           "description": "25 Steel Essence at floor 21",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Descendia: El Camino de Acero",
+            "description": "25 de Esencia de Acero en el piso 21"
+          }
         },
         {
           "seedId": "weekly.endgame.descendia-infernum",
           "title": "Descendia: Infernum 21",
           "description": "Roathe",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Descendia: Infernum 21",
+            "description": "Roathe"
+          }
         },
         {
           "seedId": "weekly.endgame.helminth",
           "title": "Helminth: apply 3 Invigorations",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Helminto: aplica 3 fortalecimientos"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Semanal: contenido final"
+      }
     },
     {
       "seedId": "baro",
@@ -336,9 +515,16 @@
           "seedId": "baro.visit",
           "title": "Visit Baro",
           "description": "Ducats + Credits",
-          "kind": "check"
+          "kind": "check",
+          "es": {
+            "title": "Visita a Baro",
+            "description": "Ducados + créditos"
+          }
         }
-      ]
+      ],
+      "es": {
+        "title": "Baro Ki'Teer"
+      }
     }
   ]
 }
