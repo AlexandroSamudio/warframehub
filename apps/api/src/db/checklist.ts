@@ -1,3 +1,4 @@
+import type { SeedText } from '../domain/seed-text.js';
 import {
   slotsMatchKind,
   type ChecklistResponse,
@@ -14,7 +15,7 @@ import { HttpError } from '../http-error.js';
 import type { Db } from './client.js';
 import { freeSlug, SEED_NOTICE_KEY } from './init.js';
 import { items, manualCounters, sections, settings } from './schema.js';
-import { parseSlots } from './tracker.js';
+import { parseSlots, userLanguage } from './tracker.js';
 
 /**
  * Edit mode (SPEC §6, §8.1). Rules from SPEC §5.1:
@@ -25,7 +26,8 @@ import { parseSlots } from './tracker.js';
  */
 
 /** The whole checklist, hidden rows included. */
-export function loadChecklist(db: Db, userId: number): ChecklistResponse {
+export function loadChecklist(db: Db, userId: number, text?: SeedText): ChecklistResponse {
+  const lang = userLanguage(db, userId);
   const sectionRows = db
     .select()
     .from(sections)
@@ -45,8 +47,7 @@ export function loadChecklist(db: Db, userId: number): ChecklistResponse {
     list.push({
       id: row.id,
       sectionId: row.sectionId,
-      title: row.title,
-      description: row.description,
+      ...(text ? text.item(row, lang) : { title: row.title, description: row.description }),
       kind: row.kind,
       slots: parseSlots(row.slotsJson),
       verify: row.verify,
@@ -61,7 +62,7 @@ export function loadChecklist(db: Db, userId: number): ChecklistResponse {
     sections: sectionRows.map((s) => ({
       id: s.id,
       slug: s.slug,
-      title: s.title,
+      title: text ? text.sectionTitle(s, lang) : s.title,
       period: s.period,
       hidden: s.hidden,
       origin: s.origin,
@@ -135,8 +136,13 @@ export function updateSection(
   userId: number,
   id: number,
   body: UpdateSectionRequest,
+  text?: SeedText,
 ): void {
   const row = getSection(db, userId, id);
+  // The Spanish title sent back unchanged is not an edit: keep the stored English.
+  if (text && body.title === text.sectionTitle(row, userLanguage(db, userId))) {
+    body = { ...body, title: row.title };
+  }
   const contentChanged =
     (body.title !== undefined && body.title !== row.title) ||
     (body.period !== undefined && body.period !== row.period);
@@ -222,8 +228,15 @@ export function updateItem(
   id: number,
   body: UpdateItemRequest,
   now: Date,
+  text?: SeedText,
 ): void {
   const row = getItem(db, userId, id);
+  // Spanish seed text sent back unchanged is not an edit: keep the stored English.
+  if (text) {
+    const shown = text.item(row, userLanguage(db, userId));
+    if (body.title === shown.title) body = { ...body, title: row.title };
+    if (body.description === shown.description) body = { ...body, description: row.description };
+  }
   const current = {
     title: row.title,
     description: row.description,

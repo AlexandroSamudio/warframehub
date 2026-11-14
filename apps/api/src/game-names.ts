@@ -80,6 +80,11 @@ export class GameNames {
   }
 
   /** Reads the files in `apps/api/data` (built into dist the same way). */
+  /** The names file itself (the live rotations read it too). */
+  get data(): NamesFile {
+    return this.es;
+  }
+
   static load(): GameNames {
     const es = NamesFile.parse(JSON.parse(readFileSync(NAMES_FILE, 'utf8')));
     const lines = existsSync(LINES_FILE)

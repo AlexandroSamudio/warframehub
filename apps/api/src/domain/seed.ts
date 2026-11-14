@@ -13,6 +13,8 @@ const BaseItem = z.object({
   /** Shown with a "verify" badge until confirmed in game. */
   verify: z.boolean().default(false),
   linkUrl: z.url().optional(),
+  /** The Spanish text (SPEC §8.3), shown while the item is unedited. */
+  es: z.object({ title: z.string().min(1), description: z.string().default('') }).optional(),
 });
 
 export const SeedItem = z.discriminatedUnion('kind', [
@@ -28,6 +30,8 @@ export const SeedSection = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/),
   title: z.string().min(1),
   period: PeriodType,
+  /** The Spanish title, shown while the section is unedited. */
+  es: z.object({ title: z.string().min(1) }).optional(),
   items: z.array(SeedItem),
 });
 export type SeedSection = z.infer<typeof SeedSection>;

@@ -1,3 +1,4 @@
+import type { SeedText } from '../domain/seed-text.js';
 import {
   ClearSectionResponse,
   PutTickRequest,
@@ -15,16 +16,18 @@ export interface TrackerRouteDeps {
   now: () => Date;
   /** Live Sortie/Baro times; may refresh the world-state cache first. */
   liveTimes: () => LiveTimes | Promise<LiveTimes>;
+  /** The default checklist's Spanish (SPEC §8.3). */
+  text: () => SeedText;
 }
 
 const IdParams = z.object({ id: z.coerce.number().int().positive() });
 
 export function registerTrackerRoutes(app: FastifyInstance, deps: TrackerRouteDeps): void {
-  const { db, userId, now, liveTimes } = deps;
+  const { db, userId, now, liveTimes, text } = deps;
 
   app.get('/api/tracker', async (): Promise<TrackerResponse> => {
     const live = await liveTimes();
-    return TrackerResponse.parse(loadTracker(db, userId, now(), live));
+    return TrackerResponse.parse(loadTracker(db, userId, now(), live, text()));
   });
 
   app.put('/api/ticks', async (request): Promise<PutTickResponse> => {

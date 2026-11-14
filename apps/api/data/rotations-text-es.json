@@ -1,0 +1,1374 @@
+{
+ "nightwave": {
+  "A Firm Handshake": {
+   "title": "Un apretón de manos firme",
+   "description": "Estrecha la mano de otro Tenno con el gesto Apretón de manos"
+  },
+  "Glider": {
+   "title": "Planeador",
+   "description": "Mata 15 enemigos mientras planeas apuntando"
+  },
+  "Augmentation": {
+   "title": "Aumentación",
+   "description": "Instala un mod de aumento en tu warframe"
+  },
+  "Builder's Touch": {
+   "title": "Toque de constructor",
+   "description": "Reclama un objeto de tu fundición"
+  },
+  "Trampoline": {
+   "title": "Trampolín",
+   "description": "Haz 150 saltos-bala"
+  },
+  "Researcher": {
+   "title": "Investigador",
+   "description": "Escanea 25 objetos o enemigos"
+  },
+  "Saver": {
+   "title": "Ahorrador",
+   "description": "Recoge 15,000 créditos"
+  },
+  "Gatherer": {
+   "title": "Recolector",
+   "description": "Recoge 1,500 recursos"
+  },
+  "Agent": {
+   "title": "Agente",
+   "description": "Completa una misión"
+  },
+  "Swordsman": {
+   "title": "Espadachín",
+   "description": "Completa una misión con solo un arma cuerpo a cuerpo equipada"
+  },
+  "Hands Full": {
+   "title": "Manos llenas",
+   "description": "Completa una misión con solo un arma primaria equipada"
+  },
+  "Sidearm": {
+   "title": "Arma de mano",
+   "description": "Completa una misión con solo un arma secundaria equipada"
+  },
+  "Death from Above": {
+   "title": "Muerte desde arriba",
+   "description": "Mata 10 enemigos con golpes contra el suelo"
+  },
+  "Air It Out": {
+   "title": "Despeja el aire",
+   "description": "Despliega una recarga de apoyo aéreo en una misión"
+  },
+  "Graffiti": {
+   "title": "Grafiti",
+   "description": "Coloca un glifo durante una misión"
+  },
+  "Doppelganger": {
+   "title": "Doble",
+   "description": "Despliega un espectro"
+  },
+  "Patron": {
+   "title": "Mecenas",
+   "description": "Haz una donación al Leverian"
+  },
+  "Feed Me More": {
+   "title": "Dame más de comer",
+   "description": "Alimenta a las Fauces en Duviri"
+  },
+  "Helping Hand": {
+   "title": "Una mano amiga",
+   "description": "Rescata a un animal en Duviri"
+  },
+  "Confiscated": {
+   "title": "Confiscado",
+   "description": "Secuestra una nave de tripulación enemiga"
+  },
+  "Loyalty": {
+   "title": "Lealtad",
+   "description": "Consigue un total de 5,000 de reputación entre todas las facciones de Sindicato"
+  },
+  "Warning Shot": {
+   "title": "Disparo de advertencia",
+   "description": "Mata 200 enemigos"
+  },
+  "Thrill Rider": {
+   "title": "Jinete temerario",
+   "description": "Mata 20 enemigos mientras montas un K-Drive, un kaithe, un velocípodo o la Merulina."
+  },
+  "Power Trip": {
+   "title": "Borracho de poder",
+   "description": "Mata 150 enemigos con habilidades"
+  },
+  "Detonator": {
+   "title": "Detonador",
+   "description": "Mata 150 enemigos con daño de explosión"
+  },
+  "Meltdown": {
+   "title": "Fusión",
+   "description": "Mata 150 enemigos con daño corrosivo"
+  },
+  "Short Circuit": {
+   "title": "Cortocircuito",
+   "description": "Mata 150 enemigos con daño de electricidad"
+  },
+  "Executioner": {
+   "title": "Verdugo",
+   "description": "Mata 10 enemigos con ataques de remate"
+  },
+  "Arsonist": {
+   "title": "Pirómano",
+   "description": "Mata 150 enemigos con daño de calor"
+  },
+  "Deep Freeze": {
+   "title": "Congelación profunda",
+   "description": "Mata 150 enemigos con daño de frío"
+  },
+  "Biohazard": {
+   "title": "Riesgo biológico",
+   "description": "Mata 150 enemigos con daño de gas"
+  },
+  "Marksman": {
+   "title": "Tirador experto",
+   "description": "Mata 40 enemigos con disparos a la cabeza"
+  },
+  "Attractive": {
+   "title": "Atractivo",
+   "description": "Mata 150 enemigos con daño magnético"
+  },
+  "Sword Dance": {
+   "title": "Danza de espadas",
+   "description": "Mata 150 enemigos con un arma cuerpo a cuerpo"
+  },
+  "Poisoner": {
+   "title": "Envenenador",
+   "description": "Mata 150 enemigos con daño de toxina"
+  },
+  "Mow Them Down": {
+   "title": "Arrásalos",
+   "description": "Mata 150 enemigos con un arma primaria"
+  },
+  "Reactor": {
+   "title": "Reactor",
+   "description": "Mata 150 enemigos con daño de radiación"
+  },
+  "Smaller Is Bigger": {
+   "title": "Menos es más",
+   "description": "Mata 150 enemigos con un arma secundaria"
+  },
+  "Go Viral": {
+   "title": "Hazte viral",
+   "description": "Mata 150 enemigos con daño viral"
+  },
+  "Hush": {
+   "title": "Silencio",
+   "description": "Mata a un esclavo de Kuva o a un Sabueso"
+  },
+  "Reclaimed": {
+   "title": "Recuperado",
+   "description": "Despeja un nodo bajo la influencia de un Lich de Kuva o de una Hermana de Parvos"
+  },
+  "Liquidation": {
+   "title": "Liquidación",
+   "description": "Vende cualquier objeto de tu inventario por créditos"
+  },
+  "Medic": {
+   "title": "Médico",
+   "description": "Revive a otro Tenno o a un compañero"
+  },
+  "No Mercy": {
+   "title": "Sin piedad",
+   "description": "Realiza un asesinato de Misericordia a un enemigo"
+  },
+  "Kleptomaniac": {
+   "title": "Cleptómano",
+   "description": "Abre 20 casilleros"
+  },
+  "Energizing": {
+   "title": "Energizante",
+   "description": "Recoge 20 orbes de energía"
+  },
+  "The Hunt is On": {
+   "title": "Comienza la cacería",
+   "description": "Encuentra 5 medallones de Sindicato"
+  },
+  "Shiny": {
+   "title": "Brillante",
+   "description": "Recoge 8 mods"
+  },
+  "Reanimator": {
+   "title": "Reanimador",
+   "description": "Encuentra y pilota un Necramech caído en Deimos."
+  },
+  "Communicator": {
+   "title": "Comunicador",
+   "description": "Marca 5 mods o recursos"
+  },
+  "Expressive": {
+   "title": "Expresivo",
+   "description": "Usa 1 gesto"
+  },
+  "Child at Heart": {
+   "title": "Niño de corazón",
+   "description": "Juega una partida de Frame Fighter, Happy Zephyr o Wyrmius"
+  },
+  "Friendly Fire": {
+   "title": "Fuego amigo",
+   "description": "Mientras pilotas una nave de tripulación secuestrada, destruye 3 cazas enemigos"
+  },
+  "Ancient Obelisk": {
+   "title": "Obelisco antiguo",
+   "description": "Activa un obelisco Réquiem en Deimos."
+  },
+  "Salutations": {
+   "title": "Saludos",
+   "description": "Visita a Acrithis en Duviri"
+  },
+  "Accelerator": {
+   "title": "Acelerador",
+   "description": "Mata 10 enemigos mientras te deslizas"
+  },
+  "Hacker": {
+   "title": "Hacker",
+   "description": "Hackea 10 consolas"
+  },
+  "Stay on Top": {
+   "title": "Mantente arriba",
+   "description": "Mata 20 enemigos con un Necramech mientras flotas"
+  },
+  "Deep Impact": {
+   "title": "Impacto profundo",
+   "description": "Suspende a 5 o más enemigos en el aire a la vez con un golpe pesado contra el suelo cuerpo a cuerpo"
+  },
+  "Swatter": {
+   "title": "Matamoscas",
+   "description": "Mata 3 drones u Ospreys con tu arma cuerpo a cuerpo"
+  },
+  "The Personal Touch": {
+   "title": "El toque personal",
+   "description": "Coloca 1 decoración en tu orbitador"
+  },
+  "Topping Off the Tank": {
+   "title": "Tanque lleno",
+   "description": "Defiende con éxito una excavadora sin dejar que se quede sin energía"
+  },
+  "Everything Old is New Again": {
+   "title": "Todo lo viejo vuelve a ser nuevo",
+   "description": "Completa 1 transmutación de mods"
+  },
+  "Two For One": {
+   "title": "Dos por uno",
+   "description": "Atraviesa y mata a 2 o más enemigos con un solo disparo de arco"
+  },
+  "Just Visiting": {
+   "title": "Solo de visita",
+   "description": "Visita un Dojo destacado"
+  },
+  "Bloodthirsty": {
+   "title": "Sediento de sangre",
+   "description": "Mata 20 enemigos en 5 segundos"
+  },
+  "Flawless": {
+   "title": "Impecable",
+   "description": "Elimina un grupo de abordaje de Railjack sin que tu warframe reciba daño"
+  },
+  "Earth Fisher": {
+   "title": "Pescador de la Tierra",
+   "description": "Pesca 6 peces raros en Las Llanuras de Eidolon"
+  },
+  "Venus Fisher": {
+   "title": "Pescador de Venus",
+   "description": "Pesca 3 servopeces raros en los Valles del Orbe"
+  },
+  "Assassin": {
+   "title": "Asesino",
+   "description": "Completa 3 misiones de Asesinato"
+  },
+  "Jailer": {
+   "title": "Carcelero",
+   "description": "Completa 3 misiones de Captura"
+  },
+  "Good Friend": {
+   "title": "Buen amigo",
+   "description": "Ayuda a Clem con su misión semanal"
+  },
+  "Don't Blow It": {
+   "title": "No lo arruines",
+   "description": "Completa 12 conductos en Interrupción"
+  },
+  "Eliminator": {
+   "title": "Eliminador",
+   "description": "Completa 3 misiones de Exterminio"
+  },
+  "Invader": {
+   "title": "Invasor",
+   "description": "Completa 9 misiones de Invasión de cualquier tipo"
+  },
+  "Don't Fear The Reaper": {
+   "title": "No temas a la Parca",
+   "description": "Completa 3 misiones de Sifón Kuva"
+  },
+  "Protector": {
+   "title": "Protector",
+   "description": "Completa 3 misiones de Defensa móvil"
+  },
+  "Sound Sleeper": {
+   "title": "Sueño profundo",
+   "description": "Completa 3 misiones del Modo Pesadilla de cualquier tipo"
+  },
+  "Rescuer": {
+   "title": "Rescatador",
+   "description": "Completa 3 misiones de Rescate"
+  },
+  "Saboteur": {
+   "title": "Saboteador",
+   "description": "Completa 3 misiones de Sabotaje"
+  },
+  "Sortie Specialist": {
+   "title": "Especialista en Incursiones",
+   "description": "Completa 1 Incursión"
+  },
+  "Operative": {
+   "title": "Operativo",
+   "description": "Completa 3 misiones de Espionaje"
+  },
+  "Supporter": {
+   "title": "Partidario",
+   "description": "Completa 5 misiones de Sindicato"
+  },
+  "Animator": {
+   "title": "Animador",
+   "description": "Llena por completo 3 esculturas Ayatan"
+  },
+  "Now Boarding": {
+   "title": "Embarque inmediato",
+   "description": "Completa 3 carreras de K-Drive distintas en los Valles del Orbe en Venus o en la Deriva Cambion en Deimos"
+  },
+  "Forward Thinking": {
+   "title": "Pensamiento frontal",
+   "description": "Destruye una nave de tripulación con la Artillería frontal"
+  },
+  "Eternal Guardian": {
+   "title": "Guardián eterno",
+   "description": "Completa 3 misiones de Armagedón del Vacío"
+  },
+  "Feed The Beast": {
+   "title": "Alimenta a la bestia",
+   "description": "Alimenta al Helminto con cualquier recurso"
+  },
+  "Finely Tuned": {
+   "title": "Bien afinado",
+   "description": "Toca 2 canciones de Shawzin distintas en Duviri."
+  },
+  "Gilded": {
+   "title": "Dorado",
+   "description": "Dora 1 objeto modular"
+  },
+  "High Ground": {
+   "title": "Terreno elevado",
+   "description": "Completa 3 misiones de Inundación del Vacío"
+  },
+  "Horsing Around": {
+   "title": "A galope",
+   "description": "Vuela con tu kaithe 1000 metros"
+  },
+  "Vault Raider": {
+   "title": "Saqueador de bóvedas",
+   "description": "Completa un contrato de la bóveda de aislamiento en Deimos"
+  },
+  "Heavy Ordnance": {
+   "title": "Artillería pesada",
+   "description": "Mata 500 enemigos con un archcañón"
+  },
+  "Not a Warning Shot": {
+   "title": "No es un disparo de advertencia",
+   "description": "Mata 500 enemigos"
+  },
+  "Necralizer": {
+   "title": "Necralizador",
+   "description": "Mata 100 enemigos con un mecha."
+  },
+  "Eximus Eliminator": {
+   "title": "Eliminador de Eximus",
+   "description": "Mata 30 Eximus"
+  },
+  "Tusk Thumpin": {
+   "title": "A pisotones",
+   "description": "Mata a un Pistón Colmillo en Las Llanuras de Eidolon"
+  },
+  "Mad Lab": {
+   "title": "Laboratorio demente",
+   "description": "Saquea uno de los laboratorios secretos de Alad V en Júpiter"
+  },
+  "Earth Miner": {
+   "title": "Minero de la Tierra",
+   "description": "Extrae 3 gemas raras en Las Llanuras de Eidolon"
+  },
+  "Venus Miner": {
+   "title": "Minero de Venus",
+   "description": "Extrae 3 gemas raras en los Valles del Orbe"
+  },
+  "Night and Day": {
+   "title": "Noche y día",
+   "description": "Recoge 10 residuos de Vome o de Fass en la Deriva Cambion"
+  },
+  "Conservationist": {
+   "title": "Conservacionista",
+   "description": "Completa 3 capturas de animales perfectas distintas en los Valles del Orbe"
+  },
+  "Mission Complete": {
+   "title": "Misión completada",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete X": {
+   "title": "Misión completada X",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XI": {
+   "title": "Misión completada XI",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XII": {
+   "title": "Misión completada XII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XIII": {
+   "title": "Misión completada XIII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XIV": {
+   "title": "Misión completada XIV",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XV": {
+   "title": "Misión completada XV",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XVI": {
+   "title": "Misión completada XVI",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XVII": {
+   "title": "Misión completada XVII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XVIII": {
+   "title": "Misión completada XVIII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XIX": {
+   "title": "Misión completada XIX",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete II": {
+   "title": "Misión completada II",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XX": {
+   "title": "Misión completada XX",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXI": {
+   "title": "Misión completada XXI",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXII": {
+   "title": "Misión completada XXII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXIII": {
+   "title": "Misión completada XXIII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXIV": {
+   "title": "Misión completada XXIV",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXV": {
+   "title": "Misión completada XXV",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXVI": {
+   "title": "Misión completada XXVI",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXVII": {
+   "title": "Misión completada XXVII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXVIII": {
+   "title": "Misión completada XXVIII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXIX": {
+   "title": "Misión completada XXIX",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete III": {
+   "title": "Misión completada III",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete XXX": {
+   "title": "Misión completada XXX",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete IV": {
+   "title": "Misión completada IV",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete V": {
+   "title": "Misión completada V",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete VI": {
+   "title": "Misión completada VI",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete VII": {
+   "title": "Misión completada VII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete VIII": {
+   "title": "Misión completada VIII",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Mission Complete IX": {
+   "title": "Misión completada IX",
+   "description": "Completa 15 misiones cualesquiera"
+  },
+  "Not a Warning Shot X": {
+   "title": "No es un disparo de advertencia X",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XI": {
+   "title": "No es un disparo de advertencia XI",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XII": {
+   "title": "No es un disparo de advertencia XII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XIII": {
+   "title": "No es un disparo de advertencia XIII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XIV": {
+   "title": "No es un disparo de advertencia XIV",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XV": {
+   "title": "No es un disparo de advertencia XV",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XVI": {
+   "title": "No es un disparo de advertencia XVI",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XVII": {
+   "title": "No es un disparo de advertencia XVII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XVIII": {
+   "title": "No es un disparo de advertencia XVIII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XIX": {
+   "title": "No es un disparo de advertencia XIX",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot II": {
+   "title": "No es un disparo de advertencia II",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XX": {
+   "title": "No es un disparo de advertencia XX",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXI": {
+   "title": "No es un disparo de advertencia XXI",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXII": {
+   "title": "No es un disparo de advertencia XXII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXIII": {
+   "title": "No es un disparo de advertencia XXIII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXIV": {
+   "title": "No es un disparo de advertencia XXIV",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXV": {
+   "title": "No es un disparo de advertencia XXV",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXVI": {
+   "title": "No es un disparo de advertencia XXVI",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXVII": {
+   "title": "No es un disparo de advertencia XXVII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXVIII": {
+   "title": "No es un disparo de advertencia XXVIII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXIX": {
+   "title": "No es un disparo de advertencia XXIX",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot III": {
+   "title": "No es un disparo de advertencia III",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot XXX": {
+   "title": "No es un disparo de advertencia XXX",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot IV": {
+   "title": "No es un disparo de advertencia IV",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot V": {
+   "title": "No es un disparo de advertencia V",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot VI": {
+   "title": "No es un disparo de advertencia VI",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot VII": {
+   "title": "No es un disparo de advertencia VII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot VIII": {
+   "title": "No es un disparo de advertencia VIII",
+   "description": "Mata 500 enemigos"
+  },
+  "Not a Warning Shot IX": {
+   "title": "No es un disparo de advertencia IX",
+   "description": "Mata 500 enemigos"
+  },
+  "Eximus Eliminator X": {
+   "title": "Eliminador de Eximus X",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XI": {
+   "title": "Eliminador de Eximus XI",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XII": {
+   "title": "Eliminador de Eximus XII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XIII": {
+   "title": "Eliminador de Eximus XIII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XIV": {
+   "title": "Eliminador de Eximus XIV",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XV": {
+   "title": "Eliminador de Eximus XV",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XVI": {
+   "title": "Eliminador de Eximus XVI",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XVII": {
+   "title": "Eliminador de Eximus XVII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XVIII": {
+   "title": "Eliminador de Eximus XVIII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XIX": {
+   "title": "Eliminador de Eximus XIX",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator II": {
+   "title": "Eliminador de Eximus II",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XX": {
+   "title": "Eliminador de Eximus XX",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXI": {
+   "title": "Eliminador de Eximus XXI",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXII": {
+   "title": "Eliminador de Eximus XXII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXIII": {
+   "title": "Eliminador de Eximus XXIII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXIV": {
+   "title": "Eliminador de Eximus XXIV",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXV": {
+   "title": "Eliminador de Eximus XXV",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXVI": {
+   "title": "Eliminador de Eximus XXVI",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXVII": {
+   "title": "Eliminador de Eximus XXVII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXVIII": {
+   "title": "Eliminador de Eximus XXVIII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXIX": {
+   "title": "Eliminador de Eximus XXIX",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator III": {
+   "title": "Eliminador de Eximus III",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator XXX": {
+   "title": "Eliminador de Eximus XXX",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator IV": {
+   "title": "Eliminador de Eximus IV",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator V": {
+   "title": "Eliminador de Eximus V",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator VI": {
+   "title": "Eliminador de Eximus VI",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator VII": {
+   "title": "Eliminador de Eximus VII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator VIII": {
+   "title": "Eliminador de Eximus VIII",
+   "description": "Mata 30 Eximus"
+  },
+  "Eximus Eliminator IX": {
+   "title": "Eliminador de Eximus IX",
+   "description": "Mata 30 Eximus"
+  },
+  "Enhance!": {
+   "title": "¡Mejora!",
+   "description": "Recoge 8 mods raros"
+  },
+  "Earth Bounty Hunter": {
+   "title": "Cazarrecompensas de la Tierra",
+   "description": "Completa 3 contratos distintos en Las Llanuras de Eidolon"
+  },
+  "Explorer": {
+   "title": "Explorador",
+   "description": "Completa 3 misiones de Railjack"
+  },
+  "Cache Hunter": {
+   "title": "Cazador de alijos",
+   "description": "Encuentra todos los alijos en 3 misiones de Sabotaje"
+  },
+  "Test Subject": {
+   "title": "Sujeto de pruebas",
+   "description": "Completa 8 oleadas de Ofensiva del Santuario"
+  },
+  "Sanctuary Researcher": {
+   "title": "Investigador del Santuario",
+   "description": "Completa 3 escaneos para el Céfalon Simaris"
+  },
+  "The Old Ways": {
+   "title": "A la antigua",
+   "description": "Completa 1 misión con solo una pistola y un glaive equipados"
+  },
+  "Vault Looter": {
+   "title": "Saqueador de bóvedas orokin",
+   "description": "Abre 4 bóvedas orokin"
+  },
+  "Unlock Relics": {
+   "title": "Abre reliquias",
+   "description": "Abre 10 reliquias"
+  },
+  "Polarized": {
+   "title": "Polarizado",
+   "description": "Polariza un arma, un compañero o un warframe (fuera del Simulacro)."
+  },
+  "Venus Bounty Hunter": {
+   "title": "Cazarrecompensas de Venus",
+   "description": "Completa 3 contratos distintos en los Valles del Orbe"
+  },
+  "Zariman Bounty Hunter": {
+   "title": "Cazarrecompensas del Zariman",
+   "description": "Completa 4 contratos distintos en el Zariman"
+  },
+  "Antiquarian": {
+   "title": "Anticuario",
+   "description": "Abre una reliquia de cada era (Lith, Meso, Neo, Axi)"
+  },
+  "Resource Scavenger": {
+   "title": "Carroñero de recursos",
+   "description": "Recoge 20 tipos de recursos distintos."
+  },
+  "Archon Hunter": {
+   "title": "Cazador de Arcontes",
+   "description": "Completa una Cacería de Arconte"
+  },
+  "Night Terror": {
+   "title": "Terror nocturno",
+   "description": "Completa 5 misiones del Modo Pesadilla de cualquier tipo"
+  },
+  "Sortie Expert": {
+   "title": "Experto en Incursiones",
+   "description": "Completa 3 Incursiones"
+  },
+  "The Path Less Travelled": {
+   "title": "El camino menos transitado",
+   "description": "Completa 5 misiones de El Camino de Acero."
+  },
+  "Elite Beast Slayer": {
+   "title": "Cazador de bestias de élite",
+   "description": "Derrota al Orowyrm en El Camino de Acero"
+  },
+  "Elite Test Subject": {
+   "title": "Sujeto de pruebas de élite",
+   "description": "Completa 8 zonas de Ofensiva del Santuario de élite"
+  },
+  "Silent Eliminator": {
+   "title": "Eliminador silencioso",
+   "description": "Completa una misión de Exterminio con enemigos de nivel 30 o superior sin ser detectado"
+  },
+  "Fallen Angel": {
+   "title": "Ángel caído",
+   "description": "Derrota a 5 Ángeles del Vacío en el Zariman"
+  },
+  "Speedster": {
+   "title": "Velocista",
+   "description": "Termina una misión de Captura en menos de 90 segundos"
+  },
+  "Choose Wisely": {
+   "title": "Elige con sabiduría",
+   "description": "Mata o convierte a un Lich de Kuva"
+  },
+  "Defense": {
+   "title": "Defensa",
+   "description": "Completa una misión de Defensa llegando al menos a la oleada 20"
+  },
+  "Crystal Clear": {
+   "title": "Cristalino",
+   "description": "Completa 3 oleadas de Defensa espejo"
+  },
+  "Profit-Taker": {
+   "title": "Robaganancias",
+   "description": "Mata a la Robaganancias"
+  },
+  "Survival": {
+   "title": "Supervivencia",
+   "description": "Completa una misión de Supervivencia llegando al menos a 20 minutos"
+  },
+  "Day Trader": {
+   "title": "Especulador",
+   "description": "Gana 3 apuestas seguidas sin dejar que el enemigo anote en una partida de El Índice."
+  },
+  "Kill Shot": {
+   "title": "Tiro mortal",
+   "description": "Mata 1,500 enemigos"
+  },
+  "Cold Steel": {
+   "title": "Acero frío",
+   "description": "Mata 1,000 enemigos en El Camino de Acero."
+  },
+  "Eximus Executioner": {
+   "title": "Verdugo de Eximus",
+   "description": "Mata 100 Eximus"
+  },
+  "Nothing but Profit": {
+   "title": "Pura ganancia",
+   "description": "Mata a la Orbe Explotadora"
+  },
+  "Hydrolyst Hunter": {
+   "title": "Cazador de Hidrolistas",
+   "description": "Mata o captura a un Eidolon Hidrolista"
+  },
+  "Flying High": {
+   "title": "Volando alto",
+   "description": "Derrota al Ropaloulista"
+  },
+  "Grove Guardian": {
+   "title": "Guardián de la arboleda",
+   "description": "Mata a un Espectro de la Arboleda Plateada"
+  },
+  "Tanked": {
+   "title": "Tanque abatido",
+   "description": "Derrota a un tanque Efervon H-09"
+  },
+  "Walk Without Rhythm": {
+   "title": "Camina sin ritmo",
+   "description": "Mata a un Pistón Doma Colmillo en Las Llanuras de Eidolon"
+  },
+  "Hold Your Breath": {
+   "title": "Contén la respiración",
+   "description": "Sobrevive más de 20 minutos en Supervivencia Kuva"
+  },
+  "Ascendant": {
+   "title": "Ascendente",
+   "description": "Completa 4 Salas de la Ascensión en Lua"
+  },
+  "Elite Explorer": {
+   "title": "Explorador de élite",
+   "description": "Completa 8 misiones de Railjack"
+  },
+  "Rise of the Machine": {
+   "title": "La rebelión de la máquina",
+   "description": "Mata 300 enemigos con un Necramech sin que lo destruyan"
+  },
+  "Machine Interference": {
+   "title": "Interferencia de máquina",
+   "description": "Completa una misión de Espionaje con 3 hackeos manuales de consola y sin alarmas"
+  },
+  "Terminated": {
+   "title": "Terminado",
+   "description": "Destruye 3 Necramechs guardianes de bóvedas"
+  },
+  "The Many Made Whole": {
+   "title": "Los muchos hechos uno",
+   "description": "Convierte 10 Fragmentos de Agrietado en un mod agrietado"
+  },
+  "The Price of Freedom": {
+   "title": "El precio de la libertad",
+   "description": "Libera a un Solaris capturado con una Corona Granum"
+  },
+  "Vital Arbiter": {
+   "title": "Árbitro vital",
+   "description": "Completa una misión de Arbitramento"
+  }
+ },
+ "archimedea": {
+  "Powerless": {
+   "name": "Sin poder",
+   "description": "Todas las habilidades están desactivadas hasta que el escuadrón mate a 50 enemigos."
+  },
+  "Bold Venture": {
+   "name": "Aventura audaz",
+   "description": "Los enemigos infligen -15% de daño y reciben +15% de daño, pero obtienen +15% de velocidad de movimiento, velocidad de ataque y cadencia de fuego."
+  },
+  "Alchemical Invulnerability": {
+   "name": "Invulnerabilidad alquímica",
+   "description": "El 10% de los enemigos lleva una barrera elemental impenetrable que solo puede destruir un ánfora del elemento correspondiente."
+  },
+  "Dropped Guard": {
+   "name": "Guardia baja",
+   "description": "La sobreguardia que obtienen los warframes y los aliados se reduce un 75%."
+  },
+  "Commanding Culverins": {
+   "name": "Culverins dominantes",
+   "description": "Los Culverins pícaros equipan armas que infligen 5x de daño a la sobreguardia y a los Necramechs."
+  },
+  "Arbiters of Hexis": {
+   "name": "Árbitros de Hexis",
+   "description": ""
+  },
+  "Arcade Automate": {
+   "name": "Autómata arcade",
+   "description": "Las armas enemigas lanzan orbes grandes y lentos en lugar de su munición habitual."
+  },
+  "Fractured Armor": {
+   "name": "Armadura fracturada",
+   "description": "Lanzar una habilidad reduce la armadura un 10% durante 10s."
+  },
+  "Artillery Beacons": {
+   "name": "Balizas de artillería",
+   "description": "Al morir, las tropas Scaldra sueltan balizas de artillería que invocan bombardeos."
+  },
+  "Assassins": {
+   "name": "Asesinos",
+   "description": ""
+  },
+  "Balloonfest": {
+   "name": "Fiesta de globos",
+   "description": "Los Heraldos Scaldra son más numerosos y atacan y se mueven más rápido."
+  },
+  "Cephalon Suda": {
+   "name": "Céfalon Suda",
+   "description": ""
+  },
+  "Ostrons": {
+   "name": "Ostronitas",
+   "description": ""
+  },
+  "Channeled Greed": {
+   "name": "Codicia canalizada",
+   "description": "Mientras una habilidad canalizada está activa, el escudo máximo y el sobreescudo se reducen cada segundo. 10s de espera para recuperarse por completo."
+  },
+  "Noise Suppression": {
+   "name": "Supresión de ruido",
+   "description": "Unos drones vuelan sobre Flare y la rocían con gas Efervon."
+  },
+  "Competitive Streak": {
+   "name": "Racha competitiva",
+   "description": "Durante toda la misión se aplican penalizaciones negativas aleatorias del modo \"Cara a cara\" de Amir y Aoi."
+  },
+  "Secondary Wounds": {
+   "name": "Heridas secundarias",
+   "description": "Recibes 1 efecto de estado de perforación cada vez que recibes daño."
+  },
+  "Hold Your Breath": {
+   "name": "Contén la respiración",
+   "description": "Toda la región inflige daño de toxina con el tiempo, que aumenta cuanto más tiempo permanecen los jugadores."
+  },
+  "Permanent Injury": {
+   "name": "Lesión permanente",
+   "description": "La salud máxima se reduce cada vez que recibes daño a la salud"
+  },
+  "Fortified Foes": {
+   "name": "Enemigos fortificados",
+   "description": "Pueden aparecer unidades Eximus Guardián, incluidos Necramechs Eximus Guardián."
+  },
+  "Vampire Rock": {
+   "name": "Rock vampírico",
+   "description": "Flare crea un campo que interrumpe las habilidades de los jugadores mientras drena energía para aumentar su salud. Flare pierde salud lentamente cuando no hay jugadores a su alcance."
+  },
+  "Double Trouble": {
+   "name": "Doble problema",
+   "description": "Dos Necramechs Demoledores atacarán cualquier conducto, pero su salud se reduce."
+  },
+  "Mitosis": {
+   "name": "Mitosis",
+   "description": "Aparecen dos legacitos en cada ronda y se necesitan el doble de capturas para tener éxito."
+  },
+  "Devil's Bargain": {
+   "name": "Pacto con el diablo",
+   "description": "Los aliados a menos de 4m de enemigos abatidos obtienen 25% de cadencia de fuego a costa de -50% de eficiencia de munición."
+  },
+  "Dull Blades": {
+   "name": "Filos romos",
+   "description": "-50% de probabilidad de contador de combo cuerpo a cuerpo"
+  },
+  "Alluring Arcocanids": {
+   "name": "Arcocánidos seductores",
+   "description": "Mientras los Arcocánidos pícaros cargan sus ataques, atraen a los warframes hacia ellos."
+  },
+  "Dense Fog": {
+   "name": "Niebla densa",
+   "description": "El gas Efervon cubre el nivel. Los enemigos pueden soltar filtros que dan un alivio temporal."
+  },
+  "Energy Exhaustion": {
+   "name": "Agotamiento de energía",
+   "description": "Pierdes 2 de energía por segundo por cada enemigo a menos de 10 metros de ti."
+  },
+  "Entrati": {
+   "name": "Entrati",
+   "description": ""
+  },
+  "Cache Crash": {
+   "name": "Desplome de alijos",
+   "description": "Las consecuencias de abrir un alijo de suministros están activas desde el inicio y se intensifican si se abre el alijo. Si no abres un alijo de suministros, se duplica la cantidad de muertes necesaria para terminar la misión."
+  },
+  "Operations Syndicate": {
+   "name": "Sindicato de Operaciones",
+   "description": ""
+  },
+  "Eximus Amphors": {
+   "name": "Ánforas Eximus",
+   "description": "Las unidades Eximus siempre sueltan ánforas."
+  },
+  "Explosive Potential": {
+   "name": "Potencial explosivo",
+   "description": "Los Fragmentos explosivos reemplazan a los Fragmentos tambaleantes."
+  },
+  "Miasmite Mash": {
+   "name": "Avalancha de miasmitas",
+   "description": "Al morir, los enemigos sueltan miasmitas que se lanzan de inmediato contra Flare."
+  },
+  "Excessive Explosives": {
+   "name": "Explosivos excesivos",
+   "description": "Todas las cajas de suministros se reemplazan por barriles explosivos."
+  },
+  "Scaldra Speed Run": {
+   "name": "Carrera rápida Scaldra",
+   "description": "Todos los enemigos se reemplazan por Scaldra y se mueven mucho más rápido."
+  },
+  "Techrot Speed Run": {
+   "name": "Carrera rápida Techrot",
+   "description": "Todos los enemigos se reemplazan por Techrot y se mueven mucho más rápido."
+  },
+  "Foggy Fall": {
+   "name": "Caída brumosa",
+   "description": "Una niebla limita la visión en toda la zona de la misión."
+  },
+  "Sealed Armor": {
+   "name": "Armadura sellada",
+   "description": "Los enemigos reciben un 90% menos de daño de los impactos fuera de los puntos débiles."
+  },
+  "Unified Purpose": {
+   "name": "Propósito unificado",
+   "description": "Los enemigos pueden atacar y destruir los conductos."
+  },
+  "Framecurse syndrome": {
+   "name": "Síndrome de la maldición del warframe",
+   "description": "Activar una habilidad te inflige 50 de daño."
+  },
+  "Gear Embargo": {
+   "name": "Embargo de equipamiento",
+   "description": "No se puede usar el equipamiento."
+  },
+  "Sporogenesis": {
+   "name": "Esporogénesis",
+   "description": "Aparecen tumores Techrot cerca de los Fregones infernales; cada tumor activo acelera el deterioro del soporte vital."
+  },
+  "Fissure Cascade": {
+   "name": "Cascada de fisuras",
+   "description": "Las fisuras irrumpen en la misión y hacen que el nivel de los enemigos suba 1 cada 10s. Destrúyelas para que el nivel deje de aumentar."
+  },
+  "Barbed Glyphs": {
+   "name": "Glifos espinosos",
+   "description": "Cada glifo inflige un poco de daño al recogerlo."
+  },
+  "Heavy Warfare": {
+   "name": "Guerra pesada",
+   "description": "Los enemigos reciben un 95% menos de daño de las armas que no son pesadas. Los enemigos sueltan paquetes de munición pesada y el tiempo de recuperación del arma pesada se reduce a 5s."
+  },
+  "Growth Hormones": {
+   "name": "Hormonas de crecimiento",
+   "description": "Los legacitos son más poderosos con cada generación, pero tardan más en escapar."
+  },
+  "It's Alive": {
+   "name": "¡Está vivo!",
+   "description": "En el subsuelo, crecimientos hostiles atacan si los jugadores dejan de moverse."
+  },
+  "Eroding Senses": {
+   "name": "Sentidos erosionados",
+   "description": "La Aurícula y el Vítreo reciben daño con el tiempo; recoger los glifos de vosfeno necesarios detiene la degradación y los cura en parte."
+  },
+  "Corrupted Flesh": {
+   "name": "Carne corrupta",
+   "description": "Los enemigos Techrot están infundidos con Efervon y reciben daño con el tiempo. Explotan al morir y dejan Efervon mortal a su paso."
+  },
+  "Infected Wounds": {
+   "name": "Heridas infectadas",
+   "description": "Recibes un efecto de estado de toxina cada vez que recibes daño."
+  },
+  "Relentless Tide": {
+   "name": "Marea implacable",
+   "description": "La Marea Fragmentada nunca deja de atacar."
+  },
+  "Jade Spirits": {
+   "name": "Espíritus de Jade",
+   "description": "Fuegos fatuos de Jade rondan la región. Si te acercas, persiguen al jugador responsable y se transforman en rayos de Luz de Jade."
+  },
+  "Kahl's Garrison": {
+   "name": "Guarnición de Kahl",
+   "description": ""
+  },
+  "Knifestep Syndrome": {
+   "name": "Síndrome del paso de cuchilla",
+   "description": "Pierdes 2 de salud al moverte. Saltar pausa el efecto."
+  },
+  "Glyph Inflation": {
+   "name": "Inflación de glifos",
+   "description": "El sistema de seguridad requiere el doble de glifos de vosfeno para activarse."
+  },
+  "Miasmite Swarm": {
+   "name": "Enjambre de miasmitas",
+   "description": "Enjambres de miasmitas Techrot salen de las sombras durante toda la misión."
+  },
+  "Beyond The Wall": {
+   "name": "Más allá del muro",
+   "description": "Enemigos de los Murmullos se unen a las fuerzas Scaldra y Techrot."
+  },
+  "Parallel Evolution": {
+   "name": "Evolución paralela",
+   "description": "A medida que el legacito evoluciona, los demás enemigos presentes también obtienen nuevas habilidades."
+  },
+  "Necraloid": {
+   "name": "Necraloide",
+   "description": ""
+  },
+  "Necramech Influx": {
+   "name": "Afluencia de Necramechs",
+   "description": "Los Necramechs aparecen con mayor frecuencia."
+  },
+  "New Loka": {
+   "name": "Nuevo Loka",
+   "description": ""
+  },
+  "Transference Distortion": {
+   "name": "Distorsión de transferencia",
+   "description": "La transferencia al Operador y al Viajero está bloqueada."
+  },
+  "Hypersensitive": {
+   "name": "Hipersensible",
+   "description": "La duración de los efectos de estado negativos se triplica"
+  },
+  "Perrin Sequence": {
+   "name": "La Secuencia Perrin",
+   "description": ""
+  },
+  "Myopic Munitions": {
+   "name": "Munición miope",
+   "description": "Los enemigos solo reciben daño si un jugador está a menos de 15m de ellos."
+  },
+  "Entanglement": {
+   "name": "Enredo",
+   "description": "Los aliados a menos de 4m de enemigos abatidos sufren menor velocidad de movimiento y de parkour."
+  },
+  "Quills": {
+   "name": "Raquis",
+   "description": ""
+  },
+  "The Emissary": {
+   "name": "El Emisario",
+   "description": ""
+  },
+  "Glassmaker": {
+   "name": "Artesano de Cristal",
+   "description": ""
+  },
+  "Intermission II": {
+   "name": "Intermedio II",
+   "description": ""
+  },
+  "Intermission III": {
+   "name": "Intermedio III",
+   "description": ""
+  },
+  "Nora's Choice": {
+   "name": "Elección de Nora",
+   "description": ""
+  },
+  "Nora's Mix Volume 1": {
+   "name": "Mix de Nora Vol. 1",
+   "description": ""
+  },
+  "Nora's Mix Volume 2": {
+   "name": "Mix de Nora Vol. 2",
+   "description": ""
+  },
+  "Intermission": {
+   "name": "Intermedio",
+   "description": ""
+  },
+  "The Wolf of Saturn Six": {
+   "name": "El Lobo de Saturno Seis",
+   "description": ""
+  },
+  "Red Veil": {
+   "name": "Velo Rojo",
+   "description": ""
+  },
+  "Hostile Regeneration": {
+   "name": "Regeneración hostil",
+   "description": "La salud de los enemigos se regenera lentamente."
+  },
+  "Coordinated Front": {
+   "name": "Frente coordinado",
+   "description": "Las unidades Eximus apoyan a la Marea Fragmentada y a su forma final."
+  },
+  "Lethargic Shields": {
+   "name": "Escudos letárgicos",
+   "description": "El retraso de recarga de escudo aumenta un 500%."
+  },
+  "Bolstered Belligerents": {
+   "name": "Beligerantes reforzados",
+   "description": "Todos los enemigos tienen sobreguardia igual al 50% de su salud máxima."
+  },
+  "Solaris United": {
+   "name": "Solaris Unidos",
+   "description": ""
+  },
+  "Ammo Deficit": {
+   "name": "Déficit de munición",
+   "description": "La munición que restauran el botín y el equipamiento se reduce un 75%."
+  },
+  "Steel Meridian": {
+   "name": "Meridiano de Acero",
+   "description": ""
+  },
+  "Engorged Gruzzlings": {
+   "name": "Gruzzlings hinchados",
+   "description": "Todos los gruzzlings son Eximus."
+  },
+  "Reinforcements": {
+   "name": "Refuerzos",
+   "description": "Llegarán refuerzos durante el combate."
+  },
+  "Thermian Plating": {
+   "name": "Blindaje termiano",
+   "description": "Solo los RPG termianos pueden dañar al tanque. Durante el combate llegarán refuerzos con RPG termianos"
+  },
+  "Toxic Tank": {
+   "name": "Tanque tóxico",
+   "description": "El tanque tiene un aura de toxina, deja rastros de toxina y todos sus ataques infligen daño de toxina."
+  },
+  "Pile-On": {
+   "name": "Amontonamiento",
+   "description": "Los enemigos Techrot intentan atacar cuerpo a cuerpo a los Fregones infernales; estallan al contacto y aumentan la contaminación del fregón un 25%."
+  },
+  "Abbreviated Abilities": {
+   "name": "Habilidades abreviadas",
+   "description": "La duración de las habilidades se reduce un 50%."
+  },
+  "Undersupplied": {
+   "name": "Desabastecido",
+   "description": "La munición máxima de todas las armas se reduce un 75%."
+  },
+  "Parasitic Towers": {
+   "name": "Torres parasitarias",
+   "description": "Las torres de soporte vital solo se activan después de matar a 20 enemigos en un radio de 15m de ellas."
+  },
+  "Vent Kids": {
+   "name": "Ventkids",
+   "description": ""
+  },
+  "Vampyric Liminus": {
+   "name": "Liminus vampíricos",
+   "description": "Liminus de Duviri lentos e inmortales drenan salud y energía de los aliados que se acercan demasiado."
+  },
+  "Ability Overload": {
+   "name": "Sobrecarga de habilidades",
+   "description": "Usar una habilidad abre una grieta del Vacío sobre ti."
+  },
+  "Postmortal Surges": {
+   "name": "Oleadas póstumas",
+   "description": "Los enemigos abatidos estallan con energía del Vacío."
+  },
+  "Hazardous Goods": {
+   "name": "Mercancía peligrosa",
+   "description": "Las ánforas infligen daño elemental mientras las llevas."
+  },
+  "Vox Solaris": {
+   "name": "Vox Solaris",
+   "description": ""
+  },
+  "Thick Ice": {
+   "name": "Hielo grueso",
+   "description": "Los globos de los Eximus árticos tienen 30x su durabilidad normal."
+  },
+  "Untreatable": {
+   "name": "Intratable",
+   "description": "Los objetos que recoges no curan y no se pueden recoger orbes de salud."
+  },
+  "The Holdfasts": {
+   "name": "Los Inquebrantables",
+   "description": ""
+  },
+  "Varzia Dax": {
+   "name": "Varzia Dax",
+   "description": ""
+  },
+  "Index Points": {
+   "name": "Puntos de El Índice",
+   "description": ""
+  }
+ }
+}

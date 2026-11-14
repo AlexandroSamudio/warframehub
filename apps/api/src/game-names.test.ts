@@ -17,6 +17,8 @@ const file: NamesFile = {
   nodes: { 'Eris/Oestrus': 'Eris/Oestrus', 'Mercury/Apollodorus': 'Mercurio/Apolodoro' },
   missionTypes: { 'Infested Salvage': 'Salvamento infestado', Survival: 'Supervivencia' },
   items: { 'Nidus Prime': 'Nidus Prime', 'Plasma Sword': 'Espada de plasma', Nidus: 'Nidus' },
+  english: {},
+  sortieModifiers: {},
 };
 const names = new GameNames(file, { 'Damage: 300': 'Daño: 300' });
 

@@ -276,7 +276,7 @@ export const en = {
   'settings.title': 'Settings',
   'settings.language': 'Language',
   'settings.languageHint':
-    'Changes the whole app, including its messages and the game names (as the game itself words them). The default checklist and the live rotations are still in English for now.',
+    'Changes the whole app: messages, game names (as the game itself words them), the default checklist and the live rotations. Items you edited stay as you wrote them.',
   'settings.languageError': "Couldn't save the language: {message}",
   'settings.timeZone': 'Display time zone',
   'settings.timeZoneHint':

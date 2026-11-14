@@ -4,7 +4,8 @@ WarframeHub's Spanish (Alex, 13 Nov 2026) is neutral Spanish with **tú**. Game 
 
 1. **DE's public export** (`content.warframe.com/PublicExport`, the `_es` files) comes first. It holds the client's own names for items, mods, arcanes, Warframes, abilities, resources and nodes.
 2. **The Spanish Warframe wiki** (`warframe.fandom.com/es`) is next, for terms the export doesn't hold (modes, menus).
-3. **Our own translation** is used only when neither source has the term. It is marked _own_ in the table.
+3. **warframestat.us's data package** (`warframe-worldstate-data`, its `es` files) for the few live-rotation texts it has in the game's Spanish (Sortie modifiers, factions). Most of its Spanish is untranslated, so it's used only for those.
+4. **Our own translation** is used only when none of these has the term. It is marked _own_ in the table.
 
 Game data (item, mod and ability names and effects) comes from the export directly (SPEC §8.3, PR 2), not from this table. The table covers the words the interface's own text uses. Checked on 13 Nov 2026.
 
@@ -46,8 +47,18 @@ Game data (item, mod and ability names and effects) comes from the export direct
 | Archon Shard stats (e.g. +10% Ability Strength)                                           | "+10 % de fuerza de habilidad" (all in `SHARD_STATS_ES`)                                        | _own_ (worded with the export's mod terms)           |
 | Ability cost: energy, shield, mutation, time                                              | energía, escudo, mutación, tiempo                                                               | _own_                                                |
 | Rotation A/B/C                                                                            | Rotación A/B/C                                                                                  | _own_                                                |
-| Mirror Defense, Conjunction Survival, Legacyte Harvest, Hive                              | Defensa espejo, Supervivencia de conjunción, Cosecha de Legacita, Colmena                       | _own_ (no Spanish wiki page)                         |
+| Mirror Defense, Conjunction Survival, Hive                                                | Defensa espejo, Supervivencia de conjunción, Colmena                                            | _own_ (no Spanish wiki page)                         |
+| Legacyte Harvest                                                                          | Cosecha de legacito                                                                             | export (node name)                                   |
 | Sanctuary Onslaught (Elite), Alchemy… (other mission types)                               | Ofensiva del Santuario (de élite); the rest as Spanish wiki titles                              | _own_ / wiki (`apps/api/data/mission-types-es.json`) |
 | Kuva Flood, Netracells, Junction                                                          | Inundación Kuva, Netracélulas, Unión                                                            | _own_                                                |
 | Ability-number notes ("(damage per second)")                                              | "(daño por segundo)" (all in `ability-lines-es.json`)                                           | _own_, with the export's terms                       |
 | Arbiters of Hexis, Cephalon Suda, New Loka, Red Veil, Steel Meridian, The Perrin Sequence | Árbitros de Hexis, Céfalon Suda, Nuevo Loka, Velo Rojo, Meridiano de Acero, La Secuencia Perrin | wiki                                                 |
+| Grineer, Corpus, Infested, Corrupted, Sentient, Man in the Wall                           | Grineer, Corpus, Infestados, Corruptos, Consciente, Hombre en la pared                          | warframe-worldstate-data (`es/factionsData.json`)    |
+| The Murmur                                                                                | El Murmullo                                                                                     | _own_ (export: "Limpieza de murmullos")              |
+| Archon Amar / Nira / Boreal                                                               | Arconte Amar / Nira / Boreal                                                                    | export ("Fragmento de Arconte Nira")                 |
+| Relay (Orcus Relay)                                                                       | Repetidor (Repetidor Orcus)                                                                     | export ("Repetidor Vesper")                          |
+| Sortie modifiers ("Environmental Hazard: Fire")                                           | "Peligro ambiental: fuego" (all in `names-es.json`)                                             | warframe-worldstate-data (`es/sortieData.json`)      |
+| Nightwave challenges, Archimedea deviations and risks                                     | all in `rotations-text-es.json`                                                                 | _own_, with the export's terms                       |
+| Daily Tribute; Grandmother; Archimedean Yonta; Cephalon Simaris                           | Tributo diario; Abuela; Arquimediana Yonta; Céfalon Simaris                                     | wiki / export                                        |
+| First Win of the Day; Search Pulses; Steel Path Incursions                                | Primera victoria del día; Pulsos de búsqueda; Incursiones del Camino de Acero                   | _own_                                                |
+| Helminth Invigoration                                                                     | fortalecimiento                                                                                 | export ("Segmento de fortalecimiento de Helminto")   |
