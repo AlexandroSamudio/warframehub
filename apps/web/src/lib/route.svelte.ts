@@ -3,9 +3,10 @@
  * `#/settings` the Settings screen, `#/warframes/nidus` a Warframe's page. Hash URLs work
  * both from Vite and from the API's static files without any server-side routing.
  */
-export type Route = 'tracker' | 'goals' | 'warframes' | 'inventory' | 'profile' | 'settings';
+export type Route =
+  'tracker' | 'goals' | 'warframes' | 'weapons' | 'inventory' | 'profile' | 'settings';
 
-const ROUTES: Route[] = ['goals', 'warframes', 'inventory', 'profile', 'settings'];
+const ROUTES: Route[] = ['goals', 'warframes', 'weapons', 'inventory', 'profile', 'settings'];
 
 function segments(hash: string): string[] {
   return hash.replace(/^#\/?/, '').split('?')[0]!.split('/');
@@ -17,14 +18,28 @@ export function routeFromHash(hash: string): Route {
 }
 
 /**
- * The part after the route: the Warframe's slug in `#/warframes/nidus`, else null.
+ * The part after the route: the slug in `#/warframes/nidus` or `#/weapons/braton`, else null.
  * Lowercased; anything else non-empty is passed on as it is, so the page can say
  * "No Warframe called…" instead of showing the list.
  */
 export function paramFromHash(hash: string): string | null {
   const [first, second] = segments(hash);
-  if (first !== 'warframes' || !second) return null;
+  if ((first !== 'warframes' && first !== 'weapons') || !second) return null;
   return decodeURIComponent(second).toLowerCase().slice(0, 60);
+}
+
+/** The Weapons list's tab (SPEC §15): `#/weapons?tab=arch` is the arch-weapons tab. */
+export type WeaponTabName = 'weapons' | 'arch';
+
+export function weaponTabFromHash(hash: string): WeaponTabName {
+  const [first, second] = segments(hash);
+  if (first !== 'weapons' || second) return 'weapons';
+  return /(?:^|&)tab=arch(?:&|$)/.test(hash.split('?')[1] ?? '') ? 'arch' : 'weapons';
+}
+
+/** The address of the Weapons list on one tab. */
+export function weaponsHref(tab: WeaponTabName): string {
+  return tab === 'arch' ? '#/weapons?tab=arch' : '#/weapons';
 }
 
 /**
@@ -79,6 +94,7 @@ export const router = $state({
   route: routeFromHash(globalThis.location?.hash ?? ''),
   param: paramFromHash(globalThis.location?.hash ?? ''),
   sub: subFromHash(globalThis.location?.hash ?? ''),
+  weaponTab: weaponTabFromHash(globalThis.location?.hash ?? ''),
 });
 
 /**
@@ -111,5 +127,6 @@ if (typeof window !== 'undefined') {
     router.route = routeFromHash(next);
     router.param = paramFromHash(next);
     router.sub = subFromHash(next);
+    router.weaponTab = weaponTabFromHash(next);
   });
 }

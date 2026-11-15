@@ -401,6 +401,25 @@ The app's full column (Overview and Builds share it, so nothing jumps between th
   - **Your progress.**
 - A small muted credit line closes the page (wiki CC BY-SA, warframestat.us, Digital Extremes).
 
+### Weapons list (`#/weapons`, `#/weapons?tab=arch`)
+
+The Warframes list, grown for about 480 weapons (SPEC §15).
+
+- **Two tabs** under the header, links with `aria-current` in the Warframe page's tab style, each with a count chip: **Weapons** (Primary, Secondary, Melee) and **Archwing & Necramech** (arch-guns, arch-melee; a muted line says Necramechs can use any arch-gun).
+- **Slot** is a **Segmented** control (the version switch as a shared component, `Segmented.svelte`, with a visible Label legend). Then **Class** (a select, only the classes of the shown slot), **Mastery** (Segmented: All · Not mastered · Mastered; without a profile it's a teal "Import your profile to filter by mastery." link instead), **Incarnon only** (Weapons tab only), and the Warframes sorter (Name, Mastered, Favorites, Mastery rank). On phones everything after Slot folds under a **Filters (n on)** row with a chevron.
+- **Grouped by slot:** a gold Label heading with the count in Dim Readout ("PRIMARY 153") over a seam, then that slot's tiles.
+- **Tiles** are the Warframes tile, with the **whole weapon** shown (`object-fit: contain`; DE draws weapons diagonally on a square), the name, "MR 8" (gold when above your Mastery Rank), and badges: Incarnon (teal), prime (gold), vandal, mk1, mastered.
+- **No Riven disposition** anywhere on the list: DE retired dispositions (every weapon is 1.20×).
+
+### Weapon page (`#/weapons/{slug}`)
+
+The Warframe page's language, one column.
+
+- **Header panel** (gold accent): the whole weapon in a cut-corner frame (10rem; 8rem stacked on phones), the name, the Favorite button, a Label line "PRIMARY · RIFLE", the version Segmented (Normal · Prime · Vandal · Mk1), badges (mastered, Incarnon, vaulted, MR), the release line and the description.
+- **Attacks** (gold accent): a Segmented switch of the attacks (only with more than one; "Normal attack" so it never reads as the "Normal" version), then the damage on the left (Label, the total in Readout size, each type as a row with its amount right-aligned) and the rest as a definition list (critical chance and multiplier, status, fire rate or attack speed, charge time, shot type). A switch announces one line ("Incarnon Form: 70 damage"), not the whole block.
+- **Weapon stats, Incarnon, Your progress** share a row on wide screens (`auto-fit`, 22rem minimum). Stats keep label and value on one line on phones. Riven disposition is a muted note: "Retired by DE: Rivens are the same on every weapon (1.20×)."
+- **How to get it** is the Warframe page's section, now one shared component (`HowToGet.svelte`).
+
 ### Builds page (`#/warframes/{slug}/builds`, `…/builds/{id}`)
 
 Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the list becomes a wrapping row above it.
@@ -467,7 +486,7 @@ Save (primary), Cancel (link), and on edit a danger **Delete build** with the in
 
 ### DE images
 
-These are **content**, never decoration: portraits, ability icons, and in builds (since 13 Nov 2026) mod, arcane, Archon Shard and weapon pictures and the polarity symbols.
+These are **content**, never decoration: portraits, ability icons, in builds (since 13 Nov 2026) mod, arcane, Archon Shard and weapon pictures and the polarity symbols, and weapon pictures in the Weapons section (since 15 Nov 2026; shown whole, never cropped).
 
 - **Framing:** always inside a thin cut-corner frame on the inset colour, at a fixed size (no layout shift), never as a background. **Mod Pic** is the shared frame: a size in px, with art cropped to fill and icons kept whole.
 - **Alt text:** a portrait has alt text with the Warframe's name; a picture next to its name is decorative (`alt=""`).

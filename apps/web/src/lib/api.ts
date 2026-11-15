@@ -16,6 +16,8 @@ import {
   TrackerResponse,
   WarframeDetail,
   WarframesResponse,
+  WeaponDetail,
+  WeaponsResponse,
   FavoriteResponse,
   WorldstateResponse,
   type BuildContent,
@@ -262,7 +264,31 @@ export function refreshWarframes(): Promise<WarframesResponse> {
   return request(WarframesResponse, '/api/warframes/refresh', json('POST'));
 }
 
-/** Where a Warframe image is served from (downloaded once, then local). */
+// ---- weapons (SPEC §15) -------------------------------------------------------------
+
+/** Every weapon, A–Z (fetched from warframestat.us at most weekly by the server). */
+export function getWeapons(): Promise<WeaponsResponse> {
+  return request(WeaponsResponse, '/api/weapons');
+}
+
+export function getWeapon(slug: string): Promise<WeaponDetail> {
+  return request(WeaponDetail, `/api/weapons/${encodeURIComponent(slug)}`);
+}
+
+/** Stars or unstars a weapon. */
+export function setWeaponFavorite(slug: string, favorite: boolean): Promise<FavoriteResponse> {
+  return request(
+    FavoriteResponse,
+    `/api/weapons/${encodeURIComponent(slug)}/favorite`,
+    json('PUT', { favorite }),
+  );
+}
+
+/** Fetches the weapon list again now (the server allows it once an hour). */
+export function refreshWeapons(): Promise<WeaponsResponse> {
+  return request(WeaponsResponse, '/api/weapons/refresh', json('POST'));
+}
+
 /** A polarity symbol (DE's, from the Warframe wiki, cached by the API). */
 export function polarityUrl(polarity: string): string {
   return `/api/polarities/${encodeURIComponent(polarity)}`;
