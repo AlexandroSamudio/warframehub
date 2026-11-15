@@ -370,7 +370,12 @@
    */
   async function importShared(event: SubmitEvent) {
     event.preventDefault();
-    if (importing || importCode.trim() === '') return;
+    if (importing) return;
+    if (importCode.trim() === '') {
+      importMessage = { text: t('build.importEmpty'), bad: true };
+      importInput?.focus();
+      return;
+    }
     importing = true;
     importMessage = null;
     pendingImport = null;
@@ -628,8 +633,11 @@
               spellcheck="false"
               bind:this={importInput}
               bind:value={importCode}
+              oninput={() => {
+                if (importMessage?.bad) importMessage = null;
+              }}
             />
-            <button type="submit" aria-disabled={importing || importCode.trim() === ''}>
+            <button type="submit" aria-disabled={importing}>
               {importing ? t('build.importing') : t('build.importButton')}
             </button>
           </div>
@@ -1155,12 +1163,19 @@
 
   .import-row input {
     flex: 1 1 16rem;
-    font-family: var(--font-mono, monospace);
+    font-family: var(--font-mono);
   }
 
   .import button[aria-disabled='true'] {
-    opacity: 0.45;
-    cursor: default;
+    cursor: progress;
+  }
+
+  /* Fingers need more than the console's dense 1.75rem. */
+  @media (pointer: coarse) {
+    .import-toggle,
+    .import button {
+      min-height: 2.75rem;
+    }
   }
 
   .import-status {

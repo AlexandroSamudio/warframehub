@@ -24,6 +24,7 @@
 
   /* Fonts are bundled with the app (no requests to font services). */
   --font-display: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
   --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --cut: 12px;
