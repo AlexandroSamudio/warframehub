@@ -2,6 +2,8 @@ import {
   ApiError,
   Build,
   BuildOptionsResponse,
+  ImportBuildResponse,
+  ShareBuildResponse,
   WarframeDetail,
   type BuildContent,
 } from '@warframehub/shared';
@@ -339,5 +341,71 @@ describe('builds', () => {
     expect((await detail(ctx, 'mesa')).builds.map((x) => x.name)).toEqual(['B']);
     expect((await ctx.call('GET', `/api/builds/${a.id}`)).statusCode).toBe(404);
     expect((await detail(ctx, 'nidus')).builds.map((x) => x.name)).toEqual(['Nidus one']);
+  });
+
+  describe('sharing', () => {
+    const shareOf = async (id: number) =>
+      ShareBuildResponse.parse((await ctx.call('GET', `/api/builds/${id}/share`)).json()).code;
+    const importAt = (slug: string, code: string) =>
+      ctx.call('POST', '/api/builds/import', { slug, code });
+
+    it('gives one line of text that reads back as the same build', async () => {
+      const saved = Build.parse((await create(ctx, mesaBuild(), 'Steel Path nuke')).json());
+      const code = await shareOf(saved.id);
+      expect(code).toMatch(/^wfhub-build1:[A-Za-z0-9_-]+$/);
+
+      const res = await importAt('mesa', code);
+      expect(res.statusCode).toBe(200);
+      const got = ImportBuildResponse.parse(res.json());
+      expect(got.name).toBe('Steel Path nuke');
+      expect(got.content).toEqual(saved.content);
+      // Nothing was saved by reading it.
+      expect((await detail(ctx, 'mesa')).builds).toHaveLength(1);
+    });
+
+    it('survives the spaces, line breaks and quotes a chat adds', async () => {
+      const saved = Build.parse((await create(ctx, mesaBuild())).json());
+      const code = await shareOf(saved.id);
+      const messy = `"${code.slice(0, 40)}\n  ${code.slice(40)} "`;
+      expect((await importAt('mesa', messy)).statusCode).toBe(200);
+    });
+
+    it('refuses text that is not a build code, or a cut one', async () => {
+      const saved = Build.parse((await create(ctx, mesaBuild())).json());
+      const code = await shareOf(saved.id);
+      for (const bad of ['hello', 'https://overframe.gg/build/1', code.slice(0, 60)]) {
+        const res = await importAt('mesa', bad);
+        expect(res.statusCode).toBe(400);
+        expect(errorOf(res)).toMatch(/isn't a build code/);
+      }
+    });
+
+    it("names the Warframe when it's pasted on another one", async () => {
+      const saved = Build.parse((await create(ctx, mesaBuild())).json());
+      const res = await importAt('nidus', await shareOf(saved.id));
+      expect(res.statusCode).toBe(400);
+      expect(errorOf(res)).toContain('Mesa');
+    });
+
+    it('checks the build against what this copy of the game data allows', async () => {
+      const saved = Build.parse((await create(ctx, mesaBuild())).json());
+      const code = await shareOf(saved.id);
+      // The same code, once the mod is not in the data any more.
+      ctx.database.db
+        .update(builds)
+        .set({
+          contentJson: JSON.stringify({ ...saved.content, aura: slot('/Lotus/Gone', 'Gone', 1) }),
+        })
+        .where(eq(builds.id, saved.id))
+        .run();
+      const res = await importAt('mesa', await shareOf(saved.id));
+      expect(res.statusCode).toBe(400);
+      expect(errorOf(res)).toMatch(/Unknown mod/);
+      expect(code).not.toBe(await shareOf(saved.id));
+    });
+
+    it('404s for a build that is not there', async () => {
+      expect((await ctx.call('GET', '/api/builds/999/share')).statusCode).toBe(404);
+    });
   });
 });

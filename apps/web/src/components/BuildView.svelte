@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SHARD_SLOTS, type BuildView } from '@warframehub/shared';
+  import * as api from '../lib/api.ts';
   import { formatSaved, sourceHost } from '../lib/builds.ts';
   import { t } from '../lib/i18n/index.ts';
   import { buildHref } from '../lib/route.svelte.ts';
@@ -7,6 +8,7 @@
   import ModCard from './ModCard.svelte';
   import ModPic from './ModPic.svelte';
   import ShardPic from './ShardPic.svelte';
+  import { tick } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
 
   /**
@@ -48,6 +50,49 @@
     if (!expanded.delete(uniqueName)) expanded.add(uniqueName);
   }
 
+  let shareMessage = $state<{ text: string; bad: boolean } | null>(null);
+  /** The code, shown to copy by hand when the browser won't let the app copy it. */
+  let manualCode = $state<string | null>(null);
+  let sharing = $state(false);
+  let codeBox = $state<HTMLTextAreaElement | null>(null);
+
+  /** Copies the build's code; falls back to showing it selected. */
+  async function share() {
+    if (sharing) return;
+    sharing = true;
+    shareMessage = null;
+    manualCode = null;
+    try {
+      const code = await api.shareBuild(b.id);
+      try {
+        await navigator.clipboard.writeText(code);
+        shareMessage = { text: t('build.shareCopied'), bad: false };
+      } catch {
+        manualCode = code;
+        shareMessage = { text: t('build.shareManual'), bad: false };
+        await tick();
+        codeBox?.focus();
+        codeBox?.select();
+      }
+    } catch (e) {
+      shareMessage = {
+        text: t('build.shareError', {
+          message: e instanceof api.ApiCallError ? e.message : t('goals.unreachable'),
+        }),
+        bad: true,
+      };
+    } finally {
+      sharing = false;
+    }
+  }
+
+  // Another build opened: its message and code don't belong to it.
+  $effect(() => {
+    void b.id;
+    shareMessage = null;
+    manualCode = null;
+  });
+
   /** "How to play" at the top jumps to its section. */
   function toGuide() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -73,17 +118,34 @@
         {/if}
       </p>
       {#if c.description}<p class="description">{c.description}</p>{/if}
+      <!-- Always in the page, so the result is announced. -->
+      <div class="share" role="status">
+        {#if shareMessage}
+          <p class:bad={shareMessage.bad}>{shareMessage.text}</p>
+        {/if}
+        {#if manualCode}
+          <textarea
+            bind:this={codeBox}
+            readonly
+            rows="3"
+            aria-label={t('build.shareCode')}
+            value={manualCode}
+            onfocus={(e) => e.currentTarget.select()}></textarea>
+        {/if}
+      </div>
     </div>
     <div class="actions">
       {#if hasGuide}
         <button type="button" class="link" onclick={toGuide}>{t('build.jumpGuide')}</button>
       {/if}
+      <button type="button" class="link" aria-disabled={sharing} onclick={share}
+        >{t('build.share')}<span class="sr-only"> {b.name}</span></button
+      >
       <a class="btn" href={buildHref(slug, { kind: 'edit', id: b.id })}
         >{t('build.edit')}<span class="sr-only"> {b.name}</span></a
       >
     </div>
   </header>
-
   <!-- The build's first half: the mods. -->
   <section class="half mods-half frame accent" aria-labelledby="build-mods">
     <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
@@ -333,6 +395,34 @@
     align-items: center;
     gap: 0.4rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .share:empty {
+    display: none;
+  }
+
+  .share {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--ok);
+  }
+
+  .share p {
+    margin: 0;
+  }
+
+  .share .bad {
+    color: var(--bad);
+  }
+
+  .share textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8rem;
+    word-break: break-all;
   }
 
   /* An Edit link styled as the console's primary (gold outline) button. */

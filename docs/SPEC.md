@@ -508,6 +508,8 @@ Each phase ends with something you can run and check.
 
 ---
 
+- **Sharing a build** (15 Nov 2026, Alex's request): a build is shared as a **code**, one line of text that starts with `wfhub-build1:` and holds the build as compressed JSON (base64url; `apps/api/src/build-share.ts`). It isn't a link because the app runs only on the owner's computer (`127.0.0.1`), so a link would lead nowhere for anyone else; the code carries the build itself and needs no server. **Share** on a build (`GET /api/builds/:id/share`) copies it. On the new-build page, "Have a shared build?" takes a pasted code (`POST /api/builds/import`, which saves nothing) and fills the whole form; the user looks it over and saves. Spaces, line breaks and quotes around the code are ignored. A code for another Warframe is refused with that Warframe's name, and the build is checked against this copy's game data like any save (a mod the data doesn't list is refused).
+
 ## Appendix A. Default checklist (seed v6)
 
 `⚠️` = shipped with the "verify" badge. Since seed v4 (10 Nov 2026) no item has it: everything below was checked in game.

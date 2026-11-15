@@ -63,6 +63,8 @@ const en = {
   // Request checks (Zod) and anything unexpected
   invalid: 'Some data was not valid ({fields})',
   buildName: 'Give the build a name',
+  shareInvalid: "That isn't a build code, or it is damaged. Copy it again whole.",
+  shareOtherWarframe: "That build is for {warframe}. Paste it on that Warframe's page.",
   sourceUrl: 'The source link must start with http:// or https://',
   unknownShardStat: 'Unknown Archon Shard stat',
   unknownTimeZone: 'Unknown time zone',
@@ -133,6 +135,8 @@ const es: Record<ServerMessageKey, string> = {
     'Ahora no se puede conectar con warframestat.us. Se conserva la lista guardada.',
   invalid: 'Hay datos que no son válidos ({fields})',
   buildName: 'Ponle un nombre a la build',
+  shareInvalid: 'Eso no es un código de build, o está dañado. Cópialo de nuevo completo.',
+  shareOtherWarframe: 'Esa build es de {warframe}. Pégala en la página de ese warframe.',
   sourceUrl: 'El enlace de la fuente debe empezar con http:// o https://',
   unknownShardStat: 'Atributo de Fragmento de Arconte desconocido',
   unknownTimeZone: 'Zona horaria desconocida',
