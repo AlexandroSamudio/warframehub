@@ -305,7 +305,7 @@ describe('goals', () => {
       {
         kind: 'quest',
         title: 'The Glast Gambit',
-        url: 'https://wiki.warframe.com/wiki/The_Glast_Gambit',
+        url: 'https://wiki.warframe.com/w/The_Glast_Gambit',
       },
     ]);
     expect(part(g, 'Chassis').sources).toEqual([]);

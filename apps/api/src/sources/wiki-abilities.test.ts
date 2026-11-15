@@ -72,7 +72,7 @@ describe('buildAbilityStats', () => {
 
   it('joins the module data with the page numbers, by internal name', () => {
     expect(file.abilities['/Lotus/Powersuits/Infestation/Abilities/InfestRuptureAbility']).toEqual({
-      page: 'https://wiki.warframe.com/wiki/Virulence',
+      page: 'https://wiki.warframe.com/w/Virulence',
       cost: 40,
       costType: 'energy',
       channeled: false,
@@ -99,7 +99,7 @@ describe('buildAbilityStats', () => {
 
   it('reads the passive, augment shops and rank-30 stats per Warframe', () => {
     expect(file.warframes['/Lotus/Powersuits/Infestation/Infestation']).toEqual({
-      page: 'https://wiki.warframe.com/wiki/Nidus',
+      page: 'https://wiki.warframe.com/w/Nidus',
       passive: 'Gains Mutation stacks.',
       augmentShops: ['Red Veil'],
       rank30: { armor: 450, shield: 0 },
