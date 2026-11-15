@@ -109,6 +109,9 @@
     <a class="cta" href={buildHref(slug, { kind: 'new' })}
       ><Icon name="plus" size={14} /><span>{t('build.add')}</span></a
     >
+    <a class="code-link" href={buildHref(slug, { kind: 'new', withCode: true })}
+      >{t('build.haveCode')}</a
+    >
   </section>
 {:else}
   <div class="builds-page">
@@ -176,6 +179,9 @@
         {/if}
         <a class="add" href={buildHref(slug, { kind: 'new' })}
           ><Icon name="plus" size={14} /><span>{t('build.add')}</span></a
+        >
+        <a class="code-link" href={buildHref(slug, { kind: 'new', withCode: true })}
+          >{t('build.pasteCode')}</a
         >
       </div>
       {#if moveError}<p class="error" role="alert">{moveError}</p>{/if}
@@ -330,6 +336,13 @@
 
   .add:hover span {
     text-decoration: underline;
+  }
+
+  /* A quiet second way in: paste a code someone sent. */
+  .code-link {
+    font-size: 0.85rem;
+    color: var(--teal);
+    text-underline-offset: 0.2em;
   }
 
   .error,

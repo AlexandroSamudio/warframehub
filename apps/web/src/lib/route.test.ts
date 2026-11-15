@@ -47,6 +47,14 @@ describe('subFromHash', () => {
     expect(subFromHash('#/warframes/mesa/builds/12')).toEqual({ kind: 'view', id: 12 });
     expect(subFromHash('#/warframes/mesa/builds/12/edit')).toEqual({ kind: 'edit', id: 12 });
     expect(subFromHash('#/warframes/mesa/builds/new')).toEqual({ kind: 'new' });
+    expect(subFromHash('#/warframes/mesa/builds/new?import')).toEqual({
+      kind: 'new',
+      withCode: true,
+    });
+    expect(subFromHash('#/warframes/mesa/builds/new?other')).toEqual({ kind: 'new' });
+    expect(buildHref('mesa', { kind: 'new', withCode: true })).toBe(
+      '#/warframes/mesa/builds/new?import',
+    );
     expect(paramFromHash('#/warframes/mesa/builds/12/edit')).toBe('mesa');
     expect(routeFromHash('#/warframes/mesa/builds')).toBe('warframes');
   });

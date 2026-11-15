@@ -397,8 +397,10 @@
     font-size: 0.85rem;
   }
 
+  /* Stays in the page when empty, so the message that appears in it is announced. */
   .share:empty {
-    display: none;
+    height: 0;
+    margin: 0;
   }
 
   .share {

@@ -331,23 +331,60 @@
   let importCode = $state('');
   let importing = $state(false);
   let importMessage = $state<{ text: string; bad: boolean } | null>(null);
+  /** The panel is closed until asked for, except when you came to paste a code. */
+  let importOpen = $state(false);
+  /** A code that was read while the form had your own work: waits for your yes. */
+  let pendingImport = $state<Awaited<ReturnType<typeof api.importBuild>> | null>(null);
+  let importInput = $state<HTMLInputElement | null>(null);
+  let keepMine = $state<HTMLButtonElement | null>(null);
 
-  /** Fills the whole form from a pasted code (nothing is saved until you press Save). */
+  async function toggleImport() {
+    importOpen = !importOpen;
+    if (importOpen) {
+      await tick();
+      importInput?.focus();
+    }
+  }
+
+  // Coming from "Paste a code": the panel is open, so start in its field.
+  $effect(() => {
+    if (options && sub.kind === 'new' && sub.withCode) {
+      importOpen = true;
+      void tick().then(() => importInput?.focus());
+    }
+  });
+
+  function applyImport(got: NonNullable<typeof pendingImport>) {
+    name = got.name;
+    content = got.content;
+    weaponImages = got.weaponImages;
+    open = null;
+    importCode = '';
+    pendingImport = null;
+    importMessage = { text: t('build.imported'), bad: false };
+  }
+
+  /**
+   * Reads a pasted code and fills the form (nothing is saved until you press Save). If the
+   * form already has your work in it, asks before replacing it.
+   */
   async function importShared(event: SubmitEvent) {
     event.preventDefault();
     if (importing || importCode.trim() === '') return;
     importing = true;
     importMessage = null;
+    pendingImport = null;
     try {
       const got = await api.importBuild(slug, importCode);
-      name = got.name;
-      content = got.content;
-      weaponImages = got.weaponImages;
-      open = null;
-      importCode = '';
-      importMessage = { text: t('build.imported'), bad: false };
-      await tick();
-      document.getElementById('build-name')?.focus();
+      if (dirty) {
+        pendingImport = got;
+        await tick();
+        keepMine?.focus();
+      } else {
+        applyImport(got);
+        await tick();
+        document.getElementById('build-name')?.focus();
+      }
     } catch (e) {
       importMessage = {
         text: t('build.importError', {
@@ -358,6 +395,19 @@
     } finally {
       importing = false;
     }
+  }
+
+  async function replaceWithImport() {
+    if (!pendingImport) return;
+    applyImport(pendingImport);
+    await tick();
+    document.getElementById('build-name')?.focus();
+  }
+
+  async function keepMyForm() {
+    pendingImport = null;
+    await tick();
+    importInput?.focus();
   }
 
   // ---- save and delete ----------------------------------------------------------------
@@ -540,36 +590,67 @@
         >
       </div>
     {/if}
+    <h2 tabindex="-1" bind:this={titleEl}>
+      {sub.kind === 'edit'
+        ? t('build.editTitle', { name: savedName })
+        : t('build.newTitle', { name: ownerName })}
+    </h2>
+
     {#if sub.kind === 'new'}
-      <!-- Its own form: Enter here reads the code, it never saves the build. -->
-      <form class="import frame" onsubmit={importShared} aria-labelledby="import-title">
-        <h3 id="import-title">{t('build.importTitle')}</h3>
-        <p class="hint">{t('build.importHint')}</p>
-        <div class="import-row">
-          <input
-            type="text"
-            aria-label={t('build.importLabel')}
-            placeholder={t('build.importPlaceholder')}
-            autocomplete="off"
-            spellcheck="false"
-            bind:value={importCode}
-          />
-          <button type="submit" aria-disabled={importing || importCode.trim() === ''}>
-            {importing ? t('build.importing') : t('build.importButton')}
-          </button>
-        </div>
-        <p class="import-status" class:bad={importMessage?.bad} role="status">
-          {importMessage?.text ?? ''}
-        </p>
-      </form>
+      <!-- Closed until asked for. Its own form: Enter here reads the code, never saves. -->
+      <div class="import-wrap">
+        <button
+          type="button"
+          class="import-toggle"
+          aria-expanded={importOpen}
+          aria-controls="import-panel"
+          onclick={toggleImport}
+        >
+          <span class="chev" class:open={importOpen}><Icon name="chevron" size={12} /></span>
+          {t('build.importTitle')}
+        </button>
+        <form
+          class="import frame"
+          id="import-panel"
+          hidden={!importOpen}
+          onsubmit={importShared}
+          aria-label={t('build.importTitle')}
+        >
+          <p class="hint">{t('build.importHint')}</p>
+          <div class="import-row">
+            <input
+              type="text"
+              aria-label={t('build.importLabel')}
+              aria-invalid={importMessage?.bad ? 'true' : undefined}
+              aria-describedby="import-status"
+              placeholder={t('build.importPlaceholder')}
+              autocomplete="off"
+              spellcheck="false"
+              bind:this={importInput}
+              bind:value={importCode}
+            />
+            <button type="submit" aria-disabled={importing || importCode.trim() === ''}>
+              {importing ? t('build.importing') : t('build.importButton')}
+            </button>
+          </div>
+          {#if pendingImport}
+            <div class="replace" role="group" aria-labelledby="replace-q">
+              <span id="replace-q">{t('build.importReplaceQ')}</span>
+              <button type="button" class="primary" bind:this={keepMine} onclick={keepMyForm}
+                >{t('build.importKeep')}</button
+              >
+              <button type="button" class="danger" onclick={replaceWithImport}
+                >{t('build.importReplace')}</button
+              >
+            </div>
+          {/if}
+          <p id="import-status" class="import-status" class:bad={importMessage?.bad} role="status">
+            {importMessage?.text ?? ''}
+          </p>
+        </form>
+      </div>
     {/if}
     <form onsubmit={save} novalidate>
-      <h2 tabindex="-1" bind:this={titleEl}>
-        {sub.kind === 'edit'
-          ? t('build.editTitle', { name: savedName })
-          : t('build.newTitle', { name: ownerName })}
-      </h2>
-
       {#if saveError}
         <p class="alert frame" role="alert" tabindex="-1" bind:this={errorEl}>{saveError}</p>
       {/if}
@@ -999,10 +1080,71 @@
     padding: 0.7rem 0.9rem;
   }
 
-  .import h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--gold);
+  .import-wrap {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+
+  .import-wrap .import {
+    justify-self: stretch;
+  }
+
+  /* `form { display: grid }` would otherwise win over the hidden attribute. */
+  .import[hidden] {
+    display: none;
+  }
+
+  /* A quiet row, not a panel: it opens when you have a code to paste. */
+  .import-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--teal);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .import-toggle:hover:not(:disabled) {
+    background: none;
+    color: var(--fg);
+  }
+
+  .chev {
+    display: inline-flex;
+    transition: transform 120ms ease;
+  }
+
+  .chev.open {
+    transform: rotate(90deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chev {
+      transition: none;
+    }
+  }
+
+  .replace {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.8rem;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--gold);
+    font-size: 0.9rem;
+  }
+
+  .replace span {
+    flex: 1 1 14rem;
   }
 
   .import-row {
@@ -1027,8 +1169,10 @@
     color: var(--ok);
   }
 
+  /* Stays in the page when empty, so what appears in it is announced. */
   .import-status:empty {
-    display: none;
+    height: 0;
+    margin-top: -0.4rem;
   }
 
   .import-status.bad {
