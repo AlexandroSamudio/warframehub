@@ -32,6 +32,7 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--fg);
+    text-wrap: balance;
   }
 
   .guide :global(h5) {

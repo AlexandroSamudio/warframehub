@@ -517,8 +517,11 @@
     break-after: avoid;
   }
 
-  .how-to :global(.guide li),
-  .how-to :global(.guide p) {
+  /*
+   * List items stay whole, but paragraphs may split across columns: a pasted guide is often
+   * one paragraph of many lines, and keeping it whole left the other columns empty.
+   */
+  .how-to :global(.guide li) {
     break-inside: avoid;
   }
 
