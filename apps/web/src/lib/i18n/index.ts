@@ -16,3 +16,13 @@ export function t(key: MessageKey, params: Record<string, string | number> = {})
     name in params ? String(params[name]) : match,
   );
 }
+
+/** Whether there is a UI string for this key (for words from game data, e.g. a class). */
+export function hasMessage(key: string): key is MessageKey {
+  return key in en;
+}
+
+/** The UI string for a game-data word ("wp.class.Polearm"), or the word as the data says. */
+export function tOr(key: string, fallback: string): string {
+  return hasMessage(key) ? t(key) : fallback;
+}

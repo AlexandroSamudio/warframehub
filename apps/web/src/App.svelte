@@ -9,6 +9,8 @@
   import Inventory from './routes/Inventory.svelte';
   import WarframePage from './routes/WarframePage.svelte';
   import Warframes from './routes/Warframes.svelte';
+  import WeaponPage from './routes/WeaponPage.svelte';
+  import Weapons from './routes/Weapons.svelte';
   import Profile from './routes/Profile.svelte';
   import Settings from './routes/Settings.svelte';
   import Tracker from './routes/Tracker.svelte';
@@ -16,7 +18,15 @@
   let health = $state<HealthResponse | null>(null);
   let stopped = $state(false);
 
-  const NAV: Route[] = ['tracker', 'goals', 'warframes', 'inventory', 'profile', 'settings'];
+  const NAV: Route[] = [
+    'tracker',
+    'goals',
+    'warframes',
+    'weapons',
+    'inventory',
+    'profile',
+    'settings',
+  ];
   // The server stops after a while with no open page; this tells it we're here (SPEC §9.2).
   const HEARTBEAT_MS = 60_000;
 
@@ -81,6 +91,10 @@
       <WarframePage slug={router.param} sub={router.sub} />
     {:else if router.route === 'warframes'}
       <Warframes />
+    {:else if router.route === 'weapons' && router.param}
+      <WeaponPage slug={router.param} />
+    {:else if router.route === 'weapons'}
+      <Weapons tab={router.weaponTab} />
     {:else if router.route === 'inventory'}
       <Inventory />
     {:else if router.route === 'profile'}

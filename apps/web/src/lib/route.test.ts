@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { buildHref, hrefFor, paramFromHash, routeFromHash, subFromHash } from './route.svelte.ts';
+import {
+  buildHref,
+  hrefFor,
+  paramFromHash,
+  routeFromHash,
+  subFromHash,
+  weaponsHref,
+  weaponTabFromHash,
+} from './route.svelte.ts';
 
 describe('routeFromHash', () => {
   it.each([
@@ -78,5 +86,25 @@ describe('subFromHash', () => {
       expect(subFromHash(buildHref('mesa', sub))).toEqual(sub);
     }
     expect(buildHref('mesa')).toBe('#/warframes/mesa/builds');
+  });
+});
+
+describe('weapons', () => {
+  it('routes the list and a weapon page', () => {
+    expect(routeFromHash('#/weapons')).toBe('weapons');
+    expect(routeFromHash('#/weapons?tab=arch')).toBe('weapons');
+    expect(paramFromHash('#/weapons')).toBeNull();
+    expect(paramFromHash('#/weapons/Braton')).toBe('braton');
+    expect(hrefFor('weapons', 'kuva-hek')).toBe('#/weapons/kuva-hek');
+  });
+
+  it('reads the tab from the list address only', () => {
+    expect(weaponTabFromHash('#/weapons')).toBe('weapons');
+    expect(weaponTabFromHash('#/weapons?tab=arch')).toBe('arch');
+    expect(weaponTabFromHash('#/weapons?tab=nope')).toBe('weapons');
+    expect(weaponTabFromHash('#/weapons/mausolon?tab=arch')).toBe('weapons');
+    expect(weaponTabFromHash('#/warframes?tab=arch')).toBe('weapons');
+    expect(weaponsHref('arch')).toBe('#/weapons?tab=arch');
+    expect(weaponsHref('weapons')).toBe('#/weapons');
   });
 });

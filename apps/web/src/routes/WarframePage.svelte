@@ -2,9 +2,9 @@
   import type { ProfileResponse, VariantKind, WarframeDetail } from '@warframehub/shared';
   import AbilityRow from '../components/AbilityRow.svelte';
   import BuildsPage from '../components/BuildsPage.svelte';
+  import HowToGet from '../components/HowToGet.svelte';
   import Icon from '../components/Icon.svelte';
   import * as api from '../lib/api.ts';
-  import { formatAmount, formatChance, groupDrops, materialList } from '../lib/goals.ts';
   import { t } from '../lib/i18n/index.ts';
   import { buildHref, hrefFor, type BuildSub } from '../lib/route.svelte.ts';
   import { formatRelease, pickVariant, polarityName, statLines } from '../lib/warframes.ts';
@@ -27,8 +27,6 @@
   let loadError = $state<string | null>(null);
   let notFound = $state(false);
   let kind = $state<VariantKind | null>(null);
-  let goalMessage = $state<{ text: string; bad: boolean } | null>(null);
-  let adding = $state(false);
   let portraitFailed = $state(false);
 
   // Builds belong to one version (the Prime, or Excalibur Umbra): SPEC §14.1.
@@ -46,14 +44,12 @@
   const stats = $derived(v ? statLines(v) : []);
 
   let nameEl = $state<HTMLHeadingElement | null>(null);
-  let goalsLink = $state<HTMLAnchorElement | null>(null);
 
   function load(s: string) {
     data = null;
     loadError = null;
     notFound = false;
     kind = null;
-    goalMessage = null;
     portraitFailed = false;
     favoriteError = null;
     listState.lastSlug = s;
@@ -96,17 +92,6 @@
     return data?.augments.filter((a) => a.ability === ability).map((a) => a.name) ?? [];
   }
 
-  function bestDrop(drops: Parameters<typeof groupDrops>[0]): string {
-    const top = groupDrops(drops)[0];
-    if (!top) return t('farm.noDrops');
-    if (top.kind === 'relic') {
-      return t('farm.bestRelic', { relic: top.relic, chance: formatChance(top.best) });
-    }
-    return top.chance === null
-      ? t('farm.bestNoChance', { location: top.location })
-      : t('farm.best', { location: top.location, chance: formatChance(top.chance) });
-  }
-
   let favoriteError = $state<string | null>(null);
 
   /** Stars or unstars this Warframe at once; puts it back if the server says no. */
@@ -126,35 +111,15 @@
     }
   }
 
-  async function addGoal() {
-    if (!v || adding) return;
+  /** After "Add as goal": the page again, so the goal shows. False when that failed. */
+  async function reload(): Promise<boolean> {
     const s = slug;
-    adding = true;
-    goalMessage = null;
-    try {
-      await api.addGoal(v.uniqueName);
-    } catch (e) {
-      goalMessage = {
-        text: t('wf.goalError', {
-          message: e instanceof api.ApiCallError ? e.message : t('goals.unreachable'),
-        }),
-        bad: true,
-      };
-      adding = false;
-      return;
-    }
-    // Added. Showing it here needs the page again; if that fails, the goal still exists.
     try {
       const d = await api.getWarframe(s);
-      if (s !== slug) return;
-      data = d;
-      goalMessage = { text: t('wf.goalAdded'), bad: false };
-      await tick();
-      goalsLink?.focus(); // the button went away: the next step is "Open Goals"
+      if (s === slug) data = d;
+      return true;
     } catch {
-      goalMessage = { text: t('wf.goalAddedStale'), bad: false };
-    } finally {
-      adding = false;
+      return false;
     }
   }
 </script>
@@ -319,62 +284,15 @@
         </dl>
       </section>
 
-      <section class="panel frame" aria-labelledby="wf-get">
-        <h3 id="wf-get">{t('wf.get')}</h3>
-        {#if v.vaulted}<p class="hint">{t('wf.vaultedNote')}</p>{/if}
-        {#if v.recipe && v.recipe.parts.length > 0}
-          <ul class="rows">
-            {#each v.recipe.parts as p (p.key)}
-              <li>
-                <span class="lead"
-                  >{p.name}{#if p.count > 1}<span class="for num"> × {p.count}</span>{/if}</span
-                >
-                {#if p.sources.length > 0}
-                  <span class="for"
-                    >{t('part.sourceQuest')}
-                    {#each p.sources as s, i (s.url)}{#if i > 0},
-                      {/if}<a href={s.url} target="_blank" rel="noopener noreferrer"
-                        >{s.title}<span class="sr-only"> {t('part.opensNewTab')}</span></a
-                      >{/each}</span
-                  >
-                {:else}
-                  <span class="for">{bestDrop(p.drops)}</span>
-                {/if}
-                {#if p.craft}
-                  <p class="effect">
-                    <span class="craft-label">{t('part.craftLabel')}</span>
-                    {materialList(p.craft)
-                      .map((m) => `${formatAmount(m.count)} ${m.name}`)
-                      .join(' · ')}
-                  </p>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-          <p class="build">
-            <span class="craft-label">{t('wf.toBuild', { name: v.name })}</span>
-            {v.recipe.resources.map((r) => `${formatAmount(r.count)} ${r.name}`).join(' · ')}
-          </p>
-        {:else}
-          <p class="hint">{t('wf.getNone')}</p>
-        {/if}
-
-        <div class="goal">
-          {#if v.goal?.status === 'active'}
-            <span class="badge teal">{t('wf.inGoals')}</span>
-            <a href={hrefFor('goals')} bind:this={goalsLink}>{t('wf.goToGoals')}</a>
-          {:else if v.goal?.status === 'built'}
-            <span class="badge ok">{t('wf.built')}</span>
-          {:else if v.recipe}
-            <button type="button" class="primary" aria-disabled={adding} onclick={addGoal}>
-              {adding ? t('wf.adding') : t('wf.addGoal')}
-            </button>
-          {/if}
-          <span class="goal-msg" class:bad={goalMessage?.bad} role="status"
-            >{goalMessage?.text ?? ''}</span
-          >
-        </div>
-      </section>
+      <HowToGet
+        id="wf-get"
+        uniqueName={v.uniqueName}
+        name={v.name}
+        recipe={v.recipe}
+        vaulted={v.vaulted}
+        goal={v.goal}
+        {reload}
+      />
 
       <section class="panel frame" aria-labelledby="wf-progress">
         <h3 id="wf-progress">{t('wf.progress')}</h3>
@@ -706,20 +624,6 @@
     max-width: 64ch;
   }
 
-  .craft-label {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-right: 0.3rem;
-  }
-
-  .build {
-    margin: 0.2rem 0 0;
-    font-size: 0.85rem;
-  }
-
   .stats {
     display: grid;
     grid-template-columns: minmax(9rem, max-content) 1fr;
@@ -741,28 +645,6 @@
   .r30 {
     margin-left: 0.35em;
     color: var(--muted);
-  }
-
-  .goal {
-    margin-top: 0.4rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4rem 0.8rem;
-  }
-
-  .goal button[aria-disabled='true'] {
-    opacity: 0.45;
-    cursor: default;
-  }
-
-  .goal-msg {
-    font-size: 0.85rem;
-    color: var(--ok);
-  }
-
-  .goal-msg.bad {
-    color: var(--bad);
   }
 
   .facts li {
