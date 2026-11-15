@@ -1,9 +1,16 @@
-import { POLARITY_SYMBOLS, WarframeDetail, WarframesResponse } from '@warframehub/shared';
+import {
+  FavoriteRequest,
+  FavoriteResponse,
+  POLARITY_SYMBOLS,
+  WarframeDetail,
+  WarframesResponse,
+} from '@warframehub/shared';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { Db } from '../db/client.js';
 import { userLanguage } from '../db/tracker.js';
-import { warframeDetail, warframeList } from '../db/warframes.js';
+import { setFavorite, warframeDetail, warframeList } from '../db/warframes.js';
+import { HttpError } from '../http-error.js';
 import type { GameNames } from '../game-names.js';
 import type { ImageCache } from '../sources/images.js';
 import type { WarframeCatalog } from '../sources/warframes.js';
@@ -52,6 +59,18 @@ export function registerWarframeRoutes(app: FastifyInstance, deps: WarframeRoute
         state.mods,
       ),
     );
+  });
+
+  /** Stars or unstars a Warframe (SPEC §14). */
+  app.put('/api/warframes/:slug/favorite', async (request): Promise<FavoriteResponse> => {
+    const { slug } = SlugParams.parse(request.params);
+    const { favorite } = FavoriteRequest.parse(request.body);
+    const { groups } = catalog.groups(await catalog.state());
+    if (!groups.some((g) => g.slug === slug)) {
+      throw new HttpError(404, 'not_found', 'noWarframe', { slug });
+    }
+    setFavorite(db, userId, slug, favorite);
+    return FavoriteResponse.parse({ slug, favorite });
   });
 
   /** Fetches the list again now (at most once an hour). */

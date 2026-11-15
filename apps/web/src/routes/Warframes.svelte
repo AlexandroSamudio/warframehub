@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { WarframesResponse } from '@warframehub/shared';
   import { onMount, tick } from 'svelte';
-  import { listState } from '../lib/warframes-state.svelte.ts';
+  import Icon from '../components/Icon.svelte';
+  import { listState, setOrder } from '../lib/warframes-state.svelte.ts';
   import * as api from '../lib/api.ts';
-  import { t } from '../lib/i18n/index.ts';
+  import { language, t } from '../lib/i18n/index.ts';
   import { hrefFor } from '../lib/route.svelte.ts';
   import { formatDay, formatLocal, formatUtc } from '../lib/time.ts';
-  import { filterWarframes } from '../lib/warframes.ts';
+  import { SORT_KEYS, filterWarframes, sortWarframes, type SortKey } from '../lib/warframes.ts';
 
   let data = $state<WarframesResponse | null>(null);
   let loadError = $state<string | null>(null);
@@ -16,7 +17,41 @@
   const filter = $derived(listState.filter);
   let now = $state(Date.now());
 
-  const shown = $derived(data ? filterWarframes(data.warframes, filter) : []);
+  const shown = $derived(
+    data
+      ? sortWarframes(
+          filterWarframes(data.warframes, filter),
+          listState.sortKey,
+          listState.sortDir,
+          language.current,
+        )
+      : [],
+  );
+  const orderText = $derived(t(`wf.order.${listState.sortKey}.${listState.sortDir}`));
+  let favoriteError = $state<string | null>(null);
+
+  /** Stars or unstars at once, and puts it back if the server says no. */
+  async function toggleFavorite(slug: string, favorite: boolean) {
+    if (!data) return;
+    favoriteError = null;
+    const mark = (value: boolean) => {
+      if (data) {
+        data = {
+          ...data,
+          warframes: data.warframes.map((w) => (w.slug === slug ? { ...w, favorite: value } : w)),
+        };
+      }
+    };
+    mark(favorite);
+    try {
+      await api.setFavorite(slug, favorite);
+    } catch (e) {
+      mark(!favorite);
+      favoriteError = t('wf.favoriteError', {
+        message: e instanceof api.ApiCallError ? e.message : t('goals.unreachable'),
+      });
+    }
+  }
   const locked = $derived(data?.nextRefreshAt != null && Date.parse(data.nextRefreshAt) > now);
   const dateOf = (iso: string) => formatDay(iso);
 
@@ -106,6 +141,36 @@
       >
     </p>
     {#if refreshError}<p class="error" role="alert">{refreshError}</p>{/if}
+    {#if favoriteError}<p class="error" role="alert">{favoriteError}</p>{/if}
+
+    <div class="sorter">
+      <label class="sort-field">
+        <span>{t('wf.sortLabel')}</span>
+        <select
+          value={listState.sortKey}
+          onchange={(e) => {
+            const key = e.currentTarget.value as SortKey;
+            // A new key starts at its natural order: A–Z, or the ones that have it first.
+            setOrder(key, 'asc');
+          }}
+        >
+          {#each SORT_KEYS as key (key)}
+            <option value={key}>{t(`wf.sort.${key}`)}</option>
+          {/each}
+        </select>
+      </label>
+      <button
+        type="button"
+        class="order"
+        aria-label={t('wf.orderAria', { current: orderText })}
+        onclick={() => setOrder(listState.sortKey, listState.sortDir === 'asc' ? 'desc' : 'asc')}
+      >
+        <span class="arrow" class:flip={listState.sortDir === 'desc'}
+          ><Icon name="down" size={14} /></span
+        >
+        {orderText}
+      </button>
+    </div>
 
     <!-- Always in the page, so "no match" is announced. -->
     <p class="status" role="status">
@@ -115,6 +180,16 @@
     <ul class="grid">
       {#each shown as w (w.slug)}
         <li>
+          <button
+            type="button"
+            class="star"
+            class:on={w.favorite}
+            aria-pressed={w.favorite}
+            aria-label={t('wf.favoriteAria', { name: w.name })}
+            onclick={() => toggleFavorite(w.slug, !w.favorite)}
+          >
+            <Icon name="star" size={16} filled={w.favorite} />
+          </button>
           <a class="tile" href={hrefFor('warframes', w.slug)}>
             <span class="portrait">
               {#if w.image}
@@ -257,6 +332,67 @@
 
   .alert p {
     margin: 0;
+  }
+
+  .sorter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.8rem;
+  }
+
+  .sort-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .order {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* The arrow points down for the natural order and flips for the reverse. */
+  .arrow {
+    display: inline-flex;
+  }
+
+  .arrow.flip {
+    transform: scaleY(-1);
+  }
+
+  .grid li {
+    position: relative;
+  }
+
+  /* On the portrait's top-left corner: the tile's cut corner is on the right. */
+  .star {
+    position: absolute;
+    z-index: 1;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 0;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .star:hover {
+    color: var(--gold);
+    background: var(--surface);
+  }
+
+  .star.on {
+    color: var(--gold);
   }
 
   .grid {

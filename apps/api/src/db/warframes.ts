@@ -21,9 +21,31 @@ import {
 import { buildRules, listBuilds, resolveBuild } from './builds.js';
 import type { Db } from './client.js';
 import { profileXp } from './profile.js';
-import { goals } from './schema.js';
+import { favoriteWarframes, goals } from './schema.js';
 
 /** The Warframes section's answers (SPEC §14): the catalog plus your goals and profile. */
+
+function favoriteSlugs(db: Db, userId: number): Set<string> {
+  return new Set(
+    db
+      .select({ slug: favoriteWarframes.warframeSlug })
+      .from(favoriteWarframes)
+      .where(eq(favoriteWarframes.userId, userId))
+      .all()
+      .map((r) => r.slug),
+  );
+}
+
+/** Stars or unstars a Warframe. Doing it twice is fine. */
+export function setFavorite(db: Db, userId: number, slug: string, favorite: boolean): void {
+  if (favorite) {
+    db.insert(favoriteWarframes).values({ userId, warframeSlug: slug }).onConflictDoNothing().run();
+  } else {
+    db.delete(favoriteWarframes)
+      .where(and(eq(favoriteWarframes.userId, userId), eq(favoriteWarframes.warframeSlug, slug)))
+      .run();
+  }
+}
 
 function freshness(state: CatalogState, nextRefreshAt: Date | null) {
   return {
@@ -41,8 +63,10 @@ export function warframeList(
   nextRefreshAt: Date | null,
 ): WarframesResponse {
   const xp = profileXp(db, userId);
+  const favorites = favoriteSlugs(db, userId);
   const warframes: WarframeListItem[] = groups.map((g) => ({
     slug: g.slug,
+    favorite: favorites.has(g.slug),
     name: g.name,
     image: g.variants[0]!.raw.imageName ?? null,
     variants: g.variants.map((v) => ({
@@ -155,6 +179,7 @@ export function warframeDetail(
   return {
     slug: group.slug,
     name: group.name,
+    favorite: favoriteSlugs(db, userId).has(group.slug),
     variants,
     augments: state.augments[group.name] ?? [],
     augmentShops: warframeWiki(group.variants[0]!.raw.uniqueName)?.augmentShops ?? [],

@@ -3,14 +3,16 @@
    * Small line icons drawn for WarframeHub (original SVG, one 1.5px stroke, square caps
    * to match the console's cut corners). Decorative: the control carries the label.
    */
-  export type IconName = 'up' | 'down' | 'chevron' | 'plus' | 'refresh' | 'search';
+  export type IconName = 'up' | 'down' | 'chevron' | 'plus' | 'refresh' | 'search' | 'star';
 
   interface Props {
     name: IconName;
     size?: number;
+    /** Solid fill, for a star that is on. */
+    filled?: boolean;
   }
 
-  let { name, size = 16 }: Props = $props();
+  let { name, size = 16, filled = false }: Props = $props();
 
   const PATHS: Record<IconName, string> = {
     up: 'M8 13V3M3.5 7.5 8 3l4.5 4.5',
@@ -18,6 +20,7 @@
     chevron: 'M6 3.5 10.5 8 6 12.5',
     plus: 'M8 3v10M3 8h10',
     refresh: 'M13 8a5 5 0 1 1-1.46-3.54M13 2.5v3h-3',
+    star: 'M8 1.8 9.95 6l4.55.45-3.4 3 1 4.5L8 11.6 3.9 13.95l1-4.5-3.4-3L6.05 6Z',
     search: 'M7 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM10.5 10.5 14 14',
   };
 </script>
@@ -27,7 +30,7 @@
   width={size}
   height={size}
   viewBox="0 0 16 16"
-  fill="none"
+  fill={filled ? 'currentColor' : 'none'}
   stroke="currentColor"
   stroke-width="1.5"
   stroke-linecap="square"

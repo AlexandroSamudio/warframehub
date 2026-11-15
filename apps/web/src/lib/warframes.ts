@@ -22,6 +22,34 @@ export function filterWarframes(list: WarframeListItem[], filter: string): Warfr
   );
 }
 
+export type SortKey = 'name' | 'mastered' | 'favorites';
+export type SortDir = 'asc' | 'desc';
+export const SORT_KEYS: SortKey[] = ['name', 'mastered', 'favorites'];
+
+/**
+ * The list in your order. Name: A–Z (`asc`) or Z–A. Mastered and Favorites: `asc` puts
+ * the ones that have it first, `desc` last; inside each group it is always A–Z. A Warframe
+ * counts as mastered when every one of its versions is.
+ */
+export function sortWarframes(
+  list: WarframeListItem[],
+  key: SortKey,
+  dir: SortDir,
+  locale?: string,
+): WarframeListItem[] {
+  const byName = (a: WarframeListItem, b: WarframeListItem) => a.name.localeCompare(b.name, locale);
+  const flag = (w: WarframeListItem) =>
+    key === 'mastered' ? w.variants.every((v) => v.mastered) : w.favorite;
+  const sorted = [...list];
+  if (key === 'name') {
+    sorted.sort((a, b) => (dir === 'asc' ? byName(a, b) : byName(b, a)));
+  } else {
+    const sign = dir === 'asc' ? 1 : -1;
+    sorted.sort((a, b) => sign * (Number(flag(b)) - Number(flag(a))) || byName(a, b));
+  }
+  return sorted;
+}
+
 /** "madurai" → "Madurai" (the game's polarity names). */
 export function polarityName(p: string): string {
   return p.charAt(0).toUpperCase() + p.slice(1);

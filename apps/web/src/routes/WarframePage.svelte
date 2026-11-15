@@ -55,6 +55,7 @@
     kind = null;
     goalMessage = null;
     portraitFailed = false;
+    favoriteError = null;
     listState.lastSlug = s;
     // Not a possible address ("xx_y"): say so without asking the server.
     if (!/^[a-z0-9-]{1,40}$/.test(s)) {
@@ -104,6 +105,25 @@
     return top.chance === null
       ? t('farm.bestNoChance', { location: top.location })
       : t('farm.best', { location: top.location, chance: formatChance(top.chance) });
+  }
+
+  let favoriteError = $state<string | null>(null);
+
+  /** Stars or unstars this Warframe at once; puts it back if the server says no. */
+  async function toggleFavorite() {
+    if (!data) return;
+    const next = !data.favorite;
+    const s = slug;
+    favoriteError = null;
+    data = { ...data, favorite: next };
+    try {
+      await api.setFavorite(s, next);
+    } catch (e) {
+      if (s === slug && data) data = { ...data, favorite: !next };
+      favoriteError = t('wf.favoriteError', {
+        message: e instanceof api.ApiCallError ? e.message : t('goals.unreachable'),
+      });
+    }
   }
 
   async function addGoal() {
@@ -161,7 +181,20 @@
         {/if}
       </span>
       <div class="intro">
-        <h2 id="wf-name" tabindex="-1" bind:this={nameEl}>{v.name}</h2>
+        <div class="name-row">
+          <h2 id="wf-name" tabindex="-1" bind:this={nameEl}>{v.name}</h2>
+          <button
+            type="button"
+            class="fav"
+            class:on={data.favorite}
+            aria-pressed={data.favorite}
+            onclick={toggleFavorite}
+          >
+            <Icon name="star" size={14} filled={data.favorite} />
+            {t('wf.favorite')}
+          </button>
+        </div>
+        {#if favoriteError}<p class="fav-error" role="alert">{favoriteError}</p>{/if}
 
         {#if data.variants.length > 1 && !onBuilds}
           <fieldset class="switch">
@@ -509,6 +542,31 @@
     align-content: start;
     gap: 0.5rem;
     min-width: 0;
+  }
+
+  .name-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.8rem;
+  }
+
+  .fav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+  }
+
+  .fav.on {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .fav-error {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--bad);
   }
 
   h2 {
