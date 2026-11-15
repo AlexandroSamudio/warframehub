@@ -276,7 +276,7 @@ function resolveSlot(
 
 /** A saved build with what the data says about its mods, arcanes, shards and Helminth. */
 /** A weapon's picture, from the item data the search saved (null if never seen). */
-function weaponImage(db: Db, uniqueName: string): string | null {
+export function weaponImage(db: Db, uniqueName: string): string | null {
   const row = db
     .select({ payloadJson: itemCache.payloadJson })
     .from(itemCache)

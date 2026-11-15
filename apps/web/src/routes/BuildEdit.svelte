@@ -326,6 +326,40 @@
     document.getElementById('weapon-q')?.focus();
   }
 
+  // ---- import a shared build ----------------------------------------------------------
+
+  let importCode = $state('');
+  let importing = $state(false);
+  let importMessage = $state<{ text: string; bad: boolean } | null>(null);
+
+  /** Fills the whole form from a pasted code (nothing is saved until you press Save). */
+  async function importShared(event: SubmitEvent) {
+    event.preventDefault();
+    if (importing || importCode.trim() === '') return;
+    importing = true;
+    importMessage = null;
+    try {
+      const got = await api.importBuild(slug, importCode);
+      name = got.name;
+      content = got.content;
+      weaponImages = got.weaponImages;
+      open = null;
+      importCode = '';
+      importMessage = { text: t('build.imported'), bad: false };
+      await tick();
+      document.getElementById('build-name')?.focus();
+    } catch (e) {
+      importMessage = {
+        text: t('build.importError', {
+          message: e instanceof api.ApiCallError ? e.message : t('goals.unreachable'),
+        }),
+        bad: true,
+      };
+    } finally {
+      importing = false;
+    }
+  }
+
   // ---- save and delete ----------------------------------------------------------------
 
   async function showError(message: string) {
@@ -505,6 +539,29 @@
           >{t('build.leaveAnyway')}</button
         >
       </div>
+    {/if}
+    {#if sub.kind === 'new'}
+      <!-- Its own form: Enter here reads the code, it never saves the build. -->
+      <form class="import frame" onsubmit={importShared} aria-labelledby="import-title">
+        <h3 id="import-title">{t('build.importTitle')}</h3>
+        <p class="hint">{t('build.importHint')}</p>
+        <div class="import-row">
+          <input
+            type="text"
+            aria-label={t('build.importLabel')}
+            placeholder={t('build.importPlaceholder')}
+            autocomplete="off"
+            spellcheck="false"
+            bind:value={importCode}
+          />
+          <button type="submit" aria-disabled={importing || importCode.trim() === ''}>
+            {importing ? t('build.importing') : t('build.importButton')}
+          </button>
+        </div>
+        <p class="import-status" class:bad={importMessage?.bad} role="status">
+          {importMessage?.text ?? ''}
+        </p>
+      </form>
     {/if}
     <form onsubmit={save} novalidate>
       <h2 tabindex="-1" bind:this={titleEl}>
@@ -935,6 +992,47 @@
     padding: 0.95rem 1.15rem 1.1rem;
     display: grid;
     gap: 0.6rem;
+  }
+
+  .import {
+    gap: 0.4rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .import h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--gold);
+  }
+
+  .import-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .import-row input {
+    flex: 1 1 16rem;
+    font-family: var(--font-mono, monospace);
+  }
+
+  .import button[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .import-status {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ok);
+  }
+
+  .import-status:empty {
+    display: none;
+  }
+
+  .import-status.bad {
+    color: var(--bad);
   }
 
   .hint {

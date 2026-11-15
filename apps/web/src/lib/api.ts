@@ -2,6 +2,8 @@ import {
   ApiError,
   Build,
   BuildOptionsResponse,
+  ImportBuildResponse,
+  ShareBuildResponse,
   BuildView,
   ChecklistResponse,
   ClearSectionResponse,
@@ -279,6 +281,16 @@ export function getBuildOptions(slug: string): Promise<BuildOptionsResponse> {
 /** One build with its pictures and effects (as on the Builds page). */
 export function getBuild(id: number): Promise<BuildView> {
   return request(BuildView, `/api/builds/${id}`);
+}
+
+/** The build as one line of text to send to someone. */
+export async function shareBuild(id: number): Promise<string> {
+  return (await request(ShareBuildResponse, `/api/builds/${id}/share`)).code;
+}
+
+/** Reads a pasted code for this Warframe. Saves nothing. */
+export function importBuild(slug: string, code: string): Promise<ImportBuildResponse> {
+  return request(ImportBuildResponse, '/api/builds/import', json('POST', { slug, code }));
 }
 
 export function createBuild(slug: string, name: string, content: BuildContent): Promise<Build> {

@@ -4,6 +4,9 @@ import {
   BuildOptionsResponse,
   BuildView,
   CreateBuildRequest,
+  ImportBuildRequest,
+  ImportBuildResponse,
+  ShareBuildResponse,
   ReorderBuildsRequest,
   UpdateBuildRequest,
 } from '@warframehub/shared';
@@ -20,7 +23,9 @@ import {
   reorderBuilds,
   resolveBuild,
   updateBuild,
+  weaponImage,
 } from '../db/builds.js';
+import { decodeShare, encodeShare } from '../build-share.js';
 import type { Db } from '../db/client.js';
 import { userLanguage } from '../db/tracker.js';
 import type { GameNames } from '../game-names.js';
@@ -84,6 +89,38 @@ export function registerBuildRoutes(app: FastifyInstance, deps: BuildRouteDeps):
     return BuildView.parse(
       names.build(resolveBuild(db, saved, buildRules(state, group, helminth)), lang()),
     );
+  });
+
+  /** The build as one line of text, to send to someone (SPEC §14.1). */
+  app.get('/api/builds/:id/share', async (request): Promise<ShareBuildResponse> => {
+    const { id } = IdParams.parse(request.params);
+    const saved = getBuild(db, userId, id);
+    return ShareBuildResponse.parse({
+      code: encodeShare({ slug: saved.slug, name: saved.name, content: saved.content }),
+    });
+  });
+
+  /**
+   * Reads a pasted code for this Warframe and answers with the build to fill the form with.
+   * Saves nothing: the user looks it over and saves it like any new build.
+   */
+  app.post('/api/builds/import', async (request): Promise<ImportBuildResponse> => {
+    const body = ImportBuildRequest.parse(request.body);
+    const { state, group, helminth, groups } = await rulesFor(body.slug);
+    const shared = decodeShare(body.code);
+    if (!shared) throw new HttpError(400, 'bad_request', 'shareInvalid');
+    if (shared.slug !== group.slug) {
+      const other = groups.find((g) => g.slug === shared.slug)?.name ?? shared.slug;
+      throw new HttpError(400, 'bad_request', 'shareOtherWarframe', { warframe: other });
+    }
+    const content = checkContent(shared.content, buildRules(state, group, helminth), null);
+    return ImportBuildResponse.parse({
+      name: shared.name,
+      content,
+      weaponImages: Object.fromEntries(
+        content.weapons.map((w) => [w.uniqueName, weaponImage(db, w.uniqueName)]),
+      ),
+    });
   });
 
   app.post('/api/builds', async (request, reply) => {

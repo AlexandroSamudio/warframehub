@@ -433,6 +433,25 @@ export const ReorderBuildsRequest = z.object({
 });
 export type ReorderBuildsRequest = z.infer<typeof ReorderBuildsRequest>;
 
+/** `GET /api/builds/:id/share`: the build as one line of text to paste anywhere. */
+export const ShareBuildResponse = z.object({ code: z.string() });
+export type ShareBuildResponse = z.infer<typeof ShareBuildResponse>;
+
+/** `POST /api/builds/import`: read a pasted code for this Warframe (nothing is saved). */
+export const ImportBuildRequest = z.object({
+  slug: z.string().regex(/^[a-z0-9-]{1,40}$/),
+  code: z.string().min(1).max(120_000),
+});
+export type ImportBuildRequest = z.infer<typeof ImportBuildRequest>;
+
+export const ImportBuildResponse = z.object({
+  name: z.string(),
+  content: BuildContent,
+  /** Weapon pictures we know of, by uniqueName. */
+  weaponImages: z.record(z.string(), z.string().nullable()),
+});
+export type ImportBuildResponse = z.infer<typeof ImportBuildResponse>;
+
 /** A build as saved (`GET /api/builds/:id`, for the edit page). */
 export const Build = z.object({
   id: z.int().positive(),
