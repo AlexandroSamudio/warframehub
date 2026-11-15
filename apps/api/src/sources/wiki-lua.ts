@@ -2,7 +2,7 @@
  * A small reader for the Lua data tables the Warframe wiki keeps its facts in
  * (`Module:Ability/data`, `Module:Warframes/data`). It reads only what those use:
  * `return { ... }` or `local Data = { ... }` (the code after it is ignored), tables with `key =` or `["key"] =` entries and plain list items,
- * strings, numbers, `true`/`false`/`nil`, and `--` comments. Anything else is an error,
+ * strings, numbers, `math.huge`, `true`/`false`/`nil`, and `--` comments. Anything else is an error,
  * so a format change shows up when the script runs instead of producing wrong data.
  */
 
@@ -59,6 +59,11 @@ export function parseLuaData(source: string): LuaValue {
     const c = source[i];
     if (c === '"' || c === "'") return string();
     if (c === '{') return table();
+    // Lua's infinity (Module:Weapons/data uses it for unlimited ranges).
+    if (/^math\.huge\b/.test(source.slice(i, i + 10))) {
+      i += 'math.huge'.length;
+      return Infinity;
+    }
     const word = /^(true|false|nil)\b/.exec(source.slice(i, i + 6));
     if (word) {
       i += word[1]!.length;

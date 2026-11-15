@@ -11,6 +11,7 @@ const file: NamesFile = {
   },
   abilities: {},
   warframes: {},
+  weaponDescriptions: {},
   effects: {},
   parts: { Blueprint: 'Plano', Chassis: 'Chasis', Neuroptics: 'Neurópticas' },
   relics: { 'Axi N12 Relic': 'Reliquia Axi N12' },

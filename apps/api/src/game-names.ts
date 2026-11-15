@@ -17,6 +17,8 @@ import {
   type Shortfall,
   type WarframeDetail,
   type WarframesResponse,
+  type WeaponDetail,
+  type WeaponsResponse,
 } from '@warframehub/shared';
 import { z } from 'zod';
 import { withContentNames } from './db/builds.js';
@@ -258,6 +260,34 @@ export class GameNames {
       stock: g.stock.map((s) => ({ ...s, name: this.component(s.key, s.name) })),
       partStock: g.partStock.map((p) => ({ ...p, name: this.component(p.key, p.name) })),
       undo: g.undo && { ...g.undo, name: this.compound(g.undo.name) },
+    };
+  }
+
+  /** The weapon list (SPEC §15) in Spanish: names only; the page translates the rest. */
+  weapons(list: WeaponsResponse, lang: Language): WeaponsResponse {
+    if (lang === 'en') return list;
+    return {
+      ...list,
+      weapons: list.weapons.map((w) => ({
+        ...w,
+        name: this.item(null, w.name),
+        variants: w.variants.map((v) => ({ ...v, name: this.item(null, v.name) })),
+      })),
+    };
+  }
+
+  /** A weapon's page in Spanish: names, descriptions (DE's export) and the recipe. */
+  weapon(d: WeaponDetail, lang: Language): WeaponDetail {
+    if (lang === 'en') return d;
+    return {
+      ...d,
+      name: this.item(null, d.name),
+      variants: d.variants.map((v) => ({
+        ...v,
+        name: this.item(v.uniqueName, v.name),
+        description: this.es.weaponDescriptions[v.uniqueName] ?? v.description,
+        recipe: v.recipe && this.recipe(v.recipe, lang),
+      })),
     };
   }
 

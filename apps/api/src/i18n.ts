@@ -18,6 +18,7 @@ const en = {
   itemTwice: 'An item is listed twice',
   unknownItemInOrder: 'Unknown item in the new order',
   noWarframe: 'No Warframe called "{slug}"',
+  noWeapon: 'No weapon called "{slug}"',
   noBuild: 'No build {id}',
   inBuildTwice: '{name} is in the build twice',
   unknownMod: 'Unknown mod: {name}',
@@ -60,6 +61,9 @@ const en = {
     "Can't reach warframestat.us to load the Warframes. Try again when you're online.",
   warframesTooSoon: 'Refreshed recently. Try again in {minutes} min.',
   warframesRefreshFailed: "Can't reach warframestat.us right now. The saved list is kept.",
+  weaponsUnavailable:
+    "Can't reach warframestat.us to load the weapons. Try again when you're online.",
+  weaponsRefreshFailed: "Can't reach warframestat.us right now. The saved list is kept.",
   // Request checks (Zod) and anything unexpected
   invalid: 'Some data was not valid ({fields})',
   buildName: 'Give the build a name',
@@ -89,6 +93,7 @@ const es: Record<ServerMessageKey, string> = {
   itemTwice: 'Hay un elemento repetido',
   unknownItemInOrder: 'Hay un elemento desconocido en el nuevo orden',
   noWarframe: 'No hay ningún warframe llamado "{slug}"',
+  noWeapon: 'No hay ningún arma llamada "{slug}"',
   noBuild: 'No existe la build {id}',
   inBuildTwice: '{name} está dos veces en la build',
   unknownMod: 'Mod desconocido: {name}',
@@ -133,6 +138,10 @@ const es: Record<ServerMessageKey, string> = {
     'No se puede conectar con warframestat.us para cargar los warframes. Inténtalo cuando tengas conexión.',
   warframesTooSoon: 'Se actualizó hace poco. Vuelve a intentarlo en {minutes} min.',
   warframesRefreshFailed:
+    'Ahora no se puede conectar con warframestat.us. Se conserva la lista guardada.',
+  weaponsUnavailable:
+    'No se puede conectar con warframestat.us para cargar las armas. Inténtalo cuando tengas conexión.',
+  weaponsRefreshFailed:
     'Ahora no se puede conectar con warframestat.us. Se conserva la lista guardada.',
   invalid: 'Hay datos que no son válidos ({fields})',
   buildName: 'Ponle un nombre a la build',

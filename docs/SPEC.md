@@ -296,7 +296,7 @@ Rules:
   - dark void background with Orokin **gold** accents and a cool **teal/cyan** secondary
   - thin geometric frames and angled corners on panels
   - a technical display font for headings and labels (**Rajdhani**), plus a clean body font (**Inter**). Both SIL OFL 1.1, bundled with the app via `@fontsource`; nothing is fetched from font services. Numbers that change (countdowns, counts) use Inter's tabular digits, because Rajdhani has none.
-- **Original artwork for the app itself.** No DE logos or copied UI assets. DE's Warframe images (portraits, ability icons) are allowed for personal use in the Warframes section (Alex, 11 Nov 2026): fetched from cdn.warframestat.us once, cached in the data folder, never committed (§14).
+- **Original artwork for the app itself.** No DE logos or copied UI assets. DE's Warframe images (portraits, ability icons) are allowed for personal use in the Warframes section (Alex, 11 Nov 2026), and weapon pictures in the Weapons section (Alex, 15 Nov 2026): fetched from cdn.warframestat.us once, cached in the data folder, never committed (§14, §15).
 - **Readable first:**
   - good contrast
   - visible keyboard focus
@@ -413,7 +413,7 @@ Each phase ends with something you can run and check.
 
 "Build this Warframe or weapon." Screen `#/goals`, plus a goals card on the Tracker.
 
-- **Scope:** Warframes and Primary / Secondary / Melee weapons, Primes included (Alex's choice).
+- **Scope:** Warframes and Primary / Secondary / Melee weapons, Primes included (Alex's choice). Since 15 Nov 2026 also arch-guns and arch-melee (categories `archgun`, `archmelee`), so they can be goals from the Weapons section (§15). Mastery as for any weapon (wiki, "Mastery Rank": Archwing weapons give 100 points a rank, like weapons).
 - **Data:** warframestat.us item search (§7), cached in `item_cache`. Each goal keeps its own copy of the recipe (`goals.recipe_json`), so it works offline. "Update recipe" fetches it again and keeps part counts. Part crafting materials come from the bundled DE data (§7), filled in when a goal loads, so older goals get them too.
 - **Ownership:**
   - **Parts** are ticked per goal (`goal_parts`).
@@ -509,6 +509,17 @@ Each phase ends with something you can run and check.
 ---
 
 - **Sharing a build** (15 Nov 2026, Alex's request): a build is shared as a **code**, one line of text that starts with `wfhub-build1:` and holds the build as compressed JSON (base64url; `apps/api/src/build-share.ts`). It isn't a link because the app runs only on the owner's computer (`127.0.0.1`), so a link would lead nowhere for anyone else; the code carries the build itself and needs no server. **Share** on a build (`GET /api/builds/:id/share`) copies it. On the new-build page, "Have a shared build?" takes a pasted code (`POST /api/builds/import`, which saves nothing) and fills the whole form; the user looks it over and saves. The panel is a closed disclosure under the page title ("Have a shared build?"); it opens by itself from the address `…/builds/new?import`, which the empty Builds tab ("Have a code? Paste it") and the sidebar ("Paste a code") link to. If the form already has your own work, a read code waits for "Replace" or "Keep mine" before it overwrites anything. Spaces, line breaks and quotes around the code are ignored. A code for another Warframe is refused with that Warframe's name, and the build is checked against this copy's game data like any save (a mod the data doesn't list is refused).
+
+## 15. Weapons section (15 Nov 2026, Alex's request)
+
+- **What:** every weapon, one page each, built like the Warframes section (§14): a list to browse and a page per weapon with its stats per attack, how to get it (Add as goal), its details and, later, its Incarnon evolutions. Weapon builds come later and will differ from Warframe builds.
+- **Scope:** Primary, Secondary and Melee weapons in one tab; arch-guns and arch-melee in a second tab, "Archwing & Necramech". Necramechs can use any arch-gun and no arch-melee (wiki, "Necramech", checked 15 Nov 2026), so the second tab filters by Arch-gun / Arch-melee only and says so (Alex's choice). Left out: Zaw parts (`type: "Zaw Component"`), the Drifter's Sirocco (`productCategory: "OperatorAmps"`) and anything `masterable: false`. The data has no Kitgun or Amp parts as weapons.
+- **Data** (`apps/api/src/sources/weapons.ts`): warframestat.us `/weapons` (checked 15 Nov 2026: 644 entries, 598 kept), saved in `item_cache` (`weapons:all`, plus each weapon as `item:<uniqueName>` for goals), at most once a week or on Refresh (once an hour). Each entry has `attacks[]` (name, speed, crit chance and multiplier in percent, status chance, shot type, charge time, damage by type; Incarnon weapons list their "Incarnon Form" attacks), `disposition` (1–5) and `omegaAttenuation`, `masteryReq`, magazine, reload, multishot, trigger, noise, accuracy, melee `range`, picture, release, vaulted, components.
+- **Versions:** only Prime, Vandal and Mk1 group with the plain weapon (Braton, Braton Prime, Braton Vandal, Mk1-Braton); Kuva, Tenet, Coda, Syndicate, Prisma, Dex and Wraith weapons are their own (Alex's choice). A Prime with no plain version (Euphona Prime) keeps its full name. When the data has two entries of one version (Grimoire and the doppelgänger's stand-in), the one with recipe parts wins. 477 weapons on 15 Nov 2026: 153 primary, 115 secondary, 184 melee, 17 arch-guns, 8 arch-melee.
+- **Classes** (`npm run update-weapon-wiki` → `apps/api/data/weapon-wiki.json`, committed; the app never calls the wiki): from `Module:Weapons/data/{primary,secondary,melee,archwing}`, by internal name, else by name (some wiki entries have a missing or old internal name). The item data says only "Melee" for melee weapons and "Rifle" for some of them. Exalted weapons and the "(Atmosphere)" entries are skipped. Dark Split-Sword has two forms on the wiki and no single class. Arch weapons show no class.
+- **Favorites:** `PUT /api/weapons/:slug/favorite`, table `favorite_weapons` (migration `0009`).
+- **API:** `GET /api/weapons` (A–Z; each with tab, slot, class, versions with `mastered`, highest disposition, lowest MR, `incarnon`, `favorite`, plus your Mastery Rank from the profile), `GET /api/weapons/:slug` (each version's stats, attacks, recipe, details, mastered, goal), `POST /api/weapons/refresh`. Pictures go through `GET /api/images/:file`.
+- **Spanish:** names from `names-es.json`; weapon descriptions from DE's export (`weaponDescriptions`, added to `npm run update-names`). Attack names and classes are translated in the interface.
 
 ## Appendix A. Default checklist (seed v6)
 

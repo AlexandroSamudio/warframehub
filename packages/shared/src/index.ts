@@ -9,3 +9,4 @@ export * from './goals.js';
 export * from './profile.js';
 export * from './warframes.js';
 export * from './builds.js';
+export * from './weapons.js';

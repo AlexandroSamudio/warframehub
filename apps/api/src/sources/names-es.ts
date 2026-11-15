@@ -19,6 +19,8 @@ export const NamesFile = z.object({
     z.string(),
     z.object({ description: z.string(), passive: z.string().nullable() }),
   ),
+  /** Weapon descriptions by `uniqueName` (the Weapons section; added 15 Nov 2026). */
+  weaponDescriptions: z.record(z.string(), z.string()).default({}),
   /** Mod and arcane effects by `uniqueName`, one string per rank (lines joined by "\n"). */
   effects: z.record(z.string(), z.array(z.string())),
   /** Short part words: "Chassis" → "Chasis", "Blueprint" → "Plano". */
@@ -272,13 +274,17 @@ export function buildSpanishNames(
     if (e) effects[u] = e;
   }
 
-  // Weapons the goal planner and builds use: names, plus search.
-  for (const u of weapons.es.keys()) {
+  // Weapons the goal planner, builds and the Weapons section use: names, descriptions, search.
+  const weaponDescriptions: NamesFile['weaponDescriptions'] = {};
+  for (const [u, es] of weapons.es) {
     const en = weapons.en.get(u);
     const esName = name(weapons.es, u);
     if (!esName) continue;
     names[u] = esName;
     if (en?.name) items[clean(en.name)] = esName;
+    if (typeof es.description === 'string' && es.description.trim() !== '') {
+      weaponDescriptions[u] = clean(es.description);
+    }
   }
 
   // Resources that recipes for Warframes, weapons and their parts use, and the parts.
@@ -368,6 +374,7 @@ export function buildSpanishNames(
       names,
       abilities,
       warframes,
+      weaponDescriptions,
       effects,
       parts,
       relics,

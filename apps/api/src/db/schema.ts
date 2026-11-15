@@ -281,3 +281,15 @@ export const favoriteWarframes = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.warframeSlug] })],
 );
+
+/** The weapons you starred (SPEC §15), by slug. The row's presence is the favorite. */
+export const favoriteWeapons = sqliteTable(
+  'favorite_weapons',
+  {
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    weaponSlug: text('weapon_slug').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.weaponSlug] })],
+);
