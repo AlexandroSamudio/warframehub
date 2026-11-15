@@ -56,9 +56,14 @@
   let sharing = $state(false);
   let codeBox = $state<HTMLTextAreaElement | null>(null);
 
+  /** The "copied" note goes away by itself. */
+  let clearTimer: ReturnType<typeof setTimeout> | undefined;
+  $effect(() => () => clearTimeout(clearTimer));
+
   /** Copies the build's code; falls back to showing it selected. */
   async function share() {
     if (sharing) return;
+    clearTimeout(clearTimer);
     sharing = true;
     shareMessage = null;
     manualCode = null;
@@ -67,6 +72,7 @@
       try {
         await navigator.clipboard.writeText(code);
         shareMessage = { text: t('build.shareCopied'), bad: false };
+        clearTimer = setTimeout(() => (shareMessage = null), 6000);
       } catch {
         manualCode = code;
         shareMessage = { text: t('build.shareManual'), bad: false };
@@ -89,6 +95,7 @@
   // Another build opened: its message and code don't belong to it.
   $effect(() => {
     void b.id;
+    clearTimeout(clearTimer);
     shareMessage = null;
     manualCode = null;
   });
@@ -118,21 +125,16 @@
         {/if}
       </p>
       {#if c.description}<p class="description">{c.description}</p>{/if}
-      <!-- Always in the page, so the result is announced. -->
-      <div class="share" role="status">
-        {#if shareMessage}
-          <p class:bad={shareMessage.bad}>{shareMessage.text}</p>
-        {/if}
-        {#if manualCode}
-          <textarea
-            bind:this={codeBox}
-            readonly
-            rows="3"
-            aria-label={t('build.shareCode')}
-            value={manualCode}
-            onfocus={(e) => e.currentTarget.select()}></textarea>
-        {/if}
-      </div>
+      {#if manualCode}
+        <textarea
+          class="code-box"
+          bind:this={codeBox}
+          readonly
+          rows="6"
+          aria-label={t('build.shareCode')}
+          value={manualCode}
+          onfocus={(e) => e.currentTarget.select()}></textarea>
+      {/if}
     </div>
     <div class="actions">
       {#if hasGuide}
@@ -140,6 +142,10 @@
       {/if}
       <button type="button" class="link" aria-disabled={sharing} onclick={share}
         >{t('build.share')}<span class="sr-only"> {b.name}</span></button
+      >
+      <!-- Next to the button, always in the page, so the result is announced. -->
+      <span class="share" class:bad={shareMessage?.bad} role="status"
+        >{shareMessage?.text ?? ''}</span
       >
       <a class="btn" href={buildHref(slug, { kind: 'edit', id: b.id })}
         >{t('build.edit')}<span class="sr-only"> {b.name}</span></a
@@ -397,34 +403,36 @@
     font-size: 0.85rem;
   }
 
-  /* Stays in the page when empty, so the message that appears in it is announced. */
-  .share:empty {
-    height: 0;
-    margin: 0;
-  }
-
+  /* Right beside the Share button; stays in the page when empty so it is announced. */
   .share {
-    display: grid;
-    gap: 0.4rem;
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+    flex: 1 1 14rem;
+    min-width: 0;
     color: var(--ok);
   }
 
-  .share p {
-    margin: 0;
-  }
-
-  .share .bad {
+  .share.bad {
     color: var(--bad);
   }
 
-  .share textarea {
-    width: 100%;
+  .share:empty {
+    flex: 0 0 0;
+  }
+
+  .code-box {
+    display: block;
+    width: 36rem;
+    max-width: 100%;
     box-sizing: border-box;
-    font-family: var(--font-mono, monospace);
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
     font-size: 0.8rem;
     word-break: break-all;
+    resize: vertical;
+  }
+
+  .code-box:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
   }
 
   /* An Edit link styled as the console's primary (gold outline) button. */
@@ -454,6 +462,16 @@
     padding: 0.2rem 0;
     text-decoration: underline;
     text-underline-offset: 0.2em;
+  }
+
+  /* Fingers need more than the console's dense 1.75rem. */
+  @media (pointer: coarse) {
+    button.link,
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+    }
   }
 
   button.link:hover:not(:disabled) {
