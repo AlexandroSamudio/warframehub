@@ -14,6 +14,7 @@ import {
   TrackerResponse,
   WarframeDetail,
   WarframesResponse,
+  FavoriteResponse,
   WorldstateResponse,
   type BuildContent,
   type CreateItemRequest,
@@ -243,6 +244,15 @@ export function getWarframes(): Promise<WarframesResponse> {
 
 export function getWarframe(slug: string): Promise<WarframeDetail> {
   return request(WarframeDetail, `/api/warframes/${encodeURIComponent(slug)}`);
+}
+
+/** Stars or unstars a Warframe. */
+export function setFavorite(slug: string, favorite: boolean): Promise<FavoriteResponse> {
+  return request(
+    FavoriteResponse,
+    `/api/warframes/${encodeURIComponent(slug)}/favorite`,
+    json('PUT', { favorite }),
+  );
 }
 
 /** Fetches the list again now (the server allows it once an hour). */

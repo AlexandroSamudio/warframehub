@@ -5,10 +5,12 @@ import {
   formatRelease,
   pickVariant,
   polarityName,
+  sortWarframes,
   statLines,
 } from './warframes.ts';
 
 const item = (name: string, variants: string[]): WarframeListItem => ({
+  favorite: false,
   slug: name.toLowerCase(),
   name,
   image: null,
@@ -65,5 +67,63 @@ describe('pickVariant', () => {
     expect(pickVariant(vs, 'prime').kind).toBe('prime');
     expect(pickVariant(vs, 'umbra').kind).toBe('normal');
     expect(pickVariant(vs, null).kind).toBe('normal');
+  });
+});
+
+describe('sortWarframes', () => {
+  const frame = (name: string, mastered: boolean[], favorite = false): WarframeListItem => ({
+    slug: name.toLowerCase(),
+    name,
+    image: null,
+    favorite,
+    variants: mastered.map((m, i) => ({ kind: i === 0 ? 'normal' : 'prime', name, mastered: m })),
+  });
+  const list = [
+    frame('Nidus', [true, true], false),
+    frame('Ash', [false], true),
+    frame('Mesa', [true, false], true),
+    frame('Volt', [true], false),
+  ];
+  const names = (l: WarframeListItem[]) => l.map((w) => w.name);
+
+  it('sorts by name, both ways', () => {
+    expect(names(sortWarframes(list, 'name', 'asc'))).toEqual(['Ash', 'Mesa', 'Nidus', 'Volt']);
+    expect(names(sortWarframes(list, 'name', 'desc'))).toEqual(['Volt', 'Nidus', 'Mesa', 'Ash']);
+  });
+
+  it('puts the starred first or last, A–Z inside each group', () => {
+    expect(names(sortWarframes(list, 'favorites', 'asc'))).toEqual([
+      'Ash',
+      'Mesa',
+      'Nidus',
+      'Volt',
+    ]);
+    expect(names(sortWarframes(list, 'favorites', 'desc'))).toEqual([
+      'Nidus',
+      'Volt',
+      'Ash',
+      'Mesa',
+    ]);
+  });
+
+  it('counts a Warframe as mastered only when every version is', () => {
+    expect(names(sortWarframes(list, 'mastered', 'asc'))).toEqual(['Nidus', 'Volt', 'Ash', 'Mesa']);
+    expect(names(sortWarframes(list, 'mastered', 'desc'))).toEqual([
+      'Ash',
+      'Mesa',
+      'Nidus',
+      'Volt',
+    ]);
+  });
+
+  it('does not change the list it is given', () => {
+    const copy = names(list);
+    sortWarframes(list, 'name', 'desc');
+    expect(names(list)).toEqual(copy);
+  });
+
+  it('sorts accented names by the language', () => {
+    const l = [frame('Éxito', [false]), frame('Zeta', [false]), frame('Ágil', [false])];
+    expect(names(sortWarframes(l, 'name', 'asc', 'es'))).toEqual(['Ágil', 'Éxito', 'Zeta']);
   });
 });

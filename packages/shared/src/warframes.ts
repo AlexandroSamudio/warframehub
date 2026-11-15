@@ -101,6 +101,8 @@ export const WarframeListItem = z.object({
   name: z.string(),
   image: z.string().nullable(),
   variants: z.array(z.object({ kind: VariantKind, name: z.string(), mastered: z.boolean() })),
+  /** You starred it. */
+  favorite: z.boolean(),
 });
 export type WarframeListItem = z.infer<typeof WarframeListItem>;
 
@@ -126,6 +128,8 @@ export const WarframeDetail = z.object({
   augments: z.array(WarframeAugment),
   /** Syndicates that sell the augments (from the wiki). */
   augmentShops: z.array(z.string()),
+  /** You starred it. */
+  favorite: z.boolean(),
   /** The version that owns the builds (SPEC §14.1), e.g. "Mesa Prime". */
   buildsVariant: z.string(),
   /** Your builds for this Warframe, in your order. */
@@ -133,3 +137,10 @@ export const WarframeDetail = z.object({
   ...Freshness,
 });
 export type WarframeDetail = z.infer<typeof WarframeDetail>;
+
+/** `PUT /api/warframes/:slug/favorite`: star or unstar a Warframe. */
+export const FavoriteRequest = z.object({ favorite: z.boolean() });
+export type FavoriteRequest = z.infer<typeof FavoriteRequest>;
+
+export const FavoriteResponse = z.object({ slug: z.string(), favorite: z.boolean() });
+export type FavoriteResponse = z.infer<typeof FavoriteResponse>;

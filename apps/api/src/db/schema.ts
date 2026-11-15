@@ -269,3 +269,15 @@ export const builds = sqliteTable(
   },
   (t) => [index('builds_user_warframe').on(t.userId, t.warframeSlug)],
 );
+
+/** The Warframes you starred (SPEC §14), by slug. The row's presence is the favorite. */
+export const favoriteWarframes = sqliteTable(
+  'favorite_warframes',
+  {
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    warframeSlug: text('warframe_slug').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.warframeSlug] })],
+);
