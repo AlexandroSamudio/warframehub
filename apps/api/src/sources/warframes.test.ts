@@ -212,7 +212,7 @@ describe('Warframes routes', () => {
     const virulence = nidus.abilities[0]!.numbers!;
     expect(virulence.cost).toBe(40);
     expect(virulence.range).toEqual(['10 / 11 / 13 / 16 m']);
-    expect(virulence.page).toBe('https://wiki.warframe.com/wiki/Virulence');
+    expect(virulence.page).toBe('https://wiki.warframe.com/w/Virulence');
     expect(nidus.passive).not.toMatch(/\|[A-Z]+\|/); // no placeholders
     expect(nidus.rank30.armor).toBeGreaterThan(nidus.stats.armor);
     expect(d.augmentShops.length).toBeGreaterThan(0);

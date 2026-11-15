@@ -135,7 +135,7 @@ export function buildsVariant(group: WarframeGroup): WarframeGroup['variants'][n
 
 const HELMINTH_PREFIX = '/Lotus/Powersuits/PowersuitAbilities/Helminth';
 
-/** "https://wiki.warframe.com/wiki/Marked_For_Death" → "Marked For Death". */
+/** "https://wiki.warframe.com/w/Marked_For_Death" → "Marked For Death". */
 function nameFromPage(page: string): string {
   const last = page.split('/').pop() ?? '';
   return decodeURIComponent(last).replace(/_/g, ' ');

@@ -52,10 +52,8 @@ describe('names and links', () => {
   it('drops "(Quest)" from the name and builds the wiki link', () => {
     expect(questName('Vox Solaris (Quest)')).toBe('Vox Solaris');
     expect(questName('The Glast Gambit')).toBe('The Glast Gambit');
-    expect(wikiUrl('The Glast Gambit')).toBe('https://wiki.warframe.com/wiki/The_Glast_Gambit');
-    expect(wikiUrl('Vox Solaris (Quest)')).toBe(
-      'https://wiki.warframe.com/wiki/Vox_Solaris_(Quest)',
-    );
+    expect(wikiUrl('The Glast Gambit')).toBe('https://wiki.warframe.com/w/The_Glast_Gambit');
+    expect(wikiUrl('Vox Solaris (Quest)')).toBe('https://wiki.warframe.com/w/Vox_Solaris_(Quest)');
   });
 });
 
@@ -76,7 +74,7 @@ describe('buildPartSources', () => {
         {
           kind: 'quest',
           title: 'The Glast Gambit',
-          url: 'https://wiki.warframe.com/wiki/The_Glast_Gambit',
+          url: 'https://wiki.warframe.com/w/The_Glast_Gambit',
         },
       ],
     });
@@ -90,7 +88,7 @@ describe('the saved part-sources.json (Warframe wiki, 10 Nov 2026)', () => {
       {
         kind: 'quest',
         title: 'The Glast Gambit',
-        url: 'https://wiki.warframe.com/wiki/The_Glast_Gambit',
+        url: 'https://wiki.warframe.com/w/The_Glast_Gambit',
       },
     ]);
     expect(partSources('nidus', 'Blueprint')).toHaveLength(1); // matched case-insensitively

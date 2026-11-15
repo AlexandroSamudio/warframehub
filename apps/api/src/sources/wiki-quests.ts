@@ -77,7 +77,7 @@ export function questName(pageTitle: string): string {
 }
 
 export function wikiUrl(pageTitle: string): string {
-  return `${WIKI_BASE}/wiki/${encodeURIComponent(pageTitle.replace(/ /g, '_')).replace(/%2F/g, '/').replace(/%3A/g, ':')}`;
+  return `${WIKI_BASE}/w/${encodeURIComponent(pageTitle.replace(/ /g, '_')).replace(/%2F/g, '/').replace(/%3A/g, ':')}`;
 }
 
 /** Builds the file from quest pages (`title → wikitext`). */
