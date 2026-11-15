@@ -64,13 +64,16 @@ type RawItem = z.infer<typeof RawItem>;
 /**
  * Which upstream items count as Warframes or weapons. Necramechs come back with
  * category "Warframes" (type "Necramech") and Archwings with "Archwing", so Warframes
- * also need type "Warframe". Arch-guns, Arch-melee and the rest are left out.
+ * also need type "Warframe". Arch-guns and arch-melee count as weapons; the rest is left out.
  */
 function categoryOf(item: RawItem): ItemCategory | null {
   if (item.category === 'Warframes') return item.type === 'Warframe' ? 'warframe' : null;
   if (item.category === 'Primary') return 'primary';
   if (item.category === 'Secondary') return 'secondary';
   if (item.category === 'Melee') return 'melee';
+  // Arch weapons since 15 Nov 2026 (the Weapons section, SPEC §15).
+  if (item.category === 'Arch-Gun') return 'archgun';
+  if (item.category === 'Arch-Melee') return 'archmelee';
   return null;
 }
 

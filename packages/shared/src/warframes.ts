@@ -106,7 +106,8 @@ export const WarframeListItem = z.object({
 });
 export type WarframeListItem = z.infer<typeof WarframeListItem>;
 
-const Freshness = {
+/** How fresh a catalog list is (shared by the Warframes and Weapons sections). */
+export const CatalogFreshness = {
   /** When the list was fetched from warframestat.us. */
   fetchedAt: z.iso.datetime(),
   /** True when the last fetch failed and this is the saved copy. */
@@ -116,7 +117,10 @@ const Freshness = {
 };
 
 /** `GET /api/warframes`, A–Z. */
-export const WarframesResponse = z.object({ warframes: z.array(WarframeListItem), ...Freshness });
+export const WarframesResponse = z.object({
+  warframes: z.array(WarframeListItem),
+  ...CatalogFreshness,
+});
 export type WarframesResponse = z.infer<typeof WarframesResponse>;
 
 /** `GET /api/warframes/:slug`: normal first, then Prime, then Umbra. */
@@ -134,7 +138,7 @@ export const WarframeDetail = z.object({
   buildsVariant: z.string(),
   /** Your builds for this Warframe, in your order. */
   builds: z.array(BuildView),
-  ...Freshness,
+  ...CatalogFreshness,
 });
 export type WarframeDetail = z.infer<typeof WarframeDetail>;
 

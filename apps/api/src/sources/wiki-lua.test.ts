@@ -44,6 +44,13 @@ return {
     expect(isTable(root) && root.list).toEqual([1.15, -3, null, false]);
   });
 
+  it('reads math.huge as infinity', () => {
+    expect(parseLuaData('return { Range = math.huge }')).toEqual({
+      list: [],
+      map: { Range: Infinity },
+    });
+  });
+
   it('reads `local Data = { … }` and ignores the index-building code after it', () => {
     const root = parseLuaData(
       '-- x\nlocal AbilityData = { A = 1 }\nfor k,v in pairs(AbilityData) do end\nreturn AbilityData',

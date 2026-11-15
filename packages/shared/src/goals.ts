@@ -6,7 +6,14 @@ import { z } from 'zod';
  */
 
 /** Only Warframes and weapons can be goals for now (Alex, 10 Nov 2026). */
-export const ItemCategory = z.enum(['warframe', 'primary', 'secondary', 'melee']);
+export const ItemCategory = z.enum([
+  'warframe',
+  'primary',
+  'secondary',
+  'melee',
+  'archgun',
+  'archmelee',
+]);
 export type ItemCategory = z.infer<typeof ItemCategory>;
 
 export const ItemDrop = z.object({

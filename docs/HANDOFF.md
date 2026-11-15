@@ -175,6 +175,10 @@ Before the repo existed, a single-page tracker was published as a claude.ai Arti
         - `critique`: dual-agent, 27/40. Alex chose to fix everything: the loadout beside the mods, both tabs full width, visible Tauforged, R5/5 ranks, wayfinding and the empty state;
         - a scan finding (unbalanced columns) was fixed;
         - all page scans 0.
+  - **Weapons section** (15 Nov 2026, Alex's request; plan approved the same day; SPEC §15). Three PRs:
+    - **Part 1, data + API** (branch `weapons-api`): the weapon catalog (warframestat.us `/weapons`), grouping (Prime, Vandal, Mk1 only), classes from the wiki (`npm run update-weapon-wiki`), favorites (migration `0009`), routes, Spanish names and descriptions. Arch-guns and arch-melee can now be goals.
+    - **Part 2, UI** (next): the list (two tabs, slot chips, class, mastery and Incarnon filters, sort by name, mastered, favorites, disposition or MR) and the weapon page, through Impeccable.
+    - **Part 3, Incarnon:** evolutions and perks from the wiki, "in this week's Circuit", the Incarnon filter.
   - **Follow-up** (branch `goals-part-recipes`, Alex's requests): per-part crafting materials (DE public export, saved in `apps/api/data/part-recipes.json`, refresh with `npm run update-part-recipes`), a note per part for parts with no drop data ("Get another way"), and those materials counting in the shopping list until the part is owned. Migration `0004`. UI went through Impeccable again (brief addendum, dual-agent critique, audit).
   - **Header** (11 Nov 2026, PR #27): the "Weekly Tracker" tagline is gone; the mark and the WarframeHub name are one gold link home (`#/`). `DESIGN.md` updated.
   - **Builds follow-up** (#31): How to play as important as the mods (two equal framed sections), and a build description.

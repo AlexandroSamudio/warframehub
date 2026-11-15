@@ -184,6 +184,8 @@ export const es: Record<MessageKey, string> = {
   'goals.category.primary': 'Primaria',
   'goals.category.secondary': 'Secundaria',
   'goals.category.melee': 'Cuerpo a cuerpo',
+  'goals.category.archgun': 'Archcañón',
+  'goals.category.archmelee': 'Cuerpo a cuerpo de archwing',
   'goals.prime': 'prime',
   'goals.vaulted': 'en la Bóveda',
   'goals.ready': 'se puede construir',

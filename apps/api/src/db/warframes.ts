@@ -15,7 +15,6 @@ import {
   abilitiesOf,
   plainText,
   type CatalogState,
-  type RawWarframe,
   type WarframeGroup,
 } from '../sources/warframes.js';
 import { buildRules, listBuilds, resolveBuild } from './builds.js';
@@ -79,7 +78,7 @@ export function warframeList(
 }
 
 /** The goal for this item: an active one first, else the most recently built. */
-function goalFor(db: Db, userId: number, uniqueName: string) {
+export function goalFor(db: Db, userId: number, uniqueName: string) {
   const rows = db
     .select({ id: goals.id, status: goals.status })
     .from(goals)
@@ -89,7 +88,7 @@ function goalFor(db: Db, userId: number, uniqueName: string) {
   return rows.find((r) => r.status === 'active') ?? rows[0] ?? null;
 }
 
-function recipeOf(raw: RawWarframe) {
+export function recipeOf(raw: unknown) {
   try {
     const recipe = normaliseItem(raw);
     if (!recipe) return null;
@@ -102,7 +101,7 @@ function recipeOf(raw: RawWarframe) {
   }
 }
 
-function urlOrNull(value: string | undefined): string | null {
+export function urlOrNull(value: string | undefined): string | null {
   if (!value) return null;
   try {
     return new URL(value).toString();

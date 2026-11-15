@@ -22,11 +22,13 @@ import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerGoalRoutes } from './routes/goals.js';
 import { registerProfileRoutes } from './routes/profile.js';
 import { registerWarframeRoutes } from './routes/warframes.js';
+import { registerWeaponRoutes } from './routes/weapons.js';
 import { ItemCatalog } from './sources/items.js';
 import { ImageCache, WIKI_FILES } from './sources/images.js';
 import { POLARITY_FILES } from './routes/warframes.js';
 import { ProfileService } from './sources/profile.js';
 import { WarframeCatalog } from './sources/warframes.js';
+import { WeaponCatalog } from './sources/weapons.js';
 import { registerSystemRoutes } from './routes/system.js';
 import { registerTrackerRoutes } from './routes/tracker.js';
 import { registerWebApp } from './routes/web.js';
@@ -53,6 +55,8 @@ export interface AppOptions {
   items?: ItemCatalog;
   /** The Warframes section's data (warframestat.us + cache). Created with defaults if not given. */
   warframes?: WarframeCatalog;
+  /** The Weapons section's data (warframestat.us + cache). Created with defaults if not given. */
+  weapons?: WeaponCatalog;
   /** DE images, cached in the data folder. Created with defaults if not given. */
   images?: ImageCache;
   /** The polarity symbols from the Warframe wiki, cached the same way. */
@@ -204,6 +208,12 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       now,
       onError: (error) => app.log.warn({ err: error }, 'warframes fetch failed'),
     });
+  const weapons =
+    options.weapons ??
+    new WeaponCatalog(options.db, {
+      now,
+      onError: (error) => app.log.warn({ err: error }, 'weapons fetch failed'),
+    });
   registerWarframeRoutes(app, {
     db: options.db,
     userId: options.userId,
@@ -213,9 +223,10 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       options.images ??
       new ImageCache({
         ...(options.dataDir ? { dir: join(options.dataDir, 'images') } : {}),
-        // Only names the cached data mentions: Warframes, mods, arcanes, shards, weapons.
+        // Only names the cached data mentions: Warframes, weapons, mods, arcanes, shards.
         allowed: (name) =>
           warframes.cachedImageNames().has(name) ||
+          weapons.cachedImageNames().has(name) ||
           SHARD_IMAGE_NAMES.has(name) ||
           items.knowsImage(name),
         onError: (name, error) => app.log.warn({ name, err: error }, 'image fetch failed'),
@@ -229,6 +240,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         onError: (name, error) => app.log.warn({ name, err: error }, 'polarity fetch failed'),
       }),
   });
+  registerWeaponRoutes(app, { db: options.db, userId: options.userId, catalog: weapons, names });
   registerBuildRoutes(app, {
     db: options.db,
     userId: options.userId,

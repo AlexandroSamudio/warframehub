@@ -176,6 +176,8 @@ export const en = {
   'goals.category.primary': 'Primary',
   'goals.category.secondary': 'Secondary',
   'goals.category.melee': 'Melee',
+  'goals.category.archgun': 'Arch-gun',
+  'goals.category.archmelee': 'Arch-melee',
   'goals.prime': 'prime',
   'goals.vaulted': 'vaulted',
   'goals.ready': 'ready to build',

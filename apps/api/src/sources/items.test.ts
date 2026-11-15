@@ -73,9 +73,13 @@ describe('normaliseItem', () => {
   it.each([
     ['an Archwing', 'warframes_search_amesha', 'Amesha'],
     ['a Necramech (category "Warframes", type "Necramech")', 'warframes_search_voidrig', 'Voidrig'],
-    ['an Arch-gun', 'weapons_search_imperator', 'Imperator'],
   ])('leaves out %s', (_what, file, name) => {
     expect(normaliseItem(byName(file, name))).toBeNull();
+  });
+
+  it('keeps an Arch-gun (since the Weapons section, 15 Nov 2026)', () => {
+    const imperator = normaliseItem(byName('weapons_search_imperator', 'Imperator'));
+    expect(imperator?.category).toBe('archgun');
   });
 
   it('throws UnexpectedDataError for junk', () => {
@@ -132,7 +136,7 @@ describe('ItemCatalog', () => {
 
   it('keeps only Warframes and weapons in the results', async () => {
     expect((await catalog.search('voidrig')).results).toEqual([]);
-    expect((await catalog.search('imperator')).results).toEqual([]);
+    expect((await catalog.search('imperator')).results.map((r) => r.category)).toContain('archgun');
   });
 
   it('serves a repeated query from the cache for a day', async () => {

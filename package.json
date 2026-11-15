@@ -26,7 +26,8 @@
     "update-part-recipes": "tsx --conditions=source scripts/update-part-recipes.ts",
     "update-part-sources": "tsx --conditions=source scripts/update-part-sources.ts",
     "update-ability-stats": "tsx --conditions=source scripts/update-ability-stats.ts",
-    "update-names": "tsx --conditions=source scripts/update-names.ts"
+    "update-names": "tsx --conditions=source scripts/update-names.ts",
+    "update-weapon-wiki": "tsx --conditions=source scripts/update-weapon-wiki.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
