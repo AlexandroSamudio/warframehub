@@ -501,28 +501,9 @@
     outline: none;
   }
 
-  /*
-   * The guide fills its wide frame in columns, each about 55 characters wide or more: a single
-   * line that long would be hard to read, and a narrow one left the frame half empty.
-   * A narrow screen gets one column.
-   */
+  /* The guide runs the full width of its frame: each line goes on to the edge before it wraps. */
   .how-to :global(.guide) {
     max-width: none;
-    column-width: 26rem;
-    column-gap: 2.5rem;
-  }
-
-  .how-to :global(.guide h5),
-  .how-to :global(.guide h6) {
-    break-after: avoid;
-  }
-
-  /*
-   * List items stay whole, but paragraphs may split across columns: a pasted guide is often
-   * one paragraph of many lines, and keeping it whole left the other columns empty.
-   */
-  .how-to :global(.guide li) {
-    break-inside: avoid;
   }
 
   .group {
