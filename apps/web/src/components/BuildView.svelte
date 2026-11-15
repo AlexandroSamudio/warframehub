@@ -481,9 +481,25 @@
     outline: none;
   }
 
-  /* The guide reads at a comfortable measure inside its wide frame. */
+  /*
+   * The guide fills its wide frame in columns, each about 55 characters wide or more: a single
+   * line that long would be hard to read, and a narrow one left the frame half empty.
+   * A narrow screen gets one column.
+   */
   .how-to :global(.guide) {
-    max-width: 72ch;
+    max-width: none;
+    column-width: 26rem;
+    column-gap: 2.5rem;
+  }
+
+  .how-to :global(.guide h5),
+  .how-to :global(.guide h6) {
+    break-after: avoid;
+  }
+
+  .how-to :global(.guide li),
+  .how-to :global(.guide p) {
+    break-inside: avoid;
   }
 
   .group {
