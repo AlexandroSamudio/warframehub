@@ -15,3 +15,6 @@ apps/api/data/ability-stats.json
 apps/api/data/names-es.json
 apps/api/data/ability-lines-es.json
 apps/api/data/rotations-text-es.json
+# Saved Impeccable reports (git-ignored)
+.impeccable/critique/
+.impeccable/audit/

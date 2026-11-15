@@ -31,10 +31,14 @@ export function paramFromHash(hash: string): string | null {
  * The Builds part of a Warframe (SPEC §14.1):
  * - `#/warframes/mesa/builds`: the Builds page (the remembered build open);
  * - `…/builds/12`: that build open;
- * - `…/builds/new`, `…/builds/12/edit`: the edit page.
+ * - `…/builds/new`, `…/builds/12/edit`: the edit page; `…/builds/new?import` opens it with
+ *   the "paste a shared build" panel open.
  */
 export type BuildSub =
-  { kind: 'list' } | { kind: 'view'; id: number } | { kind: 'new' } | { kind: 'edit'; id: number };
+  | { kind: 'list' }
+  | { kind: 'view'; id: number }
+  | { kind: 'new'; withCode?: true }
+  | { kind: 'edit'; id: number };
 
 const ID = /^[1-9]\d{0,8}$/;
 
@@ -42,7 +46,10 @@ export function subFromHash(hash: string): BuildSub | null {
   const [first, second, third, fourth, fifth] = segments(hash);
   if (first !== 'warframes' || !second || third !== 'builds') return null;
   if (!fourth) return { kind: 'list' };
-  if (fourth === 'new') return fifth ? null : { kind: 'new' };
+  if (fourth === 'new') {
+    if (fifth) return null;
+    return hash.split('?')[1] === 'import' ? { kind: 'new', withCode: true } : { kind: 'new' };
+  }
   if (!ID.test(fourth)) return null;
   if (!fifth) return { kind: 'view', id: Number(fourth) };
   return fifth === 'edit' ? { kind: 'edit', id: Number(fourth) } : null;
@@ -55,7 +62,7 @@ export function buildHref(slug: string, sub: BuildSub = { kind: 'list' }): strin
     case 'list':
       return base;
     case 'new':
-      return `${base}/new`;
+      return sub.withCode ? `${base}/new?import` : `${base}/new`;
     case 'view':
       return `${base}/${sub.id}`;
     case 'edit':
