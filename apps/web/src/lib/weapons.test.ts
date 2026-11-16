@@ -55,6 +55,7 @@ const all: WeaponFilters = {
   cls: '',
   mastery: 'all',
   incarnonOnly: false,
+  withBuilds: false,
   query: '',
 };
 const names = (l: WeaponListItem[]) => l.map((w) => w.name);
@@ -81,6 +82,11 @@ describe('filterWeapons', () => {
     expect(names(filterWeapons(list, { ...all, tab: 'arch', incarnonOnly: true }))).toEqual([
       'Mausolon',
     ]);
+  });
+
+  it('can show only weapons with builds', () => {
+    const withBuild = [...list.slice(0, 1), { ...list[1]!, buildCount: 2 }, ...list.slice(2)];
+    expect(names(filterWeapons(withBuild, { ...all, withBuilds: true }))).toEqual(['Hek']);
   });
 
   it('searches names, and version words from 3 letters', () => {

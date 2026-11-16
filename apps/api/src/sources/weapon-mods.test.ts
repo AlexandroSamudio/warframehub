@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { openDatabase } from '../db/client.js';
+import { initDatabase } from '../db/init.js';
+import { loadSeed } from '../domain/seed.js';
+import { WarframeCatalog } from './warframes.js';
 import { fixture } from './test-fixtures.js';
 import { loadWeaponWiki } from './weapon-wiki.js';
 import {
@@ -121,5 +125,38 @@ describe('normaliseWeaponArcanes', () => {
     expect(arcanes.find((a) => a.name === 'Primary Merciless')?.kind).toBe('primary');
     expect(arcanes.find((a) => a.name === 'Melee Exposure')?.kind).toBe('melee');
     expect(arcanes.some((a) => a.name === 'Arcane Energize')).toBe(false);
+  });
+});
+
+describe('weapon pictures', () => {
+  it('lets the picture route serve weapon mod and arcane images', async () => {
+    const database = openDatabase(':memory:');
+    const now = new Date('2026-11-16T12:00:00.000Z');
+    initDatabase(database.db, loadSeed(), now);
+    const catalog = new WarframeCatalog(database.db, {
+      now: () => now,
+      fetch: async (url) => {
+        const path = new URL(url).pathname;
+        const body =
+          path === '/warframes'
+            ? fixture('warframes/warframes')
+            : path === '/mods'
+              ? fixture('warframes/mods')
+              : path === '/items/search/arcane'
+                ? fixture('warframes/arcanes')
+                : [];
+        return new Response(JSON.stringify(body));
+      },
+    });
+    await catalog.state();
+    const allowed = catalog.cachedImageNames();
+    const serration = mods.find((m) => m.name === 'Serration')!;
+    const stance = mod('Crimson Dervish');
+    const arcane = normaliseWeaponArcanes(fixture('warframes/arcanes') as unknown[])[0]!;
+    for (const image of [serration.image, stance.image, arcane.image]) {
+      expect(image).not.toBeNull();
+      expect(allowed.has(image!)).toBe(true);
+    }
+    database.close();
   });
 });

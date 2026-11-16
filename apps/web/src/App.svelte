@@ -9,6 +9,7 @@
   import Inventory from './routes/Inventory.svelte';
   import WarframePage from './routes/WarframePage.svelte';
   import Warframes from './routes/Warframes.svelte';
+  import WeaponBuildEdit from './routes/WeaponBuildEdit.svelte';
   import WeaponPage from './routes/WeaponPage.svelte';
   import Weapons from './routes/Weapons.svelte';
   import Profile from './routes/Profile.svelte';
@@ -91,8 +92,10 @@
       <WarframePage slug={router.param} sub={router.sub} />
     {:else if router.route === 'warframes'}
       <Warframes />
+    {:else if router.route === 'weapons' && router.param && (router.sub?.kind === 'new' || router.sub?.kind === 'edit')}
+      <WeaponBuildEdit slug={router.param} sub={router.sub} />
     {:else if router.route === 'weapons' && router.param}
-      <WeaponPage slug={router.param} />
+      <WeaponPage slug={router.param} sub={router.sub} />
     {:else if router.route === 'weapons'}
       <Weapons tab={router.weaponTab} />
     {:else if router.route === 'inventory'}

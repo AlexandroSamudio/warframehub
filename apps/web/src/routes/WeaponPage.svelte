@@ -2,6 +2,7 @@
   import type {
     ProfileResponse,
     WeaponAttack,
+    WeaponBuildView as WeaponBuildViewT,
     WeaponDetail,
     WeaponVariantKind,
   } from '@warframehub/shared';
@@ -12,16 +13,23 @@
   import Segmented from '../components/Segmented.svelte';
   import * as api from '../lib/api.ts';
   import { language, t, tOr } from '../lib/i18n/index.ts';
-  import { hrefFor, weaponsHref } from '../lib/route.svelte.ts';
+  import { buildHref, hrefFor, weaponsHref, type BuildSub } from '../lib/route.svelte.ts';
+  import BuildsPage from '../components/BuildsPage.svelte';
+  import ModPic from '../components/ModPic.svelte';
+  import WeaponBuildView from '../components/WeaponBuildView.svelte';
   import { formatRelease } from '../lib/warframes.ts';
   import { weaponListState } from '../lib/weapons-state.svelte.ts';
   import { attackKey, formatStat } from '../lib/weapons.ts';
 
   interface Props {
     slug: string;
+    /** On the Builds page (`…/builds`, `…/builds/12`); null on the Overview (SPEC §15.1). */
+    sub?: BuildSub | null;
   }
 
-  let { slug }: Props = $props();
+  let { slug, sub = null }: Props = $props();
+
+  const onBuilds = $derived(sub?.kind === 'list' || sub?.kind === 'view');
 
   let data = $state<WeaponDetail | null>(null);
   let profile = $state<ProfileResponse | null>(null);
@@ -42,6 +50,10 @@
     v ? (v.attacks[attackIndex] ?? v.attacks[0] ?? null) : null,
   );
   const melee = $derived(data?.slot === 'melee' || data?.slot === 'archmelee');
+  /** The Exilus slot: Primary, Secondary and Melee only (SPEC §15.1). */
+  const hasExilus = $derived(
+    data?.slot === 'primary' || data?.slot === 'secondary' || data?.slot === 'melee',
+  );
   const backTab = $derived(data?.tab ?? weaponListState.lastTab);
 
   const num = (n: number) => formatStat(n, language.current);
@@ -158,7 +170,7 @@
   </a>
 
   {#if data && v}
-    <section class="head frame accent" aria-labelledby="wp-name">
+    <section class="head frame accent" class:compact={onBuilds} aria-labelledby="wp-name">
       <span class="picture">
         {#if v.image && !pictureFailed}
           {#key v.image}
@@ -187,205 +199,250 @@
           </button>
         </div>
         {#if favoriteError}<p class="fav-error" role="alert">{favoriteError}</p>{/if}
-
-        <p class="kind-line">
-          {data.class
-            ? t('wp.slotClass', {
-                slot: t(`wp.slot.${data.slot}`),
-                cls: tOr(`wp.class.${data.class}`, data.class),
-              })
-            : t(`wp.slot.${data.slot}`)}
-        </p>
-
-        {#if data.variants.length > 1}
-          <Segmented
-            legend={t('wf.versions')}
-            hideLegend
-            name="wp-version"
-            options={data.variants.map((x) => ({ value: x.kind, label: kindLabel(x.kind) }))}
-            value={v.kind}
-            onchange={(k) => {
-              kind = k;
-              attackIndex = 0;
-              pictureFailed = false;
-              announce = data?.variants.find((x) => x.kind === k)?.name ?? '';
-            }}
-          />
-        {/if}
-
-        <p class="badges">
-          {#if v.mastered}<span class="badge ok">{t('wp.mastered')}</span>{/if}
-          {#if data.inCircuit}<span class="badge teal">{t('wp.inCircuit')}</span>{/if}
-          {#if v.evolutions}
-            <!-- A link-like badge: jumps to the evolutions (a hash link would change the page). -->
-            <button
-              type="button"
-              class="badge jump"
-              aria-label={t('wp.evoJump')}
-              onclick={() => {
-                const h = document.getElementById('wp-evolutions');
-                const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                h?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-                h?.focus({ preventScroll: true });
-              }}>{t('wp.incarnon')}</button
-            >
-          {:else if v.incarnon}<span class="badge">{t('wp.incarnon')}</span>{/if}
-          {#if v.vaulted}<span class="badge">{t('wf.vaulted')}</span>{/if}
-          {#if v.masteryReq !== null}<span class="badge">{t('wf.mr', { n: v.masteryReq })}</span
-            >{/if}
-        </p>
-        {#if v.released}
-          <p class="released">
-            {v.released.update
-              ? t('wp.releasedIn', {
-                  date: formatRelease(v.released.date),
-                  update: v.released.update,
+        <!-- On the Builds page the header is one line: the build is the content. -->
+        {#if !onBuilds}
+          <p class="kind-line">
+            {data.class
+              ? t('wp.slotClass', {
+                  slot: t(`wp.slot.${data.slot}`),
+                  cls: tOr(`wp.class.${data.class}`, data.class),
                 })
-              : t('wp.released', { date: formatRelease(v.released.date) })}
+              : t(`wp.slot.${data.slot}`)}
           </p>
+
+          {#if data.variants.length > 1}
+            <Segmented
+              legend={t('wf.versions')}
+              hideLegend
+              name="wp-version"
+              options={data.variants.map((x) => ({ value: x.kind, label: kindLabel(x.kind) }))}
+              value={v.kind}
+              onchange={(k) => {
+                kind = k;
+                attackIndex = 0;
+                pictureFailed = false;
+                announce = data?.variants.find((x) => x.kind === k)?.name ?? '';
+              }}
+            />
+          {/if}
+
+          <p class="badges">
+            {#if v.mastered}<span class="badge ok">{t('wp.mastered')}</span>{/if}
+            {#if data.inCircuit}<span class="badge teal">{t('wp.inCircuit')}</span>{/if}
+            {#if v.evolutions}
+              <!-- A link-like badge: jumps to the evolutions (a hash link would change the page). -->
+              <button
+                type="button"
+                class="badge jump"
+                aria-label={t('wp.evoJump')}
+                onclick={() => {
+                  const h = document.getElementById('wp-evolutions');
+                  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                  h?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+                  h?.focus({ preventScroll: true });
+                }}>{t('wp.incarnon')}</button
+              >
+            {:else if v.incarnon}<span class="badge">{t('wp.incarnon')}</span>{/if}
+            {#if v.vaulted}<span class="badge">{t('wf.vaulted')}</span>{/if}
+            {#if v.masteryReq !== null}<span class="badge">{t('wf.mr', { n: v.masteryReq })}</span
+              >{/if}
+          </p>
+          {#if v.released}
+            <p class="released">
+              {v.released.update
+                ? t('wp.releasedIn', {
+                    date: formatRelease(v.released.date),
+                    update: v.released.update,
+                  })
+                : t('wp.released', { date: formatRelease(v.released.date) })}
+            </p>
+          {/if}
+          {#if v.description}<p class="desc">{v.description}</p>{/if}
         {/if}
-        {#if v.description}<p class="desc">{v.description}</p>{/if}
       </div>
     </section>
 
-    <section class="panel frame accent" aria-labelledby="wp-attacks">
-      <h3 id="wp-attacks">{t('wp.attacks')}</h3>
-      {#if v.attacks.length > 1}
-        <Segmented
-          legend={t('wp.attackLabel')}
-          hideLegend
-          name="wp-attack"
-          options={v.attacks.map((a, i) => ({ value: String(i), label: attackName(a.name) }))}
-          value={String(attackIndex)}
-          onchange={(i) => {
-            attackIndex = Number(i);
-            const a = v?.attacks[attackIndex];
-            announce = a
-              ? t('wp.attackAnnounce', { attack: attackName(a.name), total: num(a.total) })
-              : '';
-          }}
+    <!-- Overview and Builds are two pages of one weapon: links, so each has its address. -->
+    <nav class="page-tabs" aria-label={t('wf.pages', { name: data.name })}>
+      <a href={hrefFor('weapons', slug)} aria-current={onBuilds ? undefined : 'page'}
+        >{t('wf.overview')}</a
+      >
+      <a
+        href={buildHref(slug, { kind: 'list' }, 'weapons')}
+        aria-current={onBuilds ? 'page' : undefined}
+        >{t('build.title')}{#if data.builds.length > 0}<span class="count num"
+            >{data.builds.length}</span
+          >{/if}</a
+      >
+    </nav>
+
+    {#if onBuilds}
+      <BuildsPage
+        {slug}
+        route="weapons"
+        open={sub?.kind === 'view' ? sub.id : null}
+        owner={data.name}
+        builds={data.builds}
+        reorder={(ids) => api.reorderWeaponBuilds(slug, ids)}
+        onReordered={(builds) => {
+          if (data) data = { ...data, builds };
+        }}
+      >
+        <!-- What tells weapon builds apart: the version, its arcanes, and a Riven. -->
+        {#snippet marks(b: WeaponBuildViewT)}
+          {@const arcanes = b.arcanes.filter((a) => a !== null)}
+          <span class="entry-version">{b.variantName}</span>
+          {#if arcanes.length > 0 || b.content.riven}
+            <span class="marks" aria-hidden="true">
+              {#each arcanes as a, i (i)}<ModPic image={a.image} size={26} fit="contain" />{/each}
+              {#if b.content.riven}<span class="badge">{t('wb.riven')}</span>{/if}
+            </span>
+          {/if}
+        {/snippet}
+        {#snippet view(b: WeaponBuildViewT)}
+          <WeaponBuildView {slug} build={b} {hasExilus} melee={data?.slot === 'melee'} />
+        {/snippet}
+      </BuildsPage>
+    {:else}
+      <section class="panel frame accent" aria-labelledby="wp-attacks">
+        <h3 id="wp-attacks">{t('wp.attacks')}</h3>
+        {#if v.attacks.length > 1}
+          <Segmented
+            legend={t('wp.attackLabel')}
+            hideLegend
+            name="wp-attack"
+            options={v.attacks.map((a, i) => ({ value: String(i), label: attackName(a.name) }))}
+            value={String(attackIndex)}
+            onchange={(i) => {
+              attackIndex = Number(i);
+              const a = v?.attacks[attackIndex];
+              announce = a
+                ? t('wp.attackAnnounce', { attack: attackName(a.name), total: num(a.total) })
+                : '';
+            }}
+          />
+        {/if}
+        {#if attack}
+          <div class="attack">
+            {#if v.attacks.length === 1}<p class="attack-name">{attackName(attack.name)}</p>{/if}
+            <div class="attack-grid">
+              <div class="damage">
+                <p class="label">{t('wp.damage')}</p>
+                <p class="total num">{num(attack.total)}</p>
+                {#if attack.damage.length > 0}
+                  <ul class="types">
+                    {#each attack.damage as d (d.type)}
+                      <li>
+                        <span>{tOr(`wp.dmg.${d.type}`, d.type)}</span>
+                        <span class="num">{num(d.amount)}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
+              </div>
+              <dl class="stats">
+                {#if attack.critChance !== null}
+                  <dt>{t('wp.crit')}</dt>
+                  <dd class="num">{pct(attack.critChance)}</dd>
+                {/if}
+                {#if attack.critMultiplier !== null}
+                  <dt>{t('wp.critMult')}</dt>
+                  <dd class="num">×{num(attack.critMultiplier)}</dd>
+                {/if}
+                {#if attack.statusChance !== null}
+                  <dt>{t('wp.status')}</dt>
+                  <dd class="num">{pct(attack.statusChance)}</dd>
+                {/if}
+                {#if attack.speed !== null}
+                  <dt>{melee ? t('wp.attackSpeed') : t('wp.fireRate')}</dt>
+                  <dd class="num">
+                    {melee ? num(attack.speed) : t('wp.perSecond', { n: num(attack.speed) })}
+                  </dd>
+                {/if}
+                {#if attack.chargeTime !== null}
+                  <dt>{t('wp.chargeTime')}</dt>
+                  <dd class="num">{t('wp.seconds', { n: num(attack.chargeTime) })}</dd>
+                {/if}
+                {#if attack.shotType !== null}
+                  <dt>{t('wp.shotType')}</dt>
+                  <dd>{tOr(`wp.shot.${attack.shotType}`, attack.shotType)}</dd>
+                {/if}
+              </dl>
+            </div>
+          </div>
+        {:else}
+          <p class="hint">{t('wp.noAttacks')}</p>
+        {/if}
+      </section>
+
+      {#if v.evolutions}
+        <Evolutions
+          evolutions={v.evolutions}
+          baseName={data.name}
+          name={v.name}
+          circuitEndsAt={data.circuitEndsAt}
         />
       {/if}
-      {#if attack}
-        <div class="attack">
-          {#if v.attacks.length === 1}<p class="attack-name">{attackName(attack.name)}</p>{/if}
-          <div class="attack-grid">
-            <div class="damage">
-              <p class="label">{t('wp.damage')}</p>
-              <p class="total num">{num(attack.total)}</p>
-              {#if attack.damage.length > 0}
-                <ul class="types">
-                  {#each attack.damage as d (d.type)}
-                    <li>
-                      <span>{tOr(`wp.dmg.${d.type}`, d.type)}</span>
-                      <span class="num">{num(d.amount)}</span>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
-            </div>
-            <dl class="stats">
-              {#if attack.critChance !== null}
-                <dt>{t('wp.crit')}</dt>
-                <dd class="num">{pct(attack.critChance)}</dd>
-              {/if}
-              {#if attack.critMultiplier !== null}
-                <dt>{t('wp.critMult')}</dt>
-                <dd class="num">×{num(attack.critMultiplier)}</dd>
-              {/if}
-              {#if attack.statusChance !== null}
-                <dt>{t('wp.status')}</dt>
-                <dd class="num">{pct(attack.statusChance)}</dd>
-              {/if}
-              {#if attack.speed !== null}
-                <dt>{melee ? t('wp.attackSpeed') : t('wp.fireRate')}</dt>
-                <dd class="num">
-                  {melee ? num(attack.speed) : t('wp.perSecond', { n: num(attack.speed) })}
-                </dd>
-              {/if}
-              {#if attack.chargeTime !== null}
-                <dt>{t('wp.chargeTime')}</dt>
-                <dd class="num">{t('wp.seconds', { n: num(attack.chargeTime) })}</dd>
-              {/if}
-              {#if attack.shotType !== null}
-                <dt>{t('wp.shotType')}</dt>
-                <dd>{tOr(`wp.shot.${attack.shotType}`, attack.shotType)}</dd>
-              {/if}
-            </dl>
-          </div>
-        </div>
-      {:else}
-        <p class="hint">{t('wp.noAttacks')}</p>
-      {/if}
-    </section>
 
-    {#if v.evolutions}
-      <Evolutions
-        evolutions={v.evolutions}
-        baseName={data.name}
+      <!-- Short panels side by side on wide screens, so none is mostly empty. -->
+      <div class="pair">
+        <section class="panel frame" aria-labelledby="wp-stats">
+          <h3 id="wp-stats">{t('wp.stats')}</h3>
+          <dl class="stats">
+            {#each statRows as r (r.label)}
+              <dt>{r.label}</dt>
+              <dd class="num">{r.value}</dd>
+            {/each}
+            <!-- DE retired dispositions: every weapon is 1.20× (wiki, "Riven Mods"). -->
+            <dt>{t('wp.stat.disposition')}</dt>
+            <dd class="note">{t('wp.dispositionRetired')}</dd>
+          </dl>
+        </section>
+
+        <section class="panel frame" aria-labelledby="wp-progress">
+          <h3 id="wp-progress">{t('wf.progress')}</h3>
+          <ul class="facts">
+            <li>
+              {#if v.mastered}
+                {t('wp.masteredYes')}
+              {:else if profile && !profile.profile}
+                <a href={hrefFor('profile')}>{t('wf.noProfile')}</a>
+              {:else}
+                {t('wp.masteredNo')}
+              {/if}
+            </li>
+            <li>
+              {v.goal?.status === 'active'
+                ? t('wf.inGoals')
+                : v.goal?.status === 'built'
+                  ? t('wp.built')
+                  : t('wf.goalNone')}
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <HowToGet
+        id="wp-get"
+        uniqueName={v.uniqueName}
         name={v.name}
-        circuitEndsAt={data.circuitEndsAt}
+        recipe={v.recipe}
+        vaulted={v.vaulted}
+        goal={v.goal}
+        {reload}
       />
+
+      <p class="credit">
+        {t('wp.credit')}
+        {#if v.wikiUrl}
+          <a href={v.wikiUrl} target="_blank" rel="noopener noreferrer"
+            >{t('wf.wikiLinkAria', { name: v.name })}<span class="sr-only">
+              {t('part.opensNewTab')}</span
+            ></a
+          >
+        {/if}
+      </p>
     {/if}
-
-    <!-- Short panels side by side on wide screens, so none is mostly empty. -->
-    <div class="pair">
-      <section class="panel frame" aria-labelledby="wp-stats">
-        <h3 id="wp-stats">{t('wp.stats')}</h3>
-        <dl class="stats">
-          {#each statRows as r (r.label)}
-            <dt>{r.label}</dt>
-            <dd class="num">{r.value}</dd>
-          {/each}
-          <!-- DE retired dispositions: every weapon is 1.20× (wiki, "Riven Mods"). -->
-          <dt>{t('wp.stat.disposition')}</dt>
-          <dd class="note">{t('wp.dispositionRetired')}</dd>
-        </dl>
-      </section>
-
-      <section class="panel frame" aria-labelledby="wp-progress">
-        <h3 id="wp-progress">{t('wf.progress')}</h3>
-        <ul class="facts">
-          <li>
-            {#if v.mastered}
-              {t('wp.masteredYes')}
-            {:else if profile && !profile.profile}
-              <a href={hrefFor('profile')}>{t('wf.noProfile')}</a>
-            {:else}
-              {t('wp.masteredNo')}
-            {/if}
-          </li>
-          <li>
-            {v.goal?.status === 'active'
-              ? t('wf.inGoals')
-              : v.goal?.status === 'built'
-                ? t('wp.built')
-                : t('wf.goalNone')}
-          </li>
-        </ul>
-      </section>
-    </div>
-
-    <HowToGet
-      id="wp-get"
-      uniqueName={v.uniqueName}
-      name={v.name}
-      recipe={v.recipe}
-      vaulted={v.vaulted}
-      goal={v.goal}
-      {reload}
-    />
-
-    <p class="credit">
-      {t('wp.credit')}
-      {#if v.wikiUrl}
-        <a href={v.wikiUrl} target="_blank" rel="noopener noreferrer"
-          >{t('wf.wikiLinkAria', { name: v.name })}<span class="sr-only">
-            {t('part.opensNewTab')}</span
-          ></a
-        >
-      {/if}
-    </p>
   {:else if notFound}
     <p class="alert frame" role="alert">{t('wp.notFound', { slug })}</p>
   {:else if loadError}
@@ -428,6 +485,74 @@
     grid-template-columns: 10rem minmax(0, 1fr);
     gap: 1.2rem;
     padding: 1.1rem 1.3rem 1.2rem;
+  }
+
+  /* On the Builds page the header is one line: the build is the content. */
+  .head.compact {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .head.compact .picture {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  /* Overview | Builds, like the Warframe page's tabs. */
+  .page-tabs {
+    display: flex;
+    gap: 1.6rem;
+    border-bottom: 1px solid var(--line);
+    margin-top: 0.2rem;
+  }
+
+  .page-tabs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: -1px;
+    padding: 0.35rem 0.1rem 0.5rem;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .page-tabs a:hover {
+    color: var(--fg);
+  }
+
+  .page-tabs a[aria-current='page'] {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .page-tabs .count {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    min-width: 1.4rem;
+    padding: 0 0.35rem;
+    border: 1px solid currentColor;
+    text-align: center;
+  }
+
+  /* A weapon build's line in the Builds list: its version, then its marks. */
+  .entry-version {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.15rem;
   }
 
   /* The whole weapon, as DE draws it on a square: never cropped. */

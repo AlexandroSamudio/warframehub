@@ -16,8 +16,14 @@ import {
   TrackerResponse,
   WarframeDetail,
   WarframesResponse,
+  WeaponBuild,
+  WeaponBuildOptionsResponse,
+  WeaponBuildView,
+  ImportWeaponBuildResponse,
   WeaponDetail,
   WeaponsResponse,
+  type WeaponBuildContent,
+  type WeaponVariantKind,
   FavoriteResponse,
   WorldstateResponse,
   type BuildContent,
@@ -335,6 +341,66 @@ export function reorderBuilds(slug: string, buildIds: number[]): Promise<Build[]
   return request(
     { parse: (data: unknown) => Build.array().parse(data) },
     '/api/builds/reorder',
+    json('POST', { slug, buildIds }),
+  );
+}
+
+// ---- weapon builds (SPEC §15.1) ------------------------------------------------------
+
+export function getWeaponBuildOptions(
+  slug: string,
+  variant?: WeaponVariantKind,
+): Promise<WeaponBuildOptionsResponse> {
+  const v = variant ? `&variant=${variant}` : '';
+  return request(
+    WeaponBuildOptionsResponse,
+    `/api/weapon-builds/options?slug=${encodeURIComponent(slug)}${v}`,
+  );
+}
+
+/** One weapon build with its pictures and effects (as on the Builds page). */
+export function getWeaponBuild(id: number): Promise<WeaponBuildView> {
+  return request(WeaponBuildView, `/api/weapon-builds/${id}`);
+}
+
+/** The weapon build as one line of text to send to someone. */
+export async function shareWeaponBuild(id: number): Promise<string> {
+  return (await request(ShareBuildResponse, `/api/weapon-builds/${id}/share`)).code;
+}
+
+/** Reads a pasted code for this weapon. Saves nothing. */
+export function importWeaponBuild(slug: string, code: string): Promise<ImportWeaponBuildResponse> {
+  return request(
+    ImportWeaponBuildResponse,
+    '/api/weapon-builds/import',
+    json('POST', { slug, code }),
+  );
+}
+
+export function createWeaponBuild(
+  slug: string,
+  name: string,
+  content: WeaponBuildContent,
+): Promise<WeaponBuild> {
+  return request(WeaponBuild, '/api/weapon-builds', json('POST', { slug, name, content }));
+}
+
+export function updateWeaponBuild(
+  id: number,
+  name: string,
+  content: WeaponBuildContent,
+): Promise<WeaponBuild> {
+  return request(WeaponBuild, `/api/weapon-builds/${id}`, json('PUT', { name, content }));
+}
+
+export async function deleteWeaponBuild(id: number): Promise<void> {
+  await request({ parse: () => undefined }, `/api/weapon-builds/${id}`, { method: 'DELETE' });
+}
+
+export function reorderWeaponBuilds(slug: string, buildIds: number[]): Promise<WeaponBuild[]> {
+  return request(
+    { parse: (data: unknown) => WeaponBuild.array().parse(data) },
+    '/api/weapon-builds/reorder',
     json('POST', { slug, buildIds }),
   );
 }

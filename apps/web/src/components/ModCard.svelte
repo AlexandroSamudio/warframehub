@@ -13,13 +13,15 @@
     slot: ResolvedSlot | null;
     /** "Aura", "Exilus", or nothing for a normal slot. */
     label?: string;
+    /** An empty slot is one quiet line ("Slot 5 · Empty") instead of a full-height tile. */
+    compact?: boolean;
   }
 
-  let { slot, label }: Props = $props();
+  let { slot, label, compact = false }: Props = $props();
   let failed = $state(false);
 </script>
 
-<li class="card" class:empty={!slot}>
+<li class="card" class:empty={!slot} class:compact={compact && !slot}>
   <div class="art">
     {#if slot?.image && !failed}
       {#key slot.image}
@@ -34,7 +36,7 @@
         />
       {/key}
     {/if}
-    {#if label}<span class="slot-label">{label}</span>{/if}
+    {#if label && !(compact && !slot)}<span class="slot-label">{label}</span>{/if}
   </div>
   <div class="body">
     {#if slot}
@@ -58,7 +60,7 @@
         <p class="note"><span class="note-label">{t('build.note')}</span> {slot.note}</p>
       {/if}
     {:else}
-      <span class="none">{t('build.empty')}</span>
+      <span class="none">{compact && label ? `${label} · ` : ''}{t('build.empty')}</span>
     {/if}
   </div>
 </li>
@@ -168,5 +170,18 @@
   .none {
     font-size: 0.85rem;
     color: var(--muted);
+  }
+
+  /* One quiet line: a partial build isn't a wall of dead tiles. */
+  .card.compact {
+    grid-template-rows: 1fr;
+  }
+
+  .card.compact .art {
+    display: none;
+  }
+
+  .card.compact .body {
+    padding: 0.5rem 0.75rem;
   }
 </style>

@@ -302,7 +302,12 @@ export class WarframeCatalog {
         at,
         raws: state.raws,
         groups: groupWarframes(state.raws),
-        images: imageNames(state.raws, [...state.mods, ...state.arcanes]),
+        images: imageNames(state.raws, [
+          ...state.mods,
+          ...state.arcanes,
+          ...state.weaponMods,
+          ...state.weaponArcanes,
+        ]),
       };
     }
     return this.memo;

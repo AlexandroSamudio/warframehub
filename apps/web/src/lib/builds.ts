@@ -61,11 +61,11 @@ export function modChoices(
   return byQuery(fits, query);
 }
 
-export function arcaneChoices(
-  arcanes: ArcaneOption[],
+export function arcaneChoices<T extends ArcaneOption>(
+  arcanes: T[],
   used: Set<string>,
   query: string,
-): ArcaneOption[] {
+): T[] {
   return byQuery(
     arcanes.filter((a) => !used.has(a.uniqueName)),
     query,

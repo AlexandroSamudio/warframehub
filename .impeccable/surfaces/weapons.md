@@ -52,3 +52,16 @@ List: loading; first load offline (message + Retry); stale line; nothing matches
 - **Tiers:** one row per tier (top seam): the tier as a gold Label ("EVOLUTION 2") and what unlocks it in Dim Readout on the left; the perks beside it as quiet inset cells (surface-2, thin seam, never framed cards), auto-fit ~14rem. Stacked on phones. A wiki link closes the panel.
 - **List:** "In the Circuit" as a teal badge on the tile (live data); Incarnon becomes a plain badge. The Incarnon filter now also counts weapons whose Incarnon is only on the wiki (most melee).
 - **Anti-goals:** no tracking of which perks you chose (not asked), no images of perks, no machine translation.
+
+---
+
+# Addendum: Weapon builds (part 2 UI, 16 Nov 2026)
+
+Follows **the Warframe Builds page** and **the build edit page** (DESIGN.md "Builds page", "Build edit page"); SPEC §15.1. Same job: a personal library, read before playing, entered by hand.
+
+- **Weapon page tabs:** Overview · Builds (n), as on the Warframe page (links with `aria-current`). On Builds the header shrinks to one line (picture, name). Addresses `#/weapons/{slug}/builds`, `…/builds/{id}`, `…/builds/{id}/edit`, `…/builds/new(?import)`.
+- **Builds page:** the shared build list (BuildsPage, now generic): entries show the version ("Braton Prime"), the description line, author · update, and marks (arcane pictures, an "R" Riven tag when it has one). ↑/↓, `[` `]`, Add a build, Paste a code.
+- **Open build:** the title row as on Warframe builds (meta, description, Share, Edit; no "How to play"). One framed **Mods** section: Exilus and Stance as the pair (only those the weapon has), then 8 Mod Cards. Beside it (a 19rem column from 75rem) the **loadout**: Arcanes (picture, name R5/5, effect), **Incarnon** (one row per picked tier: "EVOLUTION 2" Label, the perk name, its lines muted, the note), **Riven** (name and polarity, then each stat as a row: + in Readout White, − in Alert Rose, values in tabular digits), **Progenitor** ("Toxin 60%").
+- **Edit page:** About (name, description, source, author, update), **Version** (Segmented; changing it reloads what fits), Mods (Exilus/Stance pair, 8 slots: the Warframe edit page's cells and Picker), Arcanes (one or two slots, or none), Incarnon (one Segmented per tier 2–5 listing its perks, "None" first; the chosen perk's lines under it, a note), Riven (name, polarity Segmented, up to 4 stat rows: stat select from the weapon type's list, value field, "negative" checkbox only where allowed; Add a stat), Progenitor (Kuva/Tenet/Coda only: element select, % number 25–60). Import panel, leave guard, Save/Cancel/Delete as on Warframe builds.
+- **List:** "n builds" as a plain badge on tiles; a **With builds** checkbox next to Incarnon only.
+- **Anti-goals:** no guide, no stat maths or DPS, no Riven grading, no new colour.

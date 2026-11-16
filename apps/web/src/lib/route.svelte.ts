@@ -43,7 +43,7 @@ export function weaponsHref(tab: WeaponTabName): string {
 }
 
 /**
- * The Builds part of a Warframe (SPEC §14.1):
+ * The Builds part of a Warframe (SPEC §14.1) or a weapon (§15.1, `#/weapons/braton/builds`…):
  * - `#/warframes/mesa/builds`: the Builds page (the remembered build open);
  * - `…/builds/12`: that build open;
  * - `…/builds/new`, `…/builds/12/edit`: the edit page; `…/builds/new?import` opens it with
@@ -59,7 +59,7 @@ const ID = /^[1-9]\d{0,8}$/;
 
 export function subFromHash(hash: string): BuildSub | null {
   const [first, second, third, fourth, fifth] = segments(hash);
-  if (first !== 'warframes' || !second || third !== 'builds') return null;
+  if ((first !== 'warframes' && first !== 'weapons') || !second || third !== 'builds') return null;
   if (!fourth) return { kind: 'list' };
   if (fourth === 'new') {
     if (fifth) return null;
@@ -70,9 +70,13 @@ export function subFromHash(hash: string): BuildSub | null {
   return fifth === 'edit' ? { kind: 'edit', id: Number(fourth) } : null;
 }
 
-/** The address of a Warframe's Builds page, one build, or its edit page. */
-export function buildHref(slug: string, sub: BuildSub = { kind: 'list' }): string {
-  const base = `#/warframes/${slug}/builds`;
+/** The address of a Warframe's (or a weapon's) Builds page, one build, or its edit page. */
+export function buildHref(
+  slug: string,
+  sub: BuildSub = { kind: 'list' },
+  route: 'warframes' | 'weapons' = 'warframes',
+): string {
+  const base = `#/${route}/${slug}/builds`;
   switch (sub.kind) {
     case 'list':
       return base;

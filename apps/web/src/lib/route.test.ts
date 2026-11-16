@@ -108,3 +108,20 @@ describe('weapons', () => {
     expect(weaponsHref('weapons')).toBe('#/weapons');
   });
 });
+
+describe('weapon builds', () => {
+  it('reads and writes the Builds addresses under a weapon', () => {
+    expect(subFromHash('#/weapons/braton/builds')).toEqual({ kind: 'list' });
+    expect(subFromHash('#/weapons/braton/builds/7')).toEqual({ kind: 'view', id: 7 });
+    expect(subFromHash('#/weapons/braton/builds/7/edit')).toEqual({ kind: 'edit', id: 7 });
+    expect(subFromHash('#/weapons/braton/builds/new?import')).toEqual({
+      kind: 'new',
+      withCode: true,
+    });
+    expect(paramFromHash('#/weapons/braton/builds/7')).toBe('braton');
+    expect(buildHref('braton', { kind: 'view', id: 7 }, 'weapons')).toBe(
+      '#/weapons/braton/builds/7',
+    );
+    expect(buildHref('mesa')).toBe('#/warframes/mesa/builds');
+  });
+});

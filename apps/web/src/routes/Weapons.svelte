@@ -58,6 +58,7 @@
             cls,
             mastery,
             incarnonOnly: s.incarnonOnly,
+            withBuilds: s.withBuilds,
             query: s.query,
           }),
           s.sortKey,
@@ -72,7 +73,8 @@
   const activeFilters = $derived(
     (cls !== '' ? 1 : 0) +
       (mastery !== 'all' ? 1 : 0) +
-      (tab === 'weapons' && s.incarnonOnly ? 1 : 0),
+      (tab === 'weapons' && s.incarnonOnly ? 1 : 0) +
+      (s.withBuilds ? 1 : 0),
   );
   const filtered = $derived(s.query.trim() !== '' || activeFilters > 0);
   const orderText = $derived(t(`wp.order.${s.sortKey}.${s.sortDir}`));
@@ -93,6 +95,7 @@
     s.cls[tab] = '';
     s.mastery = 'all';
     s.incarnonOnly = false;
+    s.withBuilds = false;
   }
 
   /** Stars or unstars at once, and puts it back if the server says no. */
@@ -272,6 +275,10 @@
             {t('wp.incarnonOnly')}
           </label>
         {/if}
+        <label class="check">
+          <input type="checkbox" bind:checked={s.withBuilds} />
+          {t('wb.withBuilds')}
+        </label>
       </div>
 
       <div class="sorter">
@@ -353,6 +360,11 @@
                   <!-- Teal is live data: this week's Circuit. Incarnon is a fact, plain. -->
                   {#if w.inCircuit}<span class="badge teal">{t('wp.inCircuit')}</span>{/if}
                   {#if w.incarnon}<span class="badge">{t('wp.incarnon')}</span>{/if}
+                  {#if w.buildCount > 0}<span class="badge gold"
+                      >{w.buildCount === 1
+                        ? t('wb.countOne')
+                        : t('wb.count', { n: w.buildCount })}</span
+                    >{/if}
                   {#each kindsOf(w) as k (k)}<span class="badge" class:gold={k === 'prime'}
                       >{t(`wp.kind.${k}`)}</span
                     >{/each}

@@ -1,7 +1,15 @@
 <script lang="ts">
-  import type { ProfileResponse, VariantKind, WarframeDetail } from '@warframehub/shared';
+  import type {
+    ProfileResponse,
+    VariantKind,
+    WarframeDetail,
+    BuildView as BuildViewT,
+  } from '@warframehub/shared';
   import AbilityRow from '../components/AbilityRow.svelte';
+  import BuildView from '../components/BuildView.svelte';
   import BuildsPage from '../components/BuildsPage.svelte';
+  import ModPic from '../components/ModPic.svelte';
+  import ShardPic from '../components/ShardPic.svelte';
   import HowToGet from '../components/HowToGet.svelte';
   import Icon from '../components/Icon.svelte';
   import * as api from '../lib/api.ts';
@@ -229,11 +237,33 @@
           ? t('build.umbraNote', { base: data.name, owner: data.buildsVariant })
           : null}
         builds={data.builds}
-        abilityNames={ownerAbilities}
+        reorder={(ids) => api.reorderBuilds(slug, ids)}
         onReordered={(builds) => {
           if (data) data = { ...data, builds };
         }}
-      />
+      >
+        <!--
+          What tells builds apart in the list: their arcanes, Helminth ability and shards (the
+          first mods are often the same Intensify, Flow…).
+        -->
+        {#snippet marks(b: BuildViewT)}
+          {@const arcanes = b.arcanes.filter((a) => a !== null)}
+          {#if arcanes.length > 0 || b.helminth || b.shards.length > 0}
+            <span class="marks" aria-hidden="true">
+              {#each arcanes as a, i (i)}<ModPic image={a.image} size={26} fit="contain" />{/each}
+              {#if b.helminth}<ModPic image={b.helminth.image} size={26} fit="contain" />{/if}
+              {#each b.shards as s, i (i)}<ShardPic
+                  color={s.color}
+                  tauforged={s.tauforged}
+                  size={20}
+                />{/each}
+            </span>
+          {/if}
+        {/snippet}
+        {#snippet view(b: BuildViewT)}
+          <BuildView {slug} build={b} abilityNames={ownerAbilities} />
+        {/snippet}
+      </BuildsPage>
     {:else}
       <section class="panel frame" aria-labelledby="wf-abilities">
         <h3 id="wf-abilities">{t('wf.abilities')}</h3>
@@ -649,6 +679,15 @@
 
   .facts li {
     padding: 0.15rem 0;
+  }
+
+  /* A build's marks in the Builds list (pictures of its arcanes, Helminth and shards). */
+  .marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.15rem;
   }
 
   .credit {
