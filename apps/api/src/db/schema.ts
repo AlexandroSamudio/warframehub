@@ -293,3 +293,24 @@ export const favoriteWeapons = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.weaponSlug] })],
 );
+
+/**
+ * Weapon builds (SPEC §15.1): one row per build, its parts as one JSON document
+ * (`WeaponBuildContent`), in the user's order per weapon.
+ */
+export const weaponBuilds = sqliteTable(
+  'weapon_builds',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    weaponSlug: text('weapon_slug').notNull(),
+    name: text('name').notNull(),
+    sortOrder: integer('sort_order').notNull(),
+    contentJson: text('content_json').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (t) => [index('weapon_builds_user_weapon').on(t.userId, t.weaponSlug)],
+);

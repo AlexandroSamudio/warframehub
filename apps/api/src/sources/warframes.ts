@@ -1,6 +1,7 @@
 import type {
   ArcaneOption,
   ModOption,
+  WeaponArcaneOption,
   VariantKind,
   WarframeAbility,
   WarframeAugment,
@@ -11,6 +12,12 @@ import type { Db } from '../db/client.js';
 import { itemCache } from '../db/schema.js';
 import { HttpError } from '../http-error.js';
 import { normaliseArcanes, normaliseMods } from './build-data.js';
+import { loadWeaponWiki } from './weapon-wiki.js';
+import {
+  normaliseWeaponArcanes,
+  normaliseWeaponMods,
+  type StoredWeaponMod,
+} from './weapon-mods.js';
 import { ITEMS_BASE } from './items.js';
 import { UnexpectedDataError } from './warframestat.js';
 import { FETCH_TIMEOUT_MS, USER_AGENT, type FetchFn } from './worldstate.js';
@@ -28,6 +35,9 @@ const LIST_KEY = 'warframes:all';
 const AUGMENTS_KEY = 'warframes:augments';
 const MODS_KEY = 'warframes:mods';
 const ARCANES_KEY = 'warframes:arcanes';
+/** Weapon builds (SPEC §15.1): weapon mods and stances, and weapon arcanes. */
+const WEAPON_MODS_KEY = 'warframes:weaponMods';
+const WEAPON_ARCANES_KEY = 'warframes:weaponArcanes';
 const LIST_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const MIN_REFRESH_GAP_MS = 60 * 60 * 1000;
 
@@ -210,6 +220,9 @@ export interface CatalogState {
   /** Mods and arcanes a build can use (empty until the first fetch that has them). */
   mods: ModOption[];
   arcanes: ArcaneOption[];
+  /** Weapon mods, stances and arcanes for weapon builds (empty until a fetch that has them). */
+  weaponMods: StoredWeaponMod[];
+  weaponArcanes: WeaponArcaneOption[];
   fetchedAt: Date;
   stale: boolean;
 }
@@ -239,9 +252,12 @@ export class WarframeCatalog {
   /** The cached data, fetched first when missing or a week old. */
   async state(): Promise<CatalogState> {
     const row = this.row(LIST_KEY);
-    // A list saved before builds existed has no mods yet: fetch once more for them.
+    // A list saved before builds (or weapon builds) existed lacks their mods: fetch once more.
     const old =
-      !row || this.now().getTime() - row.fetchedAt.getTime() >= LIST_TTL_MS || !this.row(MODS_KEY);
+      !row ||
+      this.now().getTime() - row.fetchedAt.getTime() >= LIST_TTL_MS ||
+      !this.row(MODS_KEY) ||
+      !this.row(WEAPON_MODS_KEY);
     let stale = false;
     if (old) {
       try {
@@ -312,11 +328,17 @@ export class WarframeCatalog {
     const aug = this.row(AUGMENTS_KEY);
     const mods = this.row(MODS_KEY);
     const arcanes = this.row(ARCANES_KEY);
+    const weaponMods = this.row(WEAPON_MODS_KEY);
+    const weaponArcanes = this.row(WEAPON_ARCANES_KEY);
     return {
       raws: this.parseList(list.payloadJson),
       augments: aug ? (JSON.parse(aug.payloadJson) as Record<string, WarframeAugment[]>) : {},
       mods: mods ? (JSON.parse(mods.payloadJson) as ModOption[]) : [],
       arcanes: arcanes ? (JSON.parse(arcanes.payloadJson) as ArcaneOption[]) : [],
+      weaponMods: weaponMods ? (JSON.parse(weaponMods.payloadJson) as StoredWeaponMod[]) : [],
+      weaponArcanes: weaponArcanes
+        ? (JSON.parse(weaponArcanes.payloadJson) as WeaponArcaneOption[])
+        : [],
       fetchedAt: list.fetchedAt,
       stale,
     };
@@ -374,9 +396,12 @@ export class WarframeCatalog {
       write(LIST_KEY, kept);
       write(AUGMENTS_KEY, augmentsOf(mods));
       write(MODS_KEY, normaliseMods(mods, warframeNames(kept)));
+      write(WEAPON_MODS_KEY, normaliseWeaponMods(mods, loadWeaponWiki().mods));
       if (Array.isArray(arcanes)) {
         const list = normaliseArcanes(arcanes);
         if (list.length > 0) write(ARCANES_KEY, list);
+        const weaponList = normaliseWeaponArcanes(arcanes);
+        if (weaponList.length > 0) write(WEAPON_ARCANES_KEY, weaponList);
       }
       // Each Warframe also goes in as an item, so "Add as goal" works without a search.
       for (const raw of kept as { uniqueName: string }[]) write(`item:${raw.uniqueName}`, raw);

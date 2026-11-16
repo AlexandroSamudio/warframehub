@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { GoalStatus, ItemRecipe } from './goals.js';
 import { CatalogFreshness } from './warframes.js';
+import { WeaponBuildView } from './weapon-builds.js';
 
 /**
  * The Weapons section (SPEC §15): every Primary, Secondary and Melee weapon, and the
@@ -132,6 +133,8 @@ export const WeaponListItem = z.object({
   inCircuit: z.boolean(),
   /** You starred it. */
   favorite: z.boolean(),
+  /** How many builds you saved for it (SPEC §15.1). */
+  buildCount: z.int().min(0),
 });
 export type WeaponListItem = z.infer<typeof WeaponListItem>;
 
@@ -156,6 +159,8 @@ export const WeaponDetail = z.object({
   inCircuit: z.boolean(),
   /** When this week's Circuit picks change (the weekly reset), when `inCircuit`. */
   circuitEndsAt: z.iso.datetime().nullable(),
+  /** Your builds for it, in your order (SPEC §15.1). */
+  builds: z.array(WeaponBuildView),
   favorite: z.boolean(),
   ...CatalogFreshness,
 });

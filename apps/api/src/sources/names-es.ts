@@ -69,6 +69,18 @@ function byUnique(file: unknown, ...keys: string[]): Map<string, Entry> {
 }
 
 /** "<SHARD_RED_SIMPLE> Fragmento" → "Fragmento"; game colour tags go. */
+/** DE's mod types the builds use: Warframe and aura mods, and weapon mods and stances. */
+const MOD_TYPES = new Set([
+  'WARFRAME',
+  'AURA',
+  'PRIMARY',
+  'SECONDARY',
+  'MELEE',
+  'STANCE',
+  'ARCH-GUN',
+  'ARCH-MELEE',
+]);
+
 export function clean(text: string): string {
   return text
     .replace(/<[^>]+>/g, '')
@@ -249,11 +261,11 @@ export function buildSpanishNames(
     };
   }
 
-  // Warframe mods and arcanes: names and effects per rank.
+  // Warframe and weapon mods (weapon builds, SPEC §15.1) and arcanes: names and effects per rank.
   const effects: NamesFile['effects'] = {};
   for (const [u, es] of mods.es) {
     const type = typeof es.type === 'string' ? es.type : '';
-    if (type !== 'WARFRAME' && type !== 'AURA') continue;
+    if (!MOD_TYPES.has(type)) continue;
     const n = name(mods.es, u);
     if (n) names[u] = n;
     const e = effectsOf(es);

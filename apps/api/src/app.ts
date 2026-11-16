@@ -22,6 +22,7 @@ import { registerChecklistRoutes } from './routes/checklist.js';
 import { registerGoalRoutes } from './routes/goals.js';
 import { registerProfileRoutes } from './routes/profile.js';
 import { registerWarframeRoutes } from './routes/warframes.js';
+import { registerWeaponBuildRoutes } from './routes/weapon-builds.js';
 import { registerWeaponRoutes } from './routes/weapons.js';
 import { ItemCatalog } from './sources/items.js';
 import { ImageCache, WIKI_FILES } from './sources/images.js';
@@ -246,6 +247,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     db: options.db,
     userId: options.userId,
     catalog: weapons,
+    warframes,
     names,
     now,
     // The Circuit's weekly picks from the live data (fetched only when the cache is old).
@@ -260,6 +262,14 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
           return [];
         }
       }),
+  });
+  registerWeaponBuildRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    now,
+    weapons,
+    warframes,
+    names,
   });
   registerBuildRoutes(app, {
     db: options.db,
