@@ -523,7 +523,12 @@ Each phase ends with something you can run and check.
 - **Riven disposition is retired** (wiki, "Riven Mods", checked 15 Nov 2026: every weapon is normalized to 1.20×; the live data has 601 of 610 at 1.20). The API still returns `disposition` and `omegaAttenuation`, but the screens don't show dots or sort by it; the page says it's retired (Alex's choice).
 - **Screens** (brief `.impeccable/surfaces/weapons.md`; DESIGN.md "Weapons list", "Weapon page"):
   - `#/weapons` (Weapons tab) and `#/weapons?tab=arch` (Archwing & Necramech): search, Slot, Class, Mastery (needs a profile), Incarnon only (Weapons tab), sort by Name, Mastered, Favorites or Mastery rank; tiles grouped by slot. Everything is remembered while you look at a weapon; the order is kept in the browser (`wfhub.weapons.order`). On phones the filters fold under "Filters".
-  - `#/weapons/{slug}`: version switch, attacks (one at a time), weapon stats, Incarnon (a placeholder until part 3), How to get it with Add as goal (shared with the Warframe page), your progress, credit.
+  - `#/weapons/{slug}`: version switch, attacks (one at a time), Incarnon evolutions, weapon stats, How to get it with Add as goal (shared with the Warframe page), your progress, credit.
+- **Incarnon** (part 3, 15 Nov 2026; `npm run update-incarnon` → `apps/api/data/incarnon.json`, committed; the app never calls the wiki):
+  - **Source:** the Warframe wiki. The 45 "… Incarnon Genesis" pages in Category:Incarnon, and the pages of the 8 weapons that are Incarnon from the start (Traits "Incarnon" in `Module:Weapons/data`: Felarx, Phenmor, Laetum, Onos, Innodem, Praedos, Ruvox, Thalys). Each "Evolutions" table gives tiers EVO1–EVO5, the perks of each tier and the challenge that unlocks it. An adapter's table has one value column per version (Braton, Mk1, Vandal, Prime), so each version gets its own numbers ("+X" filled in). 53 pages, 97 weapon versions on 15 Nov 2026; a page that can't be read is listed under `skipped`, never guessed. DE's public export has no Incarnon text, so the perks are the wiki's English in both languages (Alex's choice: marked "en inglés").
+  - **Incarnon mark and filter:** the data's "Incarnon Form" attack, or evolutions on the wiki. Most melee adapters (Skana, Bo, Furax…) only have the latter: 66 weapons on 15 Nov 2026.
+  - **The Circuit:** a weapon is "In the Circuit" when its name is one of this week's Steel Path Circuit picks (`duviriCycle` `EXC_HARD`, §7), read from the live-data cache (fetched only when old).
+  - **API:** each version has `evolutions` (`kind` genesis or native, the wiki `page`, `tiers`); the list item and the page have `inCircuit`.
 
 ## Appendix A. Default checklist (seed v6)
 

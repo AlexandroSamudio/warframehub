@@ -6,8 +6,10 @@ import type {
 } from '@warframehub/shared';
 import { and, eq } from 'drizzle-orm';
 import { isMastered } from '../domain/mastery.js';
+import { nextReset } from '../domain/periods.js';
 import { HttpError } from '../http-error.js';
-import { plainText } from '../sources/warframes.js';
+import { incarnonOf } from '../sources/incarnon.js';
+import { plainText, slugOf } from '../sources/warframes.js';
 import {
   attackOf,
   hasIncarnon,
@@ -52,6 +54,18 @@ function freshness(state: WeaponCatalogState, nextRefreshAt: Date | null) {
   };
 }
 
+/**
+ * Incarnon: the data's "Incarnon Form" attack, or evolutions on the wiki (many melee
+ * weapons, e.g. Skana, have only the latter).
+ */
+const isIncarnon = (raw: WeaponGroup['variants'][number]['raw']) =>
+  hasIncarnon(raw) || incarnonOf(raw.name) !== null;
+
+/** This week's Steel Path Circuit picks ("Boar", "Ack & Brunt") as weapon slugs. */
+export function circuitSlugs(names: string[]): Set<string> {
+  return new Set(names.map(slugOf));
+}
+
 const maxOf = (values: (number | null)[]) => {
   const known = values.filter((v): v is number => v !== null);
   return known.length > 0 ? Math.max(...known) : null;
@@ -63,6 +77,7 @@ export function weaponList(
   state: WeaponCatalogState,
   groups: WeaponGroup[],
   nextRefreshAt: Date | null,
+  circuit: Set<string> = new Set(),
 ): WeaponsResponse {
   const xp = profileXp(db, userId);
   const favorites = favoriteSlugs(db, userId);
@@ -78,7 +93,8 @@ export function weaponList(
       favorite: favorites.has(g.slug),
       disposition: maxOf(g.variants.map((v) => statsOf(v.raw, g.slot).disposition)),
       masteryReq: mrs.length > 0 ? Math.min(...mrs) : null,
-      incarnon: g.variants.some((v) => hasIncarnon(v.raw)),
+      incarnon: g.variants.some((v) => isIncarnon(v.raw)),
+      inCircuit: circuit.has(g.slug),
       variants: g.variants.map((v) => ({
         kind: v.kind,
         name: v.raw.name,
@@ -100,6 +116,8 @@ export function weaponDetail(
   groups: WeaponGroup[],
   slug: string,
   nextRefreshAt: Date | null,
+  circuit: Set<string> = new Set(),
+  now: Date = new Date(),
 ): WeaponDetail {
   const group = groups.find((g) => g.slug === slug);
   if (!group) throw new HttpError(404, 'not_found', 'noWeapon', { slug });
@@ -113,7 +131,8 @@ export function weaponDetail(
     masteryReq: raw.masteryReq ?? null,
     stats: statsOf(raw, group.slot),
     attacks: raw.attacks.map(attackOf),
-    incarnon: hasIncarnon(raw),
+    incarnon: isIncarnon(raw),
+    evolutions: incarnonOf(raw.name),
     released: raw.releaseDate
       ? { date: raw.releaseDate, update: raw.introduced?.name ?? null }
       : null,
@@ -130,6 +149,11 @@ export function weaponDetail(
     tab: group.tab,
     slot: group.slot,
     class: group.class,
+    inCircuit: circuit.has(group.slug),
+    // The Circuit's picks change at the weekly reset (as `normaliseCircuit` says).
+    circuitEndsAt: circuit.has(group.slug)
+      ? (nextReset('weekly', now) as Date).toISOString()
+      : null,
     favorite: favoriteSlugs(db, userId).has(group.slug),
     variants,
     ...freshness(state, nextRefreshAt),

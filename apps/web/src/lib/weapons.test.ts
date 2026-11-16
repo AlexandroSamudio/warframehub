@@ -21,6 +21,7 @@ function weapon(over: Partial<WeaponListItem> & { name: string }): WeaponListIte
     disposition: 3,
     masteryReq: 0,
     incarnon: false,
+    inCircuit: false,
     favorite: false,
     ...over,
   };

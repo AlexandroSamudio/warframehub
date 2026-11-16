@@ -63,6 +63,28 @@ export const WeaponStats = z.object({
 });
 export type WeaponStats = z.infer<typeof WeaponStats>;
 
+/** One Incarnon perk: its name and what it does, with this version's numbers (wiki, English). */
+export const IncarnonPerk = z.object({ name: z.string(), lines: z.array(z.string()) });
+export type IncarnonPerk = z.infer<typeof IncarnonPerk>;
+
+export const IncarnonTier = z.object({
+  tier: z.int().min(1).max(5),
+  /** What unlocks the tier; null for an adapter's first tier (installing it unlocks it). */
+  challenge: z.string().nullable(),
+  /** You pick one per tier in the game. */
+  perks: z.array(IncarnonPerk),
+});
+export type IncarnonTier = z.infer<typeof IncarnonTier>;
+
+/** A version's Incarnon evolutions (SPEC §15): from a Genesis adapter, or its own. */
+export const WeaponEvolutions = z.object({
+  kind: z.enum(['genesis', 'native']),
+  /** The wiki page they come from (credit and "more"). */
+  page: z.url(),
+  tiers: z.array(IncarnonTier),
+});
+export type WeaponEvolutions = z.infer<typeof WeaponEvolutions>;
+
 export const WeaponVariant = z.object({
   uniqueName: z.string(),
   name: z.string(),
@@ -75,6 +97,8 @@ export const WeaponVariant = z.object({
   attacks: z.array(WeaponAttack),
   /** It has an Incarnon form (its own, or from a Genesis adapter). */
   incarnon: z.boolean(),
+  /** Its evolution tiers and perks, when the wiki data has them. */
+  evolutions: WeaponEvolutions.nullable(),
   released: z.object({ date: z.string(), update: z.string().nullable() }).nullable(),
   vaulted: z.boolean().nullable(),
   tradable: z.boolean().nullable(),
@@ -104,6 +128,8 @@ export const WeaponListItem = z.object({
   masteryReq: z.int().min(0).nullable(),
   /** Some version has an Incarnon form. */
   incarnon: z.boolean(),
+  /** Its Incarnon Genesis is one of this week's Steel Path Circuit picks. */
+  inCircuit: z.boolean(),
   /** You starred it. */
   favorite: z.boolean(),
 });
@@ -126,6 +152,10 @@ export const WeaponDetail = z.object({
   slot: WeaponSlot,
   class: z.string().nullable(),
   variants: z.array(WeaponVariant).min(1),
+  /** Its Incarnon Genesis is one of this week's Steel Path Circuit picks. */
+  inCircuit: z.boolean(),
+  /** When this week's Circuit picks change (the weekly reset), when `inCircuit`. */
+  circuitEndsAt: z.iso.datetime().nullable(),
   favorite: z.boolean(),
   ...CatalogFreshness,
 });

@@ -43,3 +43,12 @@ List: loading; first load offline (message + Retry); stale line; nothing matches
 - No new colour, no new dependency, no charts or stat bars, no modal, no comparison table (out of scope).
 - Keyboard: tabs are links; slot, mastery, version and attack switches are radio groups; tiles are links; focus visible.
 - Weapon builds are a later PR: leave room, add nothing.
+
+---
+
+# Addendum: Incarnon (part 3, 15 Nov 2026)
+
+- **Weapon page:** an "Incarnon evolutions" panel (gold accent) after Attacks, for every version with evolutions. One line says where they come from (the Genesis adapter you install, or the weapon's own form) and that you pick one perk per evolution. When the adapter is in this week's Steel Path Circuit: a teal "In the Circuit" badge and one plain line. In Spanish, a muted line says the perk texts are the wiki's English (DE publishes none); the English text carries `lang="en"`.
+- **Tiers:** one row per tier (top seam): the tier as a gold Label ("EVOLUTION 2") and what unlocks it in Dim Readout on the left; the perks beside it as quiet inset cells (surface-2, thin seam, never framed cards), auto-fit ~14rem. Stacked on phones. A wiki link closes the panel.
+- **List:** "In the Circuit" as a teal badge on the tile (live data); Incarnon becomes a plain badge. The Incarnon filter now also counts weapons whose Incarnon is only on the wiki (most melee).
+- **Anti-goals:** no tracking of which perks you chose (not asked), no images of perks, no machine translation.

@@ -1,0 +1,82 @@
+=== Evolutions ===
+{| class="wikitable sortable stickyHeader"
+! class=unsortable colspan="3" | Evolution
+! class=unsortable style="white-space: nowrap;" | {{Weapon|Angstrum}}
+! class=unsortable style="white-space: nowrap;" | {{Weapon|Prisma Angstrum}}
+! class=unsortable style="white-space: nowrap;" | Notes
+|-
+! EVO1
+| style="white-space: nowrap; text-align:center;" | Incarnon Form [[File:SeekingFireballs(xWhite).png|center|width=64x64]]
+|
+* Direct hits charge Incarnon Transmutation; Alt Fire transmutes. Switching back will expend any remaining charge.
+* Launches target-seeking fireballs that ricochet towards enemies. 
+| colspan="2" style="text-align:center;" | -
+|
+* Incarnon Form becomes fully automatic and shoots small fireballs that deal pure {{D|Heat}} damage. Upon hitting an enemy, the projectile will ricochet toward '''1''' enemy within '''20''' meters of the initial target. This ricochet has no homing capability and can miss. Projectiles that hit a surface can bounce up to '''2''' times before dissipating on the third impact, but these ricochets do not automatically aim towards enemies.
+|-
+! colspan="3" | Evolution Challenge !! colspan="4" | Complete a solo mission with this weapon equipped
+|-
+! rowspan="2" | EVO2
+| style="white-space: nowrap; text-align:center;" | '''Haven Foray'''[[File:DamageAndIncreasedDamageWithOvershields(xWhite).png|center|width=64x64]]
+|
+* Increase Base Damage by '''+50'''.
+* With Overshields: Increase Base Damage by '''+50'''.
+| colspan="2" style="text-align:center;" | -
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Paladin Virtue'''[[File:IncreasedCritWithEnergy(xWhite).png|center|width=64x64]]
+|
+* Increase Base Damage by '''+75'''.
+* With Energy Max Over '''700''': Increase Base Critical Damage Multiplier by '''+0.5x.'''
+| colspan="2" style="text-align:center;" | -
+| style="text-align:center" | -
+|-
+! colspan="3" | Evolution Challenge !! colspan="4" | Kill '''100''' enemies with this weapon's Incarnon Form
+|-
+! rowspan="3" | EVO3
+| style="white-space: nowrap; text-align:center;" | '''Swift Deliverance'''[[File:IncarnonProjectileSpeed(xWhite).png|center|width=64x64]]
+|
+* '''+30%''' Projectile Speed.
+| colspan="2" style="text-align:center;" | -
+|
+* Bonus stacks additively with {{M|Terminal Velocity}}.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Rapid Reinforcement'''[[File:IncarnonReloadSpeed(xWhite).png|center|width=64x64]]
+|
+* '''+50%''' Reload Speed.
+| colspan="2" style="text-align:center;" | -
+|
+* Bonus stacks additively with reload speed mods such as {{M|Fast Hands}}.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Hitman's Hoard'''[[File:IncarnonAmmoPool(xWhite).png|center|width=64x64]]
+|
+* Increase Base Ammo Capacity by '''+9'''.
+| colspan="2" style="text-align:center;" | -
+|
+* This bonus does not apply to the Incarnon form.
+|-
+! colspan="3" | Evolution Challenge !! colspan="4" | Kill '''30''' enemies afflicted with '''4''' or more status effects
+|-
+! rowspan="3" | EVO4
+| style="white-space: nowrap; text-align:center;" | '''Critical Parallel'''[[File:IncarnonCritChanceCritDamage(xWhite).png|center|width=64x64]]
+|
+* Increase Base Critical Chance by '''+X%.'''
+* Increase Base Critical Damage Multiplier by '''+0.2x'''.
+| style="text-align:center;" | X = 14%
+| style="text-align:center;" | X = 10%
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Survivor's Edge'''[[File:XCritChanceYStatChance(xWhite).png|center|width=64x64]]
+|
+* Increase Base Critical Chance by '''+X%.'''
+* Increase Base Status Chance by '''+Y%.'''
+| style="text-align:center;" |X = 9%<br>Y = 9%
+| style="text-align:center;" |X = 6%<br>Y = 6%
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Fatal Affliction'''[[File:DamagePerActiveStatus(xWhite).png|center|width=64x64]]
+|
+* '''+40%''' [[Condition Overload (Mechanic)|Direct Damage per Status Type]] affecting the target.
+| colspan="2" style="text-align:center;" | -
+| style="text-align:center" | -
+|}

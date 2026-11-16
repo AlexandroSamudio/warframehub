@@ -1,0 +1,89 @@
+===Evolutions===
+{| class="wikitable sortable stickyHeader"
+|+
+|-
+! class=unsortable colspan="3" | Evolution
+! class=unsortable style="white-space: nowrap;" | {{Weapon|Obex}}
+! class=unsortable style="white-space: nowrap;" | {{Weapon|Prisma Obex}}
+! class=unsortable | Notes
+|-
+! EVO1
+| style="white-space: nowrap; text-align:center;" | '''Incarnon Form''' [[File:VoidScytheTier0(xWhite).png|64px|center]]
+|
+*Reach 6'''x''' Combo and then [[Melee#Heavy Attack|Heavy Attack]] to activate Incarnon Form.
+*Perform a large radial attack for each Finisher strike.
+** '''+100%''' Melee Damage
+** '''+20%''' [[Sprint Speed]]
+** '''+20%''' [[Maneuvers#Parkour Velocity|Parkour Velocity]]
+| colspan="2" style="text-align:center" | -
+|
+* Finishers in Incarnon form will deal their damage in a '''12''' meter radius, with no falloff.
+|-
+! colspan="3" | Evolution Challenge !! colspan="3" | '''Complete a solo mission with this weapon equipped.'''
+|-
+! rowspan="2" | EVO2
+| style="white-space: nowrap; text-align:center;" | '''Balanced Stagger''' [[File:NeutralComboChanceToStunAndFinishers(xWhite).png|64px|center]]
+|
+* Increase Base Damage by '''+X'''
+* '''20%''' chance to stun enemies hit by a Neutral [[Combo]], opening them to [[finishers]].
+| style="text-align:center" | X = 50
+| style="text-align:center" | X = 10
+| style="text-align:left" | 
+* Bonus base damage does not function.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Armored Finisher''' [[File:ArmorOver700FinisherDamage(xWhite).png|64px|center]]
+|
+* Increase Base Damage by '''+X'''  
+* With [[Armor]] over '''450''': '''+80%'''  [[Finisher]] Damage.
+| style="text-align:center" | x = 50
+| style="text-align:center" | X = 10
+|
+* Bonus base damage does not function.
+* Finisher Damage bonus is additive to other sources of Finisher Damage such as {{M|Finishing Touch}}.
+|-
+! colspan="3" | Evolution Challenge !! colspan="3" | '''Activate this weapon's Incarnon Form 6 times in a mission.'''
+|-
+! rowspan="3" | EVO3
+| style="white-space: nowrap; text-align:center;" | '''Rapid Conclusion''' [[File:OnFinisherIncreaseParkourVelocity(xWhite).png|64px|center]]
+|
+* On Finisher Kill: '''+2.5%''' [[Maneuvers#Parkour Velocity|Parkour Velocity]]. Stacks up to '''16x'''.
+| colspan="2" style="text-align:center" | -
+|
+* Bonus lasts until death.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Orokin Reach''' [[File:MoreRange(xWhite).png|64px|center]]
+|
+* '''+1.2''' [[Melee#Range|Range]]
+| colspan="2" style="text-align:center" | -
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Standoff''' [[File:ComboCounterPausedWhenHolstered(xWhite).png|64px|center]]
+|
+* [[Combo]] Timer pauses when weapon is holstered.
+| colspan="2" style="text-align:center" | -
+| style="text-align:center" | -
+|-
+! colspan="3" | Evolution Challenge !! colspan="3" | Reach 10x [[Combo Multiplier]] 10 times.
+|-
+! rowspan="3" | EVO4
+| style="white-space: nowrap; text-align:center;" | '''Subtle Force''' [[File:XCritChanceYStatChance(xWhite).png|64px|center]]
+|
+* Increase Base [[Critical Chance]] by '''+10%'''
+* Increase Base [[Status Chance]] by '''+X'''
+| style="text-align:center" | X = 18%
+| style="text-align:center" | X = 12%
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Absolute Dominion''' [[File:HighStatus(xWhite).png|64px|center]]
+|
+* Increase Base [[Status Chance]] by '''+X'''
+| style="text-align:center" | X = 28%
+| style="text-align:center" | X = 20%
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Critical Coefficient''' [[File:CritDamage(xWhite).png|64px|center]]
+|
+* Increase Base [[Critical Damage Multiplier|Critical Damage]] [[Critical Damage Multiplier|Multiplier]] by '''+0.6x'''. Effect doubles in Incarnon Form.
+| colspan="2" style="text-align:center" | -
+| style="text-align:center" | -
+|}

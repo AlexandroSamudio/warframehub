@@ -57,6 +57,8 @@ export interface AppOptions {
   warframes?: WarframeCatalog;
   /** The Weapons section's data (warframestat.us + cache). Created with defaults if not given. */
   weapons?: WeaponCatalog;
+  /** Overrides this week's Steel Path Circuit weapons taken from `worldstate` (tests). */
+  circuitWeapons?: () => Promise<string[]>;
   /** DE images, cached in the data folder. Created with defaults if not given. */
   images?: ImageCache;
   /** The polarity symbols from the Warframe wiki, cached the same way. */
@@ -240,7 +242,25 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
         onError: (name, error) => app.log.warn({ name, err: error }, 'polarity fetch failed'),
       }),
   });
-  registerWeaponRoutes(app, { db: options.db, userId: options.userId, catalog: weapons, names });
+  registerWeaponRoutes(app, {
+    db: options.db,
+    userId: options.userId,
+    catalog: weapons,
+    names,
+    now,
+    // The Circuit's weekly picks from the live data (fetched only when the cache is old).
+    circuit:
+      options.circuitWeapons ??
+      (async () => {
+        try {
+          await worldstate.ensureFresh(['duviriCycle']);
+          const card = worldstate.cards().duviriCycle;
+          return card.freshness === 'unavailable' ? [] : (card.data?.steelPath ?? []);
+        } catch {
+          return [];
+        }
+      }),
+  });
   registerBuildRoutes(app, {
     db: options.db,
     userId: options.userId,

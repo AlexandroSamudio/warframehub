@@ -350,7 +350,9 @@
                   {/if}
                 </span>
                 <span class="badges">
-                  {#if w.incarnon}<span class="badge teal">{t('wp.incarnon')}</span>{/if}
+                  <!-- Teal is live data: this week's Circuit. Incarnon is a fact, plain. -->
+                  {#if w.inCircuit}<span class="badge teal">{t('wp.inCircuit')}</span>{/if}
+                  {#if w.incarnon}<span class="badge">{t('wp.incarnon')}</span>{/if}
                   {#each kindsOf(w) as k (k)}<span class="badge" class:gold={k === 'prime'}
                       >{t(`wp.kind.${k}`)}</span
                     >{/each}

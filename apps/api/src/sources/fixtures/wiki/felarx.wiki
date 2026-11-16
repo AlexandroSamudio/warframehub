@@ -1,0 +1,122 @@
+===Evolutions===
+
+{{clr}}
+{| class="wikitable"
+|+
+|-
+! colspan="3" | ''Evolution''
+! ''Notes''
+|-
+! colspan="3" | <h4 style="margin:0; padding:0; display: inline;">Evolution I</h4> Challenge
+! Kill '''100''' enemies with the Felarx.
+|-
+! EVO1
+| style="white-space: nowrap; text-align:center;" | Incarnon Form [[File:EvolutionIncarnonFormGun.png|64px|center]] 
+| 
+*Weakpoint Hits charge Incarnon Transmutation; Alt Fire transmutes. Switching back will expend any remaining charge. 
+|
+*Incarnon Form changes the weapon to semi-automatic and fires large energy projectiles with higher [[accuracy]] and [[critical multiplier]], '''0.5''' meter [[punch through]], and its status chance per projectile is increased to '''20%'''. However, its shots inflict {{D|Radiation}} and {{D|Impact}} damage instead of {{D|Puncture}} and {{D|Slash}}, it loses shotgun multishot mechanics and has a base multishot of 1, and its [[fire rate]] and total damage are reduced.
+*Despite the explosive visual effect, there is no radial damage.
+*As the per-shell reload makes the Felarx be able to interrupt its reload while firing, the switching can also be interrupted.
+|-
+! colspan="3" | <h4 style="margin:0; padding:0; display: inline;">Evolution II</h4> Challenge
+! Kill '''8''' [[Eximus]] with the Felarx's Incarnon Transmutation.
+|-
+! rowspan="3" | EVO2
+| style="white-space: nowrap; text-align:center;" | '''Attuned Accuracy''' [[File:MoreAccuracy.png|64px|center]]
+|
+*'''+40%''' [[Accuracy]] when Aiming.
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Kinetic Baffle''' [[File:LessRecoil.png|64px|center]]
+|
+*'''-50%''' Weapon [[Recoil]]
+|
+* Only applies while aiming.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Frictionless Flight''' [[File:EvolutionProjectileSpeed.png|64px|center]]
+|
+*'''+50%''' [[Projectile Speed]]
+|
+* Only applies while aiming.
+|-
+! colspan="3" | <h4 style="margin:0; padding:0; display: inline;">Evolution III</h4> Challenge
+! Land '''20''' headshots on [[Void Angel]]s with Primary fire without reloading.
+|-
+! rowspan="3" | EVO3
+| style="white-space: nowrap; text-align:center;" | '''Dual-Mode''' Chamber [[File:ToggleBetweenProjectileSpeedAndPunchThrough.png|64px|center]]
+| 
+*Reload toggles the weapon between '''+100%''' Projectile Speed and '''+4m''' Punch Through.
+|
+*Toggles for every shell loaded. For example, reloading all 6 shells will toggle 6 times, leaving it on the mode it started on.
+*"Reload when holstered" effects '''do''' toggle Dual-Mode Chamber.
+*Reloading via {{WF|Garuda}}'s {{M|Blood Forge}} or {{WF|Cyte-09}}'s {{A|Resupply}} does '''not''' switch chamber mode.
+*Affects Incarnon Form.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Evolved Autoloader''' [[File:ReloadWhileHolstered.png|64px|center]]
+| 
+*'''+50%''' Magazine Reloaded/s when [[Holster]]ed
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Mounting Momentum''' [[File:FireRateIncreasesPerShellReloaded.png|64px|center]]
+| 
+*Reload increases [[Fire Rate]] by '''+10%''' per shell. Resets on reload.
+| 
+*Increasing Magazine size increases the potential bonus, but also the reload time as shells are loaded individually.
+*Stacks up to 99x (+990% Fire Rate).
+*Affects Incarnon Form.
+**Activating Incarnon Form will add one stack to the counter. Deactivating Incarnon Form will reload the normal form's magazine while retaining stacks; this allows stacks to be sustained and built for as long as Incarnon charge can be built without reloading.
+**Deactivating Incarnon Form will also add stacks to the counter for each remaining unit of ammo missing from the magazine when Incarnon Form was activated. For example, if Incarnon Form is activated with 4 shells spent from the magazine and 10 stacks, deactivating Incarnon Form results in a total of 14 stacks.
+*[[Holster]]ing will reset stacks.
+**"Reload when holstered" effects such as {{M|Lock and Load}} will build stacks after resetting.
+*Reloading via {{WF|Garuda}}'s {{M|Blood Forge}} does '''not''' reset nor build stacks. Reloading via {{WF|Cyte-09}}'s {{A|Resupply}} however '''will''' build 1 stack.
+|-
+! colspan="3" | <h4 style="margin:0; padding:0; display: inline;">Evolution IV</h4> Challenge
+! Close '''12''' Ruptures in [[Void Flood]].
+|-
+! rowspan="3" | EVO4
+| style="white-space: nowrap; text-align:center;" | '''Brutal Edge''' [[File:EvolutionCriticalStatusUp.png|64px|center]]
+|
+*'''+10%''' [[Critical Chance]]
+*'''+10%''' [[Status Chance]]
+|
+*Bonuses are added after mods as a flat value.
+*Status Chance bonus is divided by the base multishot of 4, for only +2.5% Status Chance per pellet.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Incarnon Catalyst''' [[File:IncreaseChargeGainedOnKills.png|64px|center]]
+|
+*Headshots Build '''+50%''' more Incarnon Transmutation charge.
+| 
+*Reduces the number of headshots required to fully charge Transmutation to '''20'''.
+**Each headshotting-bullet generates '''3''' charge, up from '''2'''.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Racking Wrath''' [[File:EvolutionTrade-Off.png|64px|center]]
+| 
+*'''+20%''' [[Status Chance]]
+*'''-10%''' [[Critical Chance]]
+| 
+*Bonuses are added after mods as a flat value.
+*Status Chance bonus is divided by the base multishot of 4, for only +5% Status Chance per pellet.
+|-
+! colspan="3" | <h4 style="margin:0; padding:0; display: inline;">Evolution V</h4> Challenge
+! Complete a Solo mission with an Incarnon Weapon equipped in every slot.
+|-
+! rowspan="3" | EVO5
+| style="white-space: nowrap; text-align:center;" | '''Devastating Attrition''' [[File:EvolutionNon-Critical.png|64px|center]]
+|
+*'''50%''' chance to deal '''+2000%''' damage on ''non-critical'' hits
+|
+* Affects both forms.
+* Damage bonus is multiplicative to base damage bonuses such as {{M|Serration}}.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Ruptured Plentitude''' [[File:Hit3EnemiesAmmoEff.png|64px|center]]
+|
+*On Punch Through '''3''' enemies: '''+70%''' [[Ammo Efficiency]] for '''20s'''
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Agile Executor''' [[File:MultishotWhileGlidingAndSliding.png|64px|center]]
+| 
+*Gain '''50%''' Ammo Efficiency while Aim Gliding and Sliding
+| style="text-align:center" | -
+|-
+|}

@@ -1,0 +1,106 @@
+=== Evolutions ===
+
+{{clr}}
+{| class="wikitable"
+|+
+|-
+! colspan="3" | Evolution
+! Notes
+|-
+! colspan="3" | Evolution I Challenge !! Kill '''100''' enemies with the Onos.
+|-
+! EVO1
+| style="white-space: nowrap; text-align:center;" | '''Incarnon Form''' [[File:EvolutionIncarnonFormGun.png|64px|center]]
+| 
+* Weakpoint Hits charge Incarnon Transmutation; Alt Fire transmutes. Switching back will expend any remaining charge. 
+| 
+* Incarnon Form changes the weapon from an automatic hand cannon to charging [[Arm-Cannon]]. Holding down the trigger releases a wide beam that inflicts {{D|Radiation}} damage. The beam narrows and increases in damage the longer the charge is held. Once fully charged, the Arm Cannon releases a powerful {{D|Heat}} shot with guaranteed status, '''5''' meter [[Punch Through]], and explodes in a 3 meter radius.
+** Beam damage scales linearly up to '''2.5x''' damage. Resets after releasing the trigger or firing a charged shot.
+** Onos consumes '''1''' round per tick of damage, then '''50''' rounds upon releasing the {{D|Heat}} beam. The charged beam will deal full damage even if there iss less than 50 charges remaining. 
+*Incarnon Form uses Arm-Cannon animations. Contrary to its appearance, the Onos is still considered a Secondary weapon.
+|-
+! colspan="3" | Evolution II Challenge !! Kill '''8''' [[Eximus]] with the Onos's Incarnon Transmutation.
+|-
+! rowspan="3" | EVO2
+| style="white-space: nowrap; text-align:center;" | '''Marksman's Hand''' [[File:LessRecoil(xWhite).png|64px|center]]
+|
+* '''-30%''' [[Recoil]]
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Rapid Wrath''' [[File:IncarnonFireRate(xWhite).png|64px|center]]
+|
+* '''+25%''' Fire Rate
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Swift Deliverance''' [[File:IncarnonProjectileSpeed(xWhite).png|64px|center]]
+|
+* '''+50%''' [[Projectile Speed]]
+| style="text-align:center" | -
+|-
+! colspan="3" | Evolution III Challenge !! Get '''5''' headshots on {{E|Scathing Whisper|Scathing}} and {{E|Mocking Whisper|Mocking Whispers}} in [[Albrecht's Laboratories]] with Primary fire without reloading.
+|-
+! rowspan="3" | EVO3
+| style="white-space: nowrap; text-align:center;" | '''Extended Volley''' [[File:IncarnonClipSize(xWhite).png|64px|center]]
+| 
+* '''+10''' Base [[Ammo|Magazine Capacity]]
+|
+* *Only affects untransformed Onos.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Rapid Reinforcement''' [[File:IncarnonReloadSpeed(xWhite).png|64px|center]]
+| 
+* '''+30%''' [[Reload]] Speed
+|
+* Affects untransformed Onos and transformation into Incarnon mode.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Hunter's Rearmament''' [[File:OnKillChancetogetXAmmo.png|64px|center]]
+| 
+* On Kill: '''10%''' chance to replenish '''10''' [[Ammo]]
+| 
+* Only affects untransformed Onos.
+* Ammo is replenished to the reserve pool, not to the magazine.
+|-
+! colspan="3" | Evolution IV Challenge !! Open '''20''' Conduits in [[Disruption]] on [[Armatus]], [[Deimos]]
+|-
+! rowspan="3" | EVO4
+| style="white-space: nowrap; text-align:center;" | '''Lethal Lance''' [[File:OnKillPunchThrough.png|64px|center]]
+|
+* On Kill: '''+2.5''' [[Punch Through]] for '''20s'''
+|
+* Affects both modes.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Incarnon Efficiency''' [[File:IncreaseChargeGainedOnKills.png|64px|center]]
+|
+* Headshots Build '''+50%''' more Incarnon Transmutation charge.
+| 
+* Reduces the number of weakpoint hits required to fully charge Transmutation to '''8'''.
+** Each weakpoint hit generates '''75''' charge, up from '''50'''.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Elemental Excess''' [[File:XStatChanceNegYCritChance(xWhite).png|64px|center]]
+| 
+* '''+20%''' [[Status Chance]]
+* '''-10%''' [[Critical Chance]]
+| 
+* Bonuses are added after mods as a flat value.
+|-
+! colspan="3" | Evolution V Challenge !! Complete a Solo mission with an Incarnon Weapon equipped in every slot.
+|-
+! rowspan="3" | EVO5
+| style="white-space: nowrap; text-align:center;" | '''Sequential Skullbuster''' [[File:ConsecutivetHeadshotIncrDmg(xWhite).png|64px|center]]
+|
+* On Consecutive Weakpoint Hits: '''+30%''' Headshot Damage. Stacks up to '''4x'''
+| style="text-align:center" | -
+|-
+| style="white-space: nowrap; text-align:center;" | '''Impaler's Ferocity''' [[File:OnPunchThroughIncreaseDmg(xWhite).png|64px|center]]
+|
+* On [[Punch Through]] Hit: '''+200%''' Damage for '''10s'''.
+|
+* Damage bonus is additive to other base damage mods like {{M|Hornet Strike}}.
+|-
+| style="white-space: nowrap; text-align:center;" | '''Devastation Cascade''' [[File:ChargeBeamCritChanceDmg(xWhite).png|64px|center]]
+| 
+* Hitting enemies in Incarnon Form increases the [[Critical Chance]] and [[Critical Hit|Critical Damage]] of the fully charged blast by '''+5%'''. Stacks up to '''50''' times.
+|
+* Bonuses are additive to mods.
+* Also triggers on DoT Status Effects applied by the charge-up beam, including damage caused to enemies caught in {{D|Gas}} clouds.
+|-
+|}
