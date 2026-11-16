@@ -1,6 +1,7 @@
 import type {
   WeaponDetail,
   WeaponListItem,
+  WeaponBuildView,
   WeaponVariant,
   WeaponsResponse,
 } from '@warframehub/shared';
@@ -20,6 +21,7 @@ import {
 import type { Db } from './client.js';
 import { profileMasteryRank, profileXp } from './profile.js';
 import { favoriteWeapons } from './schema.js';
+import { weaponBuildCounts } from './weapon-builds.js';
 import { goalFor, recipeOf, urlOrNull } from './warframes.js';
 
 /** The Weapons section's answers (SPEC §15): the catalog plus your goals and profile. */
@@ -81,6 +83,7 @@ export function weaponList(
 ): WeaponsResponse {
   const xp = profileXp(db, userId);
   const favorites = favoriteSlugs(db, userId);
+  const buildCounts = weaponBuildCounts(db, userId);
   const weapons: WeaponListItem[] = groups.map((g) => {
     const mrs = g.variants.map((v) => v.raw.masteryReq).filter((m): m is number => m !== undefined);
     return {
@@ -91,6 +94,7 @@ export function weaponList(
       slot: g.slot,
       class: g.class,
       favorite: favorites.has(g.slug),
+      buildCount: buildCounts.get(g.slug) ?? 0,
       disposition: maxOf(g.variants.map((v) => statsOf(v.raw, g.slot).disposition)),
       masteryReq: mrs.length > 0 ? Math.min(...mrs) : null,
       incarnon: g.variants.some((v) => isIncarnon(v.raw)),
@@ -118,6 +122,7 @@ export function weaponDetail(
   nextRefreshAt: Date | null,
   circuit: Set<string> = new Set(),
   now: Date = new Date(),
+  builds: WeaponBuildView[] = [],
 ): WeaponDetail {
   const group = groups.find((g) => g.slug === slug);
   if (!group) throw new HttpError(404, 'not_found', 'noWeapon', { slug });
@@ -151,6 +156,7 @@ export function weaponDetail(
     class: group.class,
     inCircuit: circuit.has(group.slug),
     // The Circuit's picks change at the weekly reset (as `normaliseCircuit` says).
+    builds,
     circuitEndsAt: circuit.has(group.slug)
       ? (nextReset('weekly', now) as Date).toISOString()
       : null,

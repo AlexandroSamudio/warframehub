@@ -41,10 +41,10 @@ const RawBuildMod = z.looseObject({
  * normal mod ("Intensify"). Primed mods also live under `Expert` but have their own names,
  * so they stay. Conclave augments (Mesa's Waltz…) work in missions and stay too.
  */
-const SKIPPED_PATHS = ['/Beginner/', '/Intermediate/', '/PvPMods/'];
+export const SKIPPED_PATHS = ['/Beginner/', '/Intermediate/', '/PvPMods/'];
 
 /** Lower is better when two mods share a name ("Adaptation" also has a Sentient copy). */
-function pathRank(uniqueName: string): number {
+export function pathRank(uniqueName: string): number {
   if (uniqueName.includes('/Expert/')) return 3;
   if (uniqueName.startsWith('/Lotus/Upgrades/Mods/Warframe/')) return 0;
   return uniqueName.startsWith('/Lotus/Upgrades/Mods/') ? 1 : 2;

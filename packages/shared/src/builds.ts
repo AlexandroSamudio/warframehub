@@ -335,9 +335,9 @@ export function shardStat(key: string): ShardStat | undefined {
 
 // ---- a build as saved -------------------------------------------------------------
 
-const Note = z.string().trim().max(500).default('');
-const RefName = z.string().trim().min(1).max(120);
-const UniqueName = z.string().min(1).max(300);
+export const Note = z.string().trim().max(500).default('');
+export const RefName = z.string().trim().min(1).max(120);
+export const UniqueName = z.string().min(1).max(300);
 
 /** A mod or arcane in a slot. The name is kept so the build still reads if the data drops it. */
 export const BuildSlot = z.object({
@@ -372,7 +372,7 @@ export const ARCANE_SLOTS = 2;
 export const MAX_BUILD_WEAPONS = 6;
 
 /** An http(s) link, or empty. The app never fetches it. */
-const SourceUrl = z
+export const SourceUrl = z
   .union([
     z.literal(''),
     z
@@ -412,7 +412,7 @@ export const BuildContent = z.object({
 export type BuildContent = z.infer<typeof BuildContent>;
 
 // Validation messages are keys of the API's messages (apps/api/src/i18n.ts).
-const BuildName = z.string().trim().min(1, 'buildName').max(60);
+export const BuildName = z.string().trim().min(1, 'buildName').max(60);
 
 /** `POST /api/builds`. */
 export const CreateBuildRequest = z.object({

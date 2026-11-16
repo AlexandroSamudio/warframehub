@@ -530,6 +530,20 @@ Each phase ends with something you can run and check.
   - **The Circuit:** a weapon is "In the Circuit" when its name is one of this week's Steel Path Circuit picks (`duviriCycle` `EXC_HARD`, §7), read from the live-data cache (fetched only when old).
   - **API:** each version has `evolutions` (`kind` genesis or native, the wiki `page`, `tiers`); the list item and the page have `inCircuit`.
 
+### 15.1 Weapon builds (16 Nov 2026, Alex's request)
+
+- **What:** a library of weapon builds, like Warframe builds (§14.1) but with **no guide** (Alex: the "how to play" is for Warframes). Each build is for **one version** (Braton, Prime, Vandal or Mk1); a new one starts on the Prime when there is one. Every weapon gets builds, arch weapons too.
+- **A build holds:** description (300), source link, author, game update; the **Exilus** and **8 mods** (rank and note each); **arcanes**; a **stance** (melee); the **Incarnon** perk picked in tiers 2–5 (with a note); a **Riven** (name, polarity, 2–3 positive stats and at most 1 negative, each picked from the list for the weapon's type with its value typed in, a note); and for Kuva, Tenet and Coda weapons the **progenitor bonus** (element and %). Stored as one JSON document in `weapon_builds` (migration `0010`), kept apart from Warframe builds.
+- **What fits** (all from the wiki, checked 16 Nov 2026; `npm run update-weapon-wiki` now also reads `Module:Mods/data` and the "Riven Mods" page):
+  - **Mods:** each mod's wiki `Type`, plus the compatibility tags it needs or refuses, against the weapon's class, tags and family (`apps/api/src/sources/weapon-mods.ts`). Rifle mods: every primary but shotguns; Shotgun mods: primary shotguns; Pistol mods: every secondary; Assault Rifle, Sniper, Bow, Tome mods: those classes; Thrown Melee mods: glaives; melee and arch mods by slot; a type naming a weapon is an augment for that weapon and its wiki family (Kuva Hek takes Hek's; Vaykor Hek refuses it through its `SYNDICATEMODBLOCKED` tag). Crossbows aren't offered Bow mods (the wiki doesn't say they take them). Conclave-only mods and stances are left out. 553 weapon mods (56 stances) on 16 Nov 2026.
+  - **Exilus:** Primary, Secondary and Melee only ("Exilus Weapon Adapter").
+  - **Arcanes** ("Arcane Enhancement"): one slot for Primary, Secondary and Melee weapons (bows and shotguns also take Bow / Shotgun arcanes); arch-guns a Primary and a Secondary slot; arch-melee none.
+  - **Riven** ("Riven Mods"): Madurai, Naramon or Vazarin; the stat list per type (Rifle for every primary but shotguns, Shotgun, Pistol, Melee, Archgun; 22–24 stats each, normal and spliced; arch-melee take none). Disposition is retired (§15).
+  - **Progenitor bonus** ("Kuva/Tenet/Coda Weapons"): Impact, Heat, Cold, Electricity, Toxin, Magnetic or Radiation, 25–60%.
+- **Data:** the Warframe catalog's weekly `/mods` and arcane fetch also keeps `warframes:weaponMods` and `warframes:weaponArcanes` (an older cache fetches once more for them). Spanish names and effects of weapon mods and stances were added to `npm run update-names`.
+- **API:** `GET /api/weapon-builds/options?slug=&variant=`, `GET`/`PUT`/`DELETE /api/weapon-builds/:id`, `POST /api/weapon-builds`, `POST /api/weapon-builds/reorder`, `GET /api/weapon-builds/:id/share`, `POST /api/weapon-builds/import`. `GET /api/weapons/:slug` adds `builds` (resolved: effects at the rank, pictures, perk names); `GET /api/weapons` adds `buildCount`. Every check answers 400 with a message (mods that don't fit, Exilus/stance/arcane slots, ranks, twice, Incarnon picks, Riven stats and counts, progenitor, the version).
+- **Sharing:** a code starting with `wfhub-weaponbuild1:` (the Warframe build packing); it imports on the same weapon only, and a Warframe build's code is told apart.
+
 ## Appendix A. Default checklist (seed v6)
 
 `⚠️` = shipped with the "verify" badge. Since seed v4 (10 Nov 2026) no item has it: everything below was checked in game.

@@ -2,7 +2,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import {
   shardStat,
   shardText,
-  type ArcaneOption,
   type BuildOptionsResponse,
   type BuildView,
   type GoalsResponse,
@@ -17,6 +16,8 @@ import {
   type Shortfall,
   type WarframeDetail,
   type WarframesResponse,
+  type WeaponBuildOptionsResponse,
+  type WeaponBuildView,
   type WeaponDetail,
   type WeaponsResponse,
 } from '@warframehub/shared';
@@ -343,13 +344,54 @@ export class GameNames {
     });
   }
 
-  private option<T extends ModOption | ArcaneOption>(o: T): T {
+  private option<T extends { uniqueName: string; name: string; effects: string[] }>(o: T): T {
     const name = this.es.names[o.uniqueName];
     return {
       ...o,
       name: name ?? o.name,
       alias: name && name !== o.name ? o.name : null,
       effects: this.es.effects[o.uniqueName] ?? o.effects,
+    };
+  }
+
+  /**
+   * A weapon build (SPEC §15.1) in Spanish: mod, stance and arcane names and effects, the
+   * version's name. The Incarnon perks stay in English (DE publishes none).
+   */
+  weaponBuild(b: WeaponBuildView, lang: Language): WeaponBuildView {
+    if (lang === 'en') return b;
+    const view = {
+      ...b,
+      variantName: this.item(null, b.variantName),
+      exilus: this.slot(b.exilus),
+      slots: b.slots.map((s) => this.slot(s)),
+      stance: this.slot(b.stance),
+      arcanes: b.arcanes.map((s) => this.slot(s)),
+    };
+    // The edit page names each part like the build page does.
+    const named = <T extends { name: string }>(saved: T | null, shown: { name: string } | null) =>
+      saved && shown ? { ...saved, name: shown.name } : saved;
+    const c = view.content;
+    return {
+      ...view,
+      content: {
+        ...c,
+        exilus: named(c.exilus, view.exilus),
+        slots: c.slots.map((s, i) => named(s, view.slots[i] ?? null)),
+        stance: named(c.stance, view.stance),
+        arcanes: c.arcanes.map((s, i) => named(s, view.arcanes[i] ?? null)),
+      },
+    };
+  }
+
+  /** A weapon build's choices in Spanish; renamed ones keep their English name as `alias`. */
+  weaponBuildOptions(o: WeaponBuildOptionsResponse, lang: Language): WeaponBuildOptionsResponse {
+    if (lang === 'en') return o;
+    return {
+      ...o,
+      mods: o.mods.map((m) => this.option(m)),
+      stances: o.stances.map((m) => this.option(m)),
+      arcaneSlots: o.arcaneSlots.map((slot) => slot.map((a) => this.option(a))),
     };
   }
 

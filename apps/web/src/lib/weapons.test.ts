@@ -23,6 +23,7 @@ function weapon(over: Partial<WeaponListItem> & { name: string }): WeaponListIte
     incarnon: false,
     inCircuit: false,
     favorite: false,
+    buildCount: 0,
     ...over,
   };
 }
