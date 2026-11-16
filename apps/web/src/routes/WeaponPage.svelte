@@ -6,6 +6,7 @@
     WeaponVariantKind,
   } from '@warframehub/shared';
   import { onMount, tick } from 'svelte';
+  import Evolutions from '../components/Evolutions.svelte';
   import HowToGet from '../components/HowToGet.svelte';
   import Icon from '../components/Icon.svelte';
   import Segmented from '../components/Segmented.svelte';
@@ -214,7 +215,21 @@
 
         <p class="badges">
           {#if v.mastered}<span class="badge ok">{t('wp.mastered')}</span>{/if}
-          {#if v.incarnon}<span class="badge teal">{t('wp.incarnon')}</span>{/if}
+          {#if data.inCircuit}<span class="badge teal">{t('wp.inCircuit')}</span>{/if}
+          {#if v.evolutions}
+            <!-- A link-like badge: jumps to the evolutions (a hash link would change the page). -->
+            <button
+              type="button"
+              class="badge jump"
+              aria-label={t('wp.evoJump')}
+              onclick={() => {
+                const h = document.getElementById('wp-evolutions');
+                const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                h?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+                h?.focus({ preventScroll: true });
+              }}>{t('wp.incarnon')}</button
+            >
+          {:else if v.incarnon}<span class="badge">{t('wp.incarnon')}</span>{/if}
           {#if v.vaulted}<span class="badge">{t('wf.vaulted')}</span>{/if}
           {#if v.masteryReq !== null}<span class="badge">{t('wf.mr', { n: v.masteryReq })}</span
             >{/if}
@@ -304,6 +319,15 @@
       {/if}
     </section>
 
+    {#if v.evolutions}
+      <Evolutions
+        evolutions={v.evolutions}
+        baseName={data.name}
+        name={v.name}
+        circuitEndsAt={data.circuitEndsAt}
+      />
+    {/if}
+
     <!-- Short panels side by side on wide screens, so none is mostly empty. -->
     <div class="pair">
       <section class="panel frame" aria-labelledby="wp-stats">
@@ -318,14 +342,6 @@
           <dd class="note">{t('wp.dispositionRetired')}</dd>
         </dl>
       </section>
-
-      {#if v.incarnon}
-        <section class="panel frame" aria-labelledby="wp-incarnon">
-          <h3 id="wp-incarnon">{t('wp.incarnonTitle')}</h3>
-          <p>{t('wp.incarnonHas')}</p>
-          <p class="hint">{t('wp.incarnonLater')}</p>
-        </section>
-      {/if}
 
       <section class="panel frame" aria-labelledby="wp-progress">
         <h3 id="wp-progress">{t('wf.progress')}</h3>
@@ -489,6 +505,23 @@
 
   .badges:empty {
     display: none;
+  }
+
+  /* The Incarnon badge as a jump to the evolutions: the badge look, plus a hover. */
+  .badge.jump {
+    background: none;
+    padding: 0 0.4rem;
+    border: 1px solid currentColor;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
+  }
+
+  .badge.jump:hover {
+    background: none;
+    color: var(--fg);
   }
 
   .released,

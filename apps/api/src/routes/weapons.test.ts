@@ -12,7 +12,7 @@ import type { FetchFn } from '../sources/worldstate.js';
 
 const START = new Date('2026-11-15T12:00:00.000Z');
 
-async function setup() {
+async function setup(circuit: string[] = ['Braton', 'Skana']) {
   const database = openDatabase(':memory:');
   const { userId } = initDatabase(database.db, loadSeed(), START);
   const fetchFn: FetchFn = async (url) => {
@@ -29,6 +29,8 @@ async function setup() {
     now,
     liveTimes: () => ({}),
     weapons: new WeaponCatalog(database.db, { fetch: fetchFn, now }),
+    // This week's Steel Path Circuit picks, instead of the live data.
+    circuitWeapons: async () => circuit,
     // Goals must come from the weapon list's saved items, never a search.
     items: new ItemCatalog(database.db, { fetch: offline, now }),
   });
@@ -186,5 +188,55 @@ describe('favorite weapons', () => {
       payload: { favorite: 'yes' },
     });
     expect(bad.statusCode).toBe(400);
+  });
+});
+
+describe('Incarnon (part 3)', () => {
+  it('marks Incarnon weapons, also melee ones the item data has no Incarnon attack for', async () => {
+    const { list } = await setup();
+    const { weapons } = await list();
+    const skana = weapons.find((w) => w.slug === 'skana')!;
+    expect(skana.incarnon).toBe(true); // only the wiki's evolutions say so
+    expect(weapons.find((w) => w.slug === 'hek')!.incarnon).toBe(false);
+  });
+
+  it('marks the weapons whose Genesis is in this week’s Circuit', async () => {
+    const { list, page } = await setup();
+    const { weapons } = await list();
+    expect(weapons.filter((w) => w.inCircuit).map((w) => w.slug)).toEqual(['braton', 'skana']);
+    const braton = await page('braton');
+    expect(braton.inCircuit).toBe(true);
+    // Sunday 15 Nov: this week's picks change at Monday 00:00 UTC.
+    expect(braton.circuitEndsAt).toBe('2026-11-16T00:00:00.000Z');
+    const hek = await page('hek');
+    expect(hek.inCircuit).toBe(false);
+    expect(hek.circuitEndsAt).toBeNull();
+  });
+
+  it('marks nothing when the Circuit is unknown', async () => {
+    const { list } = await setup([]);
+    expect((await list()).weapons.some((w) => w.inCircuit)).toBe(false);
+  });
+
+  it('gives each version its own evolutions, with its numbers', async () => {
+    const { page } = await setup();
+    const braton = await page('braton');
+    const prime = braton.variants.find((v) => v.kind === 'prime')!;
+    const mk1 = braton.variants.find((v) => v.kind === 'mk1')!;
+    expect(prime.evolutions).toMatchObject({
+      kind: 'genesis',
+      page: 'https://wiki.warframe.com/w/Braton_Incarnon_Genesis',
+    });
+    expect(prime.evolutions!.tiers[1]!.perks[0]!.name).toBe('Daring Reverie');
+    expect(prime.evolutions!.tiers[1]!.perks[0]!.lines[0]).toBe('Increase Base Damage by +4.');
+    expect(mk1.evolutions!.tiers[1]!.perks[0]!.lines[0]).toBe('Increase Base Damage by +28.');
+    expect((await page('hek')).variants[0]!.evolutions).toBeNull();
+  });
+
+  it('keeps the evolutions in English in Spanish (no official text exists)', async () => {
+    const { page, language } = await setup();
+    await language('es');
+    const prime = (await page('braton')).variants.find((v) => v.kind === 'prime')!;
+    expect(prime.evolutions!.tiers[1]!.perks[0]!.name).toBe('Daring Reverie');
   });
 });
