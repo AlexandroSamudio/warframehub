@@ -17,6 +17,8 @@ export interface WeaponFilters {
   cls: string;
   mastery: MasteryFilter;
   incarnonOnly: boolean;
+  /** Only weapons you saved a build for (SPEC §15.1). */
+  withBuilds: boolean;
   query: string;
 }
 
@@ -48,6 +50,7 @@ export function filterWeapons(list: WeaponListItem[], f: WeaponFilters): WeaponL
       (f.mastery === 'all' || isMastered(w) === (f.mastery === 'yes')) &&
       // Only the Weapons tab has Incarnon weapons; the arch tab doesn't offer the filter.
       (!f.incarnonOnly || f.tab === 'arch' || w.incarnon) &&
+      (!f.withBuilds || w.buildCount > 0) &&
       matches(w, f.query),
   );
 }

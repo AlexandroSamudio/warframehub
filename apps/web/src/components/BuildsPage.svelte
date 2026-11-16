@@ -1,60 +1,73 @@
-<script lang="ts">
-  import type { BuildView as Build } from '@warframehub/shared';
+<script
+  lang="ts"
+  generics="B extends { id: number; name: string; content: { description: string; author: string; patch: string } }"
+>
+  import type { Snippet } from 'svelte';
   import * as api from '../lib/api.ts';
   import { rememberedTab, rememberTab } from '../lib/builds.ts';
   import { t } from '../lib/i18n/index.ts';
   import { shift } from '../lib/reorder.ts';
-  import { buildHref } from '../lib/route.svelte.ts';
-  import BuildView from './BuildView.svelte';
+  import { buildHref, type BuildSub } from '../lib/route.svelte.ts';
   import Icon from './Icon.svelte';
-  import ModPic from './ModPic.svelte';
-  import ShardPic from './ShardPic.svelte';
   import { onMount, tick } from 'svelte';
 
-  /** The Builds page of a Warframe (SPEC §14.1): your builds on the left, one open. */
+  /**
+   * The Builds page of a Warframe (SPEC §14.1) or a weapon (§15.1): your builds on the left,
+   * one open. What tells builds apart in the list (`marks`) and the open build (`view`) come
+   * from the page; the list, its order and the keys are the same for both.
+   */
   interface Props {
     slug: string;
+    route?: 'warframes' | 'weapons';
     /** The build in the address (`…/builds/12`), or null for `…/builds`. */
     open: number | null;
-    /** The version that owns the builds ("Mesa Prime"). */
+    /** What the builds are for ("Mesa Prime", "Braton"), for the list's name. */
     owner: string;
     /** Why the builds sit on that version, when it isn't obvious (Excalibur Umbra). */
-    ownerNote: string | null;
-    builds: Build[];
-    abilityNames: Map<number, string>;
+    ownerNote?: string | null;
+    builds: B[];
+    /** A list entry's extra line(s): pictures, the version. */
+    marks?: Snippet<[B]>;
+    /** The open build. */
+    view: Snippet<[B]>;
+    /** Saves the new order on the server. */
+    reorder: (ids: number[]) => Promise<unknown>;
     /** The builds in their new order, after ↑/↓. */
-    onReordered: (builds: Build[]) => void;
+    onReordered: (builds: B[]) => void;
   }
 
-  let { slug, open, owner, ownerNote, builds, abilityNames, onReordered }: Props = $props();
+  let {
+    slug,
+    route = 'warframes',
+    open,
+    owner,
+    ownerNote = null,
+    builds,
+    marks,
+    view,
+    reorder,
+    onReordered,
+  }: Props = $props();
+
+  const href = (sub?: BuildSub) => buildHref(slug, sub, route);
+  // Weapons and Warframes can share a slug ("bo"?): remember each list's own last build.
+  const memo = $derived(route === 'weapons' ? `weapon:${slug}` : slug);
 
   // `…/builds/12` opens that build; `…/builds` the one opened last (or the first).
   const missing = $derived(open !== null && !builds.some((b) => b.id === open));
   const selected = $derived(
     open !== null
       ? (builds.find((b) => b.id === open) ?? null)
-      : (builds.find((b) => b.id === rememberedTab(slug)) ?? builds[0] ?? null),
+      : (builds.find((b) => b.id === rememberedTab(memo)) ?? builds[0] ?? null),
   );
 
   $effect(() => {
-    if (selected) rememberTab(slug, selected.id);
+    if (selected) rememberTab(memo, selected.id);
   });
 
   const index = $derived(selected ? builds.findIndex((b) => b.id === selected.id) : -1);
   let moving = $state(false);
   let moveError = $state<string | null>(null);
-
-  /**
-   * What tells builds apart in the list: their arcanes, Helminth ability and shards (the
-   * first mods are often the same Intensify, Flow…).
-   */
-  function marks(b: Build) {
-    return {
-      arcanes: b.arcanes.filter((a) => a !== null).map((a) => a.image),
-      helminth: b.helminth?.image ?? null,
-      shards: b.shards,
-    };
-  }
 
   // [ and ] open the previous and next build, unless you're typing somewhere.
   onMount(() => {
@@ -67,7 +80,7 @@
       const i = builds.findIndex((b) => b.id === selected.id);
       const next = builds[(i + (event.key === ']' ? 1 : -1) + builds.length) % builds.length]!;
       event.preventDefault();
-      window.location.hash = buildHref(slug, { kind: 'view', id: next.id });
+      window.location.hash = href({ kind: 'view', id: next.id });
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -85,7 +98,7 @@
     moving = true;
     moveError = null;
     try {
-      await api.reorderBuilds(slug, ids);
+      await reorder(ids);
       onReordered(ids.map((id) => builds.find((b) => b.id === id)!));
       await tick();
       // At the new end the button disables itself: keep focus on its partner.
@@ -106,12 +119,10 @@
   <section class="empty frame accent" aria-label={t('build.title')}>
     <p>{t('build.none')}</p>
     {#if ownerNote}<p class="muted">{ownerNote}</p>{/if}
-    <a class="cta" href={buildHref(slug, { kind: 'new' })}
+    <a class="cta" href={href({ kind: 'new' })}
       ><Icon name="plus" size={14} /><span>{t('build.add')}</span></a
     >
-    <a class="code-link" href={buildHref(slug, { kind: 'new', withCode: true })}
-      >{t('build.haveCode')}</a
-    >
+    <a class="code-link" href={href({ kind: 'new', withCode: true })}>{t('build.haveCode')}</a>
   </section>
 {:else}
   <div class="builds-page">
@@ -120,12 +131,11 @@
       <ul>
         {#each builds as b (b.id)}
           {@const on = b.id === selected?.id}
-          {@const m = marks(b)}
           <li>
             <a
               class="entry"
               class:on
-              href={buildHref(slug, { kind: 'view', id: b.id })}
+              href={href({ kind: 'view', id: b.id })}
               aria-current={on ? 'page' : undefined}
             >
               <span class="entry-name">{b.name}</span>
@@ -138,21 +148,7 @@
                   >{[b.content.author, b.content.patch].filter(Boolean).join(' · ')}</span
                 >
               {/if}
-              {#if m.arcanes.length > 0 || m.helminth || m.shards.length > 0}
-                <span class="marks" aria-hidden="true">
-                  {#each m.arcanes as img, i (i)}<ModPic
-                      image={img}
-                      size={26}
-                      fit="contain"
-                    />{/each}
-                  {#if m.helminth}<ModPic image={m.helminth} size={26} fit="contain" />{/if}
-                  {#each m.shards as s, i (i)}<ShardPic
-                      color={s.color}
-                      tauforged={s.tauforged}
-                      size={20}
-                    />{/each}
-                </span>
-              {/if}
+              {@render marks?.(b)}
             </a>
           </li>
         {/each}
@@ -177,12 +173,10 @@
             >
           </span>
         {/if}
-        <a class="add" href={buildHref(slug, { kind: 'new' })}
+        <a class="add" href={href({ kind: 'new' })}
           ><Icon name="plus" size={14} /><span>{t('build.add')}</span></a
         >
-        <a class="code-link" href={buildHref(slug, { kind: 'new', withCode: true })}
-          >{t('build.pasteCode')}</a
-        >
+        <a class="code-link" href={href({ kind: 'new', withCode: true })}>{t('build.pasteCode')}</a>
       </div>
       {#if moveError}<p class="error" role="alert">{moveError}</p>{/if}
       {#if builds.length > 1}<p class="hint">{t('build.keysHint')}</p>{/if}
@@ -193,7 +187,7 @@
         <p class="alert frame" role="alert">{t('build.notFoundHere', { id: open ?? '' })}</p>
       {:else if selected}
         {#key selected.id}
-          <BuildView {slug} build={selected} {abilityNames} />
+          {@render view(selected)}
         {/key}
       {/if}
     </div>
@@ -276,14 +270,6 @@
     -webkit-line-clamp: 1;
     line-clamp: 1;
     overflow: hidden;
-  }
-
-  .marks {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: 0.15rem;
   }
 
   .list-foot {

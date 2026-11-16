@@ -35,6 +35,7 @@ export const weaponListState = $state({
   cls: { weapons: '', arch: '' } as Record<WeaponTab, string>,
   mastery: 'all' as MasteryFilter,
   incarnonOnly: false,
+  withBuilds: false,
   lastSlug: null as string | null,
   /** The tab the last weapon was opened from, for "← All weapons". */
   lastTab: 'weapons' as WeaponTab,
