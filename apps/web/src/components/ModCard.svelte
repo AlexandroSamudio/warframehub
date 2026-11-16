@@ -60,9 +60,7 @@
         <p class="note"><span class="note-label">{t('build.note')}</span> {slot.note}</p>
       {/if}
     {:else}
-      <span class="none"
-        >{#if compact && label}{label}{' · '}{/if}{t('build.empty')}</span
-      >
+      <span class="none">{compact && label ? `${label} · ` : ''}{t('build.empty')}</span>
     {/if}
   </div>
 </li>
