@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-13T18:30:15Z",
+  "generatedAt": "2026-11-16T13:14:49Z",
   "title": "Design System: WarframeHub",
   "extensions": {
     "colorMeta": {
@@ -325,6 +325,16 @@
         "name": "progress-fill",
         "value": "width 200ms ease",
         "purpose": "Section progress bar fill; only without prefers-reduced-motion."
+      },
+      {
+        "name": "chevron-turn",
+        "value": "transform 120ms ease",
+        "purpose": "The chevron on a folded row (Filters, Have a shared build?) turning when it opens; only without prefers-reduced-motion."
+      },
+      {
+        "name": "jump-scroll",
+        "value": "scrollIntoView smooth",
+        "purpose": "The Incarnon badge and the edit page section nav scroll to their heading; instant with prefers-reduced-motion."
       }
     ],
     "breakpoints": [
@@ -345,8 +355,16 @@
         "value": "48rem"
       },
       {
+        "name": "attack-stack",
+        "value": "48rem"
+      },
+      {
         "name": "tracker-stack",
         "value": "60rem"
+      },
+      {
+        "name": "loadout-column",
+        "value": "75rem"
       }
     ]
   },
@@ -420,11 +438,39 @@
       "description": "Compact frame: label, large tabular countdown, local time with UTC.",
       "html": "<div class=\"ds-clock\"><span class=\"ds-clock-label\">Daily</span><span class=\"ds-clock-count\">8h 5m</span><span class=\"ds-clock-at\">Tue 21:00 · 00:00 UTC</span></div>",
       "css": ".ds-clock { --cut: 10px; position: relative; isolation: isolate; background: var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); padding: 0.65rem 0.9rem; display: grid; gap: 0.05rem; max-width: 12rem; color: var(--fg, #e6e9ef); font-family: var(--font-body, Inter, sans-serif); } .ds-clock::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--surface, #10151e); clip-path: inherit; } .ds-clock::after { content: ''; position: absolute; top: 0; left: 0; width: 2.5rem; height: 2px; background: var(--gold, #d6b465); } .ds-clock::after { display: none; } .ds-clock-label { font: 600 0.8rem var(--font-display, Rajdhani, sans-serif); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted, #9ba7ba); } .ds-clock-count { font: 600 1.6rem/1.15 var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; } .ds-clock-at { font: 500 0.85rem var(--font-body, Inter, sans-serif); font-variant-numeric: tabular-nums; color: var(--muted, #9ba7ba); }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "custom",
+      "description": "A radio group in the button style: versions, attacks, slots, mastery. The chosen one is gold on a gold tint.",
+      "html": "<fieldset class=\"ds-seg\"><div class=\"ds-seg-opts\"><label class=\"ds-seg-on\"><input type=\"radio\" name=\"v\" checked>Normal</label><label><input type=\"radio\" name=\"v\">Prime</label><label><input type=\"radio\" name=\"v\">Vandal</label><label><input type=\"radio\" name=\"v\">Mk1</label></div></fieldset>",
+      "css": ".ds-seg { margin: 0; padding: 0; border: 0; } .ds-seg-opts { display: flex; flex-wrap: wrap; } .ds-seg label { position: relative; padding: 0.3rem 0.8rem; border: 1px solid var(--line-strong, #5a6b88); margin: 0 0 -1px -1px; font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted, #9ba7ba); cursor: pointer; } .ds-seg label:hover { color: var(--fg, #e6e9ef); border-color: var(--gold, #d6b465); z-index: 1; } .ds-seg label.ds-seg-on { z-index: 2; border-color: var(--gold, #d6b465); color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 12%, transparent); } .ds-seg input { position: absolute; opacity: 0; width: 1px; height: 1px; } .ds-seg label:has(input:focus-visible) { outline: 2px solid var(--teal, #66cbd9); outline-offset: 2px; z-index: 3; }"
+    },
+    {
+      "name": "Weapon Tile",
+      "kind": "card",
+      "description": "A weapon on the list: the whole picture (DE draws it diagonally on a square), name, MR, and badges; star on the corner.",
+      "html": "<a class=\"ds-wtile\" href=\"#\"><span class=\"ds-wpic\"><svg viewBox=\"0 0 100 100\" width=\"100%\" height=\"100%\" aria-hidden=\"true\"><path d=\"M12 72 L88 28\" stroke=\"currentColor\" stroke-width=\"6\" stroke-linecap=\"square\" fill=\"none\"/></svg></span><span class=\"ds-wname\">Braton</span><span class=\"ds-wline\">MR 8</span><span class=\"ds-wbadges\"><span class=\"ds-wbadge ds-wb-teal\">In the Circuit</span><span class=\"ds-wbadge\">Incarnon</span><span class=\"ds-wbadge ds-wb-gold\">Prime</span></span></a>",
+      "css": ".ds-wtile { display: grid; align-content: start; gap: 0.35rem; width: 9rem; padding: 0.5rem 0.5rem 0.6rem; box-sizing: border-box; text-decoration: none; color: var(--fg, #e6e9ef); background: var(--surface, #10151e); border: 1px solid var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); } .ds-wtile:hover { border-color: var(--gold, #d6b465); } .ds-wtile:hover .ds-wname { color: var(--gold, #d6b465); } .ds-wpic { display: block; aspect-ratio: 1; background: var(--surface-2, #171e2a); color: var(--muted, #9ba7ba); overflow: hidden; } .ds-wname { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; letter-spacing: 0.04em; } .ds-wline { font-size: 0.8rem; color: var(--muted, #9ba7ba); font-variant-numeric: tabular-nums; } .ds-wbadges { display: flex; flex-wrap: wrap; gap: 0.25rem; } .ds-wbadge { font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.72rem; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 0.4rem; border: 1px solid currentColor; color: var(--muted, #9ba7ba); white-space: nowrap; } .ds-wb-teal { color: var(--teal, #66cbd9); } .ds-wb-gold { color: var(--gold, #d6b465); }"
+    },
+    {
+      "name": "Mod Card",
+      "kind": "card",
+      "description": "A mod on a build: a wide art band with the slot label on a panel tab, name and gold rank, polarity, effect, and a note. Cards share one seam.",
+      "html": "<div class=\"ds-mod\"><div class=\"ds-mod-art\"><span class=\"ds-mod-tab\">Exilus</span></div><div class=\"ds-mod-body\"><span class=\"ds-mod-name\">Serration</span><span class=\"ds-mod-rank\">R10/10</span><span class=\"ds-mod-pol\">Madurai</span><p class=\"ds-mod-effect\">+165% Damage</p></div></div>",
+      "css": ".ds-mod { width: 14rem; background: var(--surface, #10151e); border: 1px solid var(--line, #2c3749); } .ds-mod-art { position: relative; height: 5.5rem; background: var(--surface-2, #171e2a); border-bottom: 1px solid var(--line, #2c3749); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); } .ds-mod-tab { position: absolute; top: 0; left: 0; padding: 0 0.5rem; font-family: var(--font-display, Rajdhani, sans-serif); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted, #9ba7ba); background: var(--surface, #10151e); border-right: 1px solid var(--line, #2c3749); border-bottom: 1px solid var(--line, #2c3749); } .ds-mod-body { display: grid; gap: 0.1rem; padding: 0.6rem 0.75rem 0.75rem; } .ds-mod-name { font-weight: 600; line-height: 1.25; } .ds-mod-rank { font-size: 0.85rem; color: var(--gold, #d6b465); font-variant-numeric: tabular-nums; } .ds-mod-pol { font-size: 0.8rem; color: var(--muted, #9ba7ba); } .ds-mod-effect { margin: 0; font-size: 0.85rem; line-height: 1.4; color: var(--muted, #9ba7ba); }"
+    },
+    {
+      "name": "Choice Cell",
+      "kind": "custom",
+      "description": "A perk to pick (Incarnon): a quiet inset cell on a thin seam, not a framed card; the chosen one gold on a gold tint.",
+      "html": "<label class=\"ds-choice ds-choice-on\"><span class=\"ds-choice-name\">Daring Reverie</span><span class=\"ds-choice-line\">Increase Base Damage by +4.</span></label>",
+      "css": ".ds-choice { position: relative; display: grid; align-content: start; gap: 0.2rem; width: 14rem; padding: 0.5rem 0.65rem; border: 1px solid var(--line, #2c3749); background: var(--surface-2, #171e2a); cursor: pointer; } .ds-choice:hover { border-color: var(--line-strong, #5a6b88); } .ds-choice-on { border-color: var(--gold, #d6b465); background: color-mix(in srgb, var(--gold, #d6b465) 10%, transparent); } .ds-choice-name { font-weight: 600; } .ds-choice-line { font-size: 0.85rem; color: var(--fg, #e6e9ef); }"
     }
   ],
   "narrative": {
     "northStar": "The Orbiter Console",
-    "overview": "WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.\n\nMost visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits, ability icons and (in builds) mod and arcane pictures appear only as content in the Warframes section.",
+    "overview": "WarframeHub reads like a ship terminal you check between missions. Everything sits on a near-black void. Information lives on dark hull panels outlined by thin seams, with two corners cut off. Orokin gold trims the things that name and frame (titles, the active nav item, a clock that's about to reset). Void teal marks what is live or interactive (rotation cards, ticked slots, focus). The console is **precise and quiet**: thin lines, uppercase labels, very little fill. The data is the star.\n\nMost visits are an alt-tab: a few seconds to see what's left and when it resets, then back to the game. So the console favours glanceable structure over decoration. Countdowns are the largest type on screen. Every time is shown in local time with UTC beside it. State is said in words and colour together (Live, Estimated, May be outdated, Check in game). It is dark by design; there is no light mode. All shapes are original. No DE logos or copied UI; DE's Warframe portraits, ability icons and (in builds) mod and arcane pictures appear only as content in the Warframes section. Since the Weapons section the console also reads a catalogue: roughly 480 weapon tiles under a Label heading per slot, a Segmented control for every small choice (version, attack, slot, mastery), and weapon builds that put the weapon's own choices (arcane, Incarnon perks, Riven) first on a phone. DE's pictures stay content, shown whole.",
     "keyCharacteristics": [
       "Near-black void with soft gold and teal glows at the top corners of the page",
       "Flat hull panels with two cut corners and a 1px seam that follows the cut",
@@ -470,7 +516,10 @@
       "**Do** use the shared button, input and badge styles in `app.css`, not one-off copies in components.",
       "**Do** say state in words and colour together (Live / Estimated / May be outdated / Check in game; Done; verify).",
       "**Do** keep text at least 5.5:1 and control borders at least 3:1, with a visible teal focus ring on every control.",
-      "**Do** confirm destructive actions inline (Yes / Cancel), never with a browser dialog."
+      "**Do** confirm destructive actions inline (Yes / Cancel), never with a browser dialog.",
+      "Do show a weapon's picture whole (object-fit: contain): DE draws weapons diagonally on a square, so cropping loses them.",
+      "Do use a Segmented control (real radio buttons, the chosen one gold on a gold tint) for any choice of four or fewer; a select beyond that.",
+      "Do put the weapon's own choices (arcane, Incarnon perks, Riven) before the mod grid on a phone; a note you wrote gets the gold NOTE label so it never reads as game text."
     ],
     "donts": [
       "**Don't** add shadows, glows on components, rounded corners or solid-filled buttons.",
@@ -478,7 +527,10 @@
       "**Don't** use gold and teal on the same element, or green and rose for anything but status.",
       "**Don't** use DE logos or copied UI assets; decoration is original CSS or SVG geometry. DE images are content (Warframes section only), never decoration.",
       "**Don't** add a light theme; the console is dark by design.",
-      "**Don't** show cosmetic content (decorations, furniture, skins)."
+      "**Don't** show cosmetic content (decorations, furniture, skins).",
+      "Don't offer a control that can't match anything (Incarnon only on the arch tab, Mastery without a profile): hide it or say why.",
+      "Don't show disposition dots or sort by it: DE retired Riven dispositions (every weapon is 1.20x).",
+      "Don't leave ten placeholder-only note fields open: a note is a small 'Add a note' link until it has text."
     ]
   }
 }
