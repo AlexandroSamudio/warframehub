@@ -434,6 +434,10 @@ The Warframe Builds page, for weapons, with no How to play.
 - **Edit page extras:** a sticky **section nav** (About · Mods · Arcanes · Incarnon · Riven · Progenitor; each heading takes focus), a Save bar that stays at the bottom, and notes behind a small teal **Add a note** link (a part with a note shows its field, with a gold NOTE label). A note on a build page also carries the gold NOTE label.
 - **List:** a gold "n builds" badge on tiles and a **With builds** checkbox in the (phone-folded) filters.
 
+### Build costs (Warframe and weapon builds, 20 Nov 2026)
+
+A Dim Readout pair on the right of the **Mods** title (`BuildCosts.svelte`, a `dl`): "FORMA 7" (the author's typed number, hidden when not entered) and "ENDO TO MAX 157,000" (computed to every mod's max rank; "+n without data" muted when a mod can't be priced). Label chips in Label type (0.8rem, uppercase, muted), values in 1.05rem foreground, tabular numbers. On phones the pair wraps under the title. The edit page has a "Forma needed (optional)" number field next to Game update.
+
 ### Builds page (`#/warframes/{slug}/builds`, `…/builds/{id}`)
 
 Two columns: a 17rem **build list** (sticky) and the open build. Under 60rem the list becomes a wrapping row above it.

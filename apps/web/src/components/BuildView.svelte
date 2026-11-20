@@ -5,6 +5,7 @@
   import { t } from '../lib/i18n/index.ts';
   import { buildHref } from '../lib/route.svelte.ts';
   import Guide from './Guide.svelte';
+  import BuildCosts from './BuildCosts.svelte';
   import ModCard from './ModCard.svelte';
   import ModPic from './ModPic.svelte';
   import ShardPic from './ShardPic.svelte';
@@ -154,7 +155,10 @@
   </header>
   <!-- The build's first half: the mods. -->
   <section class="half mods-half frame accent" aria-labelledby="build-mods">
-    <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
+    <div class="mods-head">
+      <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
+      <BuildCosts forma={c.forma} mods={[b.aura, b.exilus, ...b.slots]} />
+    </div>
     <ul class="mods special">
       <ModCard slot={b.aura} label={t('build.aura')} />
       <ModCard slot={b.exilus} label={t('build.exilus')} />
@@ -486,6 +490,19 @@
   .half {
     padding: 1rem 1.15rem 1.2rem;
     min-width: 0;
+  }
+
+  .mods-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.3rem 1.5rem;
+    margin: 0 0 0.8rem;
+  }
+
+  .mods-head .section-title {
+    margin: 0;
   }
 
   .section-title {

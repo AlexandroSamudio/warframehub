@@ -5,6 +5,7 @@
   import { t, tOr } from '../lib/i18n/index.ts';
   import { buildHref } from '../lib/route.svelte.ts';
   import { polarityName } from '../lib/warframes.ts';
+  import BuildCosts from './BuildCosts.svelte';
   import ModCard from './ModCard.svelte';
   import ModPic from './ModPic.svelte';
   import { tick } from 'svelte';
@@ -126,7 +127,10 @@
   </header>
 
   <section class="mods-half frame accent" aria-labelledby="build-mods">
-    <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
+    <div class="mods-head">
+      <h4 class="section-title" id="build-mods">{t('build.mods')}</h4>
+      <BuildCosts forma={c.forma} mods={[b.exilus, b.stance, ...b.slots]} />
+    </div>
     {#if hasExilus || melee}
       <ul class="mods special" class:single={!(hasExilus && melee)}>
         {#if hasExilus}<ModCard slot={b.exilus} label={t('build.exilus')} />{/if}
@@ -412,6 +416,19 @@
       align-items: center;
       min-height: 2.75rem;
     }
+  }
+
+  .mods-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.3rem 1.5rem;
+    margin: 0 0 0.8rem;
+  }
+
+  .mods-head .section-title {
+    margin: 0;
   }
 
   .section-title {

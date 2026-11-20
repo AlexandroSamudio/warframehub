@@ -1,5 +1,13 @@
 import { z } from 'zod';
-import { ArcaneOption, BuildName, BuildSlot, Note, ResolvedSlot, SourceUrl } from './builds.js';
+import {
+  ArcaneOption,
+  BuildForma,
+  BuildName,
+  BuildSlot,
+  Note,
+  ResolvedSlot,
+  SourceUrl,
+} from './builds.js';
 
 /**
  * Weapon builds (SPEC §15.1): a personal library of weapon setups, like Warframe builds but
@@ -88,6 +96,7 @@ export const WeaponBuildContent = z.object({
   patch: z.string().trim().max(40).default(''),
   /** What the build is for (plain text). */
   description: z.string().trim().max(300).default(''),
+  forma: BuildForma,
   exilus: BuildSlot.nullable().default(null),
   slots: z
     .array(BuildSlot.nullable())
