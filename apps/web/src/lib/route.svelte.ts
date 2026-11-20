@@ -37,9 +37,23 @@ export function weaponTabFromHash(hash: string): WeaponTabName {
   return /(?:^|&)tab=arch(?:&|$)/.test(hash.split('?')[1] ?? '') ? 'arch' : 'weapons';
 }
 
-/** The address of the Weapons list on one tab. */
-export function weaponsHref(tab: WeaponTabName): string {
-  return tab === 'arch' ? '#/weapons?tab=arch' : '#/weapons';
+/**
+ * The Weapons list's page (SPEC §15): `#/weapons?page=3` or `#/weapons?tab=arch&page=2`.
+ * 1 when missing or not a positive whole number; the list clamps it to the pages it has.
+ */
+export function weaponPageFromHash(hash: string): number {
+  const [first, second] = segments(hash);
+  if (first !== 'weapons' || second) return 1;
+  const m = /(?:^|&)page=(\d{1,4})(?:&|$)/.exec(hash.split('?')[1] ?? '');
+  return m ? Math.max(1, Number(m[1])) : 1;
+}
+
+/** The address of the Weapons list on one tab and page (page 1 leaves it out). */
+export function weaponsHref(tab: WeaponTabName, page = 1): string {
+  const query = [tab === 'arch' ? 'tab=arch' : '', page > 1 ? `page=${page}` : '']
+    .filter(Boolean)
+    .join('&');
+  return query ? `#/weapons?${query}` : '#/weapons';
 }
 
 /**
@@ -99,6 +113,7 @@ export const router = $state({
   param: paramFromHash(globalThis.location?.hash ?? ''),
   sub: subFromHash(globalThis.location?.hash ?? ''),
   weaponTab: weaponTabFromHash(globalThis.location?.hash ?? ''),
+  weaponPage: weaponPageFromHash(globalThis.location?.hash ?? ''),
 });
 
 /**
@@ -132,5 +147,6 @@ if (typeof window !== 'undefined') {
     router.param = paramFromHash(next);
     router.sub = subFromHash(next);
     router.weaponTab = weaponTabFromHash(next);
+    router.weaponPage = weaponPageFromHash(next);
   });
 }

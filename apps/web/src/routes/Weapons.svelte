@@ -14,6 +14,10 @@
     classesOf,
     filterWeapons,
     groupBySlot,
+    pageGroups,
+    pageWindow,
+    paginate,
+    slotStartPages,
     isMastered,
     sortWeapons,
     type MasteryFilter,
@@ -24,9 +28,11 @@
   interface Props {
     /** From the address: `#/weapons` or `#/weapons?tab=arch`. */
     tab: WeaponTab;
+    /** From the address: `#/weapons?page=3` (1 when missing). */
+    page: number;
   }
 
-  let { tab }: Props = $props();
+  let { tab, page }: Props = $props();
 
   let data = $state<WeaponsResponse | null>(null);
   let loadError = $state<string | null>(null);
@@ -67,7 +73,55 @@
         )
       : [],
   );
-  const groups = $derived(groupBySlot(shown, tab));
+  // The list is cut into pages of 48 in the browser (it is already loaded, filtered and
+  // sorted here); the slot headings flow across the pages.
+  const allGroups = $derived(groupBySlot(shown, tab));
+  const paged = $derived(
+    paginate(
+      allGroups.flatMap((g) => g.items),
+      page,
+    ),
+  );
+  const groups = $derived(pageGroups(allGroups, paged));
+  const pageNumbers = $derived(pageWindow(paged.page, paged.pages));
+  const pageHref = (n: number) => weaponsHref(tab, n);
+  const slotJumps = $derived(slotStartPages(allGroups));
+  let resultsEl = $state<HTMLParagraphElement | null>(null);
+  /** The page changed by the pager: scroll back up to the list and start reading there. */
+  let pagerUsed = false;
+
+  async function movedPage() {
+    pagerUsed = true;
+    await tick();
+    if (!pagerUsed) return;
+    pagerUsed = false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    resultsEl?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    resultsEl?.focus({ preventScroll: true });
+  }
+
+  // A new search, filter, slot or order starts again at page 1.
+  const listKey = $derived(
+    JSON.stringify([
+      tab,
+      s.query,
+      s.slot[tab],
+      s.cls[tab],
+      s.mastery,
+      s.incarnonOnly,
+      s.withBuilds,
+      s.sortKey,
+      s.sortDir,
+    ]),
+  );
+  let lastKey: string | null = null;
+  $effect(() => {
+    const key = listKey;
+    if (lastKey !== null && key !== lastKey && page > 1) {
+      window.location.replace(weaponsHref(tab, 1));
+    }
+    lastKey = key;
+  });
   // On a phone the class, mastery, Incarnon and sort controls fold into one "Filters" row.
   let filtersOpen = $state(false);
   const activeFilters = $derived(
@@ -312,11 +366,55 @@
       <button type="button" class="clear" onclick={clearFilters}>{t('wp.clearFilters')}</button>
     {/if}
 
+    {#if paged.total > 0}
+      <!-- Where you are in the list; the pager moves focus here. -->
+      <p class="results" id="wp-results" tabindex="-1" bind:this={resultsEl}>
+        {t('wp.showing', { from: paged.from, to: paged.to, total: paged.total })}
+        {#if paged.pages > 1}<span class="of"
+            >· {t('wp.pageOf', { page: paged.page, pages: paged.pages })}</span
+          >{/if}
+      </p>
+      {#if paged.pages > 1}
+        <!-- Where each slot starts, and the page steps within reach without scrolling. -->
+        <div class="topbar">
+          {#if slotJumps.length > 1}
+            <nav class="jumps" aria-label={t('wp.jumpNav')}>
+              {#each slotJumps as j (j.slot)}
+                <a
+                  href={pageHref(j.page)}
+                  aria-label={t('wp.jumpTo', { slot: t(`wp.slot.${j.slot}`), n: j.page })}
+                  onclick={movedPage}
+                  >{t(`wp.slot.${j.slot}`)}<span class="num"
+                    >{t('wp.pageShort', { n: j.page })}</span
+                  ></a
+                >
+              {/each}
+            </nav>
+          {/if}
+          <span class="mini">
+            {#if paged.page > 1}
+              <a href={pageHref(paged.page - 1)} aria-label={t('wp.prev')} onclick={movedPage}>‹</a>
+            {:else}
+              <span class="off" aria-hidden="true">‹</span>
+            {/if}
+            {#if paged.page < paged.pages}
+              <a href={pageHref(paged.page + 1)} aria-label={t('wp.next')} onclick={movedPage}>›</a>
+            {:else}
+              <span class="off" aria-hidden="true">›</span>
+            {/if}
+          </span>
+        </div>
+      {/if}
+    {/if}
+
     {#each groups as g (g.slot)}
       {@const headingId = `wp-group-${g.slot}`}
       <section class="group" aria-labelledby={headingId}>
         <h3 id={headingId}>
-          {t(`wp.slot.${g.slot as WeaponSlot}`)}<span class="num">{g.items.length}</span>
+          {t(`wp.slot.${g.slot as WeaponSlot}`)}<span class="num">{g.total}</span
+          >{#if g.continued}<span class="cont" aria-hidden="true">{t('wp.contShort')}</span><span
+              class="sr">{t('wp.continued')}</span
+            >{/if}
         </h3>
         <ul class="grid">
           {#each g.items as w (w.slug)}
@@ -331,7 +429,14 @@
               >
                 <Icon name="star" size={16} filled={w.favorite} />
               </button>
-              <a class="tile" href={hrefFor('weapons', w.slug)} onclick={() => (s.lastTab = tab)}>
+              <a
+                class="tile"
+                href={hrefFor('weapons', w.slug)}
+                onclick={() => {
+                  s.lastTab = tab;
+                  s.lastPage = paged.page;
+                }}
+              >
                 <span class="picture">
                   {#if w.image}
                     <img
@@ -377,6 +482,46 @@
         </ul>
       </section>
     {/each}
+
+    {#if paged.pages > 1}
+      <nav class="pager" aria-label={t('wp.pagesNav')}>
+        {#if paged.page > 1}
+          <a class="step" rel="prev" href={pageHref(paged.page - 1)} onclick={movedPage}
+            >{t('wp.prev')}</a
+          >
+        {:else}
+          <span class="step off" aria-disabled="true"
+            >{t('wp.prev')}<span class="sr"> ({t('wp.firstPage')})</span></span
+          >
+        {/if}
+        <ol class="nums">
+          {#each pageNumbers as n, i (i)}
+            <li>
+              {#if n === 'gap'}
+                <span class="gap" aria-hidden="true">…</span>
+              {:else}
+                <a
+                  href={pageHref(n)}
+                  aria-current={n === paged.page ? 'page' : undefined}
+                  aria-label={t('wp.pageN', { n })}
+                  onclick={movedPage}>{n}</a
+                >
+              {/if}
+            </li>
+          {/each}
+        </ol>
+        <span class="of-phone num">{t('wp.pageOf', { page: paged.page, pages: paged.pages })}</span>
+        {#if paged.page < paged.pages}
+          <a class="step" rel="next" href={pageHref(paged.page + 1)} onclick={movedPage}
+            >{t('wp.next')}</a
+          >
+        {:else}
+          <span class="step off" aria-disabled="true"
+            >{t('wp.next')}<span class="sr"> ({t('wp.lastPage')})</span></span
+          >
+        {/if}
+      </nav>
+    {/if}
   {:else if loadError}
     <div class="alert frame" role="alert">
       <p>{loadError}</p>
@@ -632,6 +777,190 @@
     margin: 0;
   }
 
+  /* "Showing 49–96 of 453 · Page 2 of 10": the pager's anchor, quiet like the meta line. */
+  .results {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .results:focus {
+    outline: none;
+  }
+
+  .results .of {
+    margin-left: 0.2rem;
+  }
+
+  .cont {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.8rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Slot jump links and compact steps, one row under the count line. */
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem 1rem;
+  }
+
+  .jumps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.5rem;
+  }
+
+  .jumps a,
+  .mini a,
+  .mini .off {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  .jumps .num {
+    color: var(--gold);
+  }
+
+  .jumps a:hover,
+  .mini a:hover {
+    color: var(--fg);
+    border-color: var(--gold);
+  }
+
+  .mini {
+    display: inline-flex;
+    gap: 0.3rem;
+  }
+
+  .mini a,
+  .mini .off {
+    justify-content: center;
+    min-width: 2.2rem;
+    font-size: 1.05rem;
+  }
+
+  .mini .off {
+    opacity: 0.45;
+  }
+
+  @media (pointer: coarse) {
+    .jumps a,
+    .mini a,
+    .mini .off {
+      min-height: 2.75rem;
+    }
+  }
+
+  /* The pager: outlined steps and numbers in the segmented control's look; the page is gold. */
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem 0.8rem;
+    margin-top: 0.6rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .nums {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nums li {
+    display: flex;
+  }
+
+  .pager a,
+  .pager .step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nums a {
+    margin-left: -1px;
+  }
+
+  .pager a:hover {
+    color: var(--fg);
+    border-color: var(--gold);
+  }
+
+  .pager a[aria-current='page'] {
+    position: relative;
+    z-index: 1;
+    color: var(--gold);
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+
+  .pager .step.off {
+    opacity: 0.45;
+  }
+
+  .gap {
+    padding: 0 0.5rem;
+    color: var(--muted);
+  }
+
+  .of-phone {
+    display: none;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  @media (pointer: coarse) {
+    .pager a,
+    .pager .step {
+      min-height: 2.75rem;
+      min-width: 2.75rem;
+    }
+  }
+
   .group {
     display: grid;
     gap: 0.5rem;
@@ -779,6 +1108,19 @@
   }
 
   @media (max-width: 36rem) {
+    /* On a phone: Previous · Page 2 of 10 · Next (the numbers need more room than that). */
+    .nums {
+      display: none;
+    }
+
+    .of-phone {
+      display: inline;
+    }
+
+    .pager {
+      justify-content: space-between;
+    }
+
     .fold {
       display: inline-flex;
     }

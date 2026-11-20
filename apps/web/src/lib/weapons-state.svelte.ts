@@ -39,6 +39,8 @@ export const weaponListState = $state({
   lastSlug: null as string | null,
   /** The tab the last weapon was opened from, for "← All weapons". */
   lastTab: 'weapons' as WeaponTab,
+  /** The page the last weapon was opened from. */
+  lastPage: 1,
   ...savedOrder(),
 });
 
