@@ -45,8 +45,15 @@
 <style>
   .clocks {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.75rem), 1fr));
+    /* Even rows only: 6, then 3, then 2 a row, so no clock is left on a row by itself. */
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0.5rem;
+  }
+
+  @media (max-width: 72rem) {
+    .clocks {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .clock {
@@ -68,6 +75,10 @@
 
   /* Phones: two clocks per row, slightly smaller. */
   @media (max-width: 30rem) {
+    .clocks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .clock {
       padding: 0.5rem 0.65rem 0.55rem;
     }

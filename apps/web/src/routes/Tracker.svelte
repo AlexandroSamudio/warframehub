@@ -6,6 +6,8 @@
   import GoalsCard from '../components/GoalsCard.svelte';
   import Rotations from '../components/Rotations.svelte';
   import SectionCard from '../components/SectionCard.svelte';
+  import Segmented from '../components/Segmented.svelte';
+  import { savedTrackerView, saveTrackerView, type TrackerView } from '../lib/folds.ts';
   import { clearSection, dismissNotice, getTracker, putTick } from '../lib/api.ts';
   import { t } from '../lib/i18n/index.ts';
   import { earliestReset } from '../lib/progress.ts';
@@ -15,6 +17,18 @@
   let loadFailed = $state(false);
   let saveFailed = $state(false);
   let editing = $state(false);
+
+  // Under 60rem the two columns stack; a switch then shows one at a time (both stay mounted,
+  // so the countdowns keep running).
+  let narrow = $state(false);
+  let view = $state<TrackerView>(savedTrackerView());
+  const showChecklist = $derived(!narrow || view === 'checklist');
+  const showLive = $derived(!narrow || view === 'live');
+
+  function chooseView(next: TrackerView) {
+    view = next;
+    saveTrackerView(next);
+  }
 
   async function toggleEditing() {
     editing = !editing;
@@ -85,6 +99,10 @@
   }
 
   onMount(() => {
+    const narrowQuery = window.matchMedia('(max-width: 60rem)');
+    narrow = narrowQuery.matches;
+    const onNarrow = (e: MediaQueryListEvent) => (narrow = e.matches);
+    narrowQuery.addEventListener('change', onNarrow);
     void load();
     const timer = setInterval(() => {
       nowMs = Date.now() + offsetMs;
@@ -98,6 +116,7 @@
     return () => {
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
+      narrowQuery.removeEventListener('change', onNarrow);
     };
   });
 </script>
@@ -120,25 +139,46 @@
       </div>
     {/if}
 
-    <div class="toolbar">
-      <button type="button" class="primary" aria-pressed={editing} onclick={toggleEditing}>
-        {editing ? t('edit.done') : t('edit.open')}
-      </button>
-    </div>
+    {#if narrow && !editing}
+      <Segmented
+        legend={t('tracker.view.legend')}
+        hideLegend
+        name="tracker-view"
+        options={[
+          { value: 'checklist', label: t('tracker.view.checklist') },
+          { value: 'live', label: t('tracker.view.live') },
+        ]}
+        value={view}
+        onchange={chooseView}
+      />
+    {/if}
 
     <div class="columns">
-      {#if editing}
-        <ChecklistEditor />
-      {:else}
-        <div class="sections">
-          {#each data.sections as section (section.id)}
-            <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
-          {/each}
+      <section class="main" aria-labelledby="checklist-title" hidden={!showChecklist && !editing}>
+        <!-- The same header row as Live rotations, so both columns start level. -->
+        <div class="bar" class:narrow>
+          <!-- On phones the switch above already names it. -->
+          <h2 id="checklist-title" class:sr-only={narrow}>{t('tracker.checklist')}</h2>
+          <button type="button" class="primary" aria-pressed={editing} onclick={toggleEditing}>
+            {editing ? t('edit.done') : t('edit.open')}
+          </button>
         </div>
-      {/if}
-      <div class="side">
+        {#if editing}
+          <ChecklistEditor />
+        {:else}
+          <!-- Columns, not grid rows: each panel stacks under the one above it, with no holes. -->
+          <div class="sections">
+            {#each data.sections as section (section.id)}
+              <div class="cell">
+                <SectionCard {section} {nowMs} {timeZone} onToggle={toggle} onClear={clear} />
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </section>
+      <div class="side" hidden={!showLive || (narrow && editing)}>
         <GoalsCard />
-        <Rotations {nowMs} {timeZone} onUpdate={load} />
+        <Rotations {nowMs} {timeZone} onUpdate={load} quietHeading={narrow} />
       </div>
     </div>
   </div>
@@ -176,16 +216,50 @@
     align-content: start;
   }
 
-  .sections {
+  .main {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-    gap: 1rem;
-    align-items: start;
+    gap: 0.6rem;
+    align-content: start;
+    min-width: 0;
   }
 
-  .toolbar {
+  /* Matches the Live rotations header (Rotations.svelte .bar / h2). */
+  .bar {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* With the heading read out only, the action keeps its place on the right. */
+  .bar.narrow {
     justify-content: flex-end;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+  }
+
+  .sections {
+    columns: 2 22rem;
+    column-gap: 1rem;
+  }
+
+  .cell {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+
+  .cell:last-child {
+    margin-bottom: 0;
+  }
+
+  [hidden] {
+    display: none;
   }
 
   .notice {

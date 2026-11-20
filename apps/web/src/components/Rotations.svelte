@@ -2,8 +2,9 @@
   import type { WorldstateResponse } from '@warframehub/shared';
   import { onMount } from 'svelte';
   import { ApiCallError, getWorldstate, refreshWorldstate } from '../lib/api.ts';
-  import { t } from '../lib/i18n/index.ts';
+  import { t, type MessageKey } from '../lib/i18n/index.ts';
   import { formatCountdown, formatLocal, formatUtc } from '../lib/time.ts';
+  import { isFoldOpen, setFoldOpen } from '../lib/folds.ts';
   import RotationCard from './RotationCard.svelte';
 
   interface Props {
@@ -11,9 +12,27 @@
     timeZone: string;
     /** Called after new live data arrives, so the tracker can pick up new Sortie/Baro times. */
     onUpdate?: () => void;
+    /** On phones a switch above already names this column: the heading is read out only. */
+    quietHeading?: boolean;
   }
 
-  let { nowMs, timeZone, onUpdate }: Props = $props();
+  let { nowMs, timeZone, onUpdate, quietHeading = false }: Props = $props();
+
+  /** "6 risks", "1 risk": a count with its word in the right number. */
+  const counted = (key: CountKey, n: number) =>
+    t(`${key}.${n === 1 ? 'one' : 'many'}` as MessageKey, { n });
+  type CountKey =
+    | 'archimedea.risks'
+    | 'archimedea.modifiers'
+    | 'nightwave.dailyCount'
+    | 'nightwave.weeklyCount'
+    | 'nightwave.eliteCount';
+  /** The non-zero parts, joined with " · ". */
+  const parts = (list: [CountKey, number][]) =>
+    list
+      .filter(([, n]) => n > 0)
+      .map(([key, n]) => counted(key, n))
+      .join(' · ');
 
   let ws = $state<WorldstateResponse | null>(null);
   let failed = $state(false);
@@ -76,8 +95,8 @@
 </script>
 
 <aside class="rotations" aria-label={t('rotations.label')}>
-  <div class="bar">
-    <h2>{t('rotations.label')}</h2>
+  <div class="bar" class:quiet={quietHeading}>
+    <h2 class:sr-only={quietHeading}>{t('rotations.label')}</h2>
     <button type="button" class="teal" onclick={refresh} disabled={refreshing}>
       {refreshing ? t('rotations.refreshing') : t('rotations.refresh')}
     </button>
@@ -156,44 +175,69 @@
         stale={c.archimedeas.stale}
         {nowMs}
       >
+        <!-- The three missions at a glance; what changes them folds away. -->
         <ol class="missions">
           {#each arch.missions as m, i (i)}
             <li>
               <span class="lead">{t('mission.line', { type: m.missionType, node: m.faction })}</span
               >
-              {#if m.deviation}
-                <details>
-                  <summary>{t('archimedea.deviation', { name: m.deviation.name })}</summary>
-                  <p class="sub">{m.deviation.description}</p>
-                </details>
-              {/if}
-              {#each m.risks as r, j (j)}
-                <details>
-                  <summary>
-                    {t('archimedea.risk', { name: r.name })}
-                    {#if r.elite}<span class="badge gold" title={t('archimedea.eliteHint')}
-                        >{t('archimedea.elite')}</span
-                      >{/if}
-                  </summary>
-                  <p class="sub">{r.description}</p>
-                </details>
-              {/each}
             </li>
           {/each}
         </ol>
-        {#if arch.personalModifiers.length > 0}
-          <p class="group">{t('archimedea.personal')}</p>
-          <ul>
-            {#each arch.personalModifiers as pm, k (k)}
+        {@const foldKey = `archimedea.${arch.kind}`}
+        <details
+          class="fold"
+          open={isFoldOpen(foldKey)}
+          ontoggle={(e) => setFoldOpen(foldKey, e.currentTarget.open)}
+        >
+          <summary
+            >{t('archimedea.showDetails', {
+              what: parts([
+                ['archimedea.risks', arch.missions.reduce((n, m) => n + m.risks.length, 0)],
+                ['archimedea.modifiers', arch.personalModifiers.length],
+              ]),
+            })}</summary
+          >
+          <ol class="missions inner">
+            {#each arch.missions as m, i (i)}
               <li>
-                <details>
-                  <summary>{pm.name}</summary>
-                  <p class="sub">{pm.description}</p>
-                </details>
+                <span class="mission"
+                  >{t('mission.line', { type: m.missionType, node: m.faction })}</span
+                >
+                {#if m.deviation}
+                  <details>
+                    <summary>{t('archimedea.deviation', { name: m.deviation.name })}</summary>
+                    <p class="sub">{m.deviation.description}</p>
+                  </details>
+                {/if}
+                {#each m.risks as r, j (j)}
+                  <details>
+                    <summary>
+                      {t('archimedea.risk', { name: r.name })}
+                      {#if r.elite}<span class="badge gold" title={t('archimedea.eliteHint')}
+                          >{t('archimedea.elite')}</span
+                        >{/if}
+                    </summary>
+                    <p class="sub">{r.description}</p>
+                  </details>
+                {/each}
               </li>
             {/each}
-          </ul>
-        {/if}
+          </ol>
+          {#if arch.personalModifiers.length > 0}
+            <p class="group">{t('archimedea.personal')}</p>
+            <ul>
+              {#each arch.personalModifiers as pm, k (k)}
+                <li>
+                  <details>
+                    <summary>{pm.name}</summary>
+                    <p class="sub">{pm.description}</p>
+                  </details>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </details>
         <p class="when">{ends(arch.expiry)}</p>
       </RotationCard>
     {:else}
@@ -231,21 +275,38 @@
         {#if nw.season !== null}<p class="sub">
             {t('nightwave.season', { season: nw.season })}
           </p>{/if}
-        {#each ['daily', 'weekly', 'elite'] as const as kind (kind)}
-          {@const list = nw.challenges.filter((ch) => ch.kind === kind)}
-          {#if list.length > 0}
-            <p class="group">{t(`nightwave.${kind}`)}</p>
-            <ul>
-              {#each list as ch, i (i)}
-                <li>
-                  <span title={ch.description}>{ch.title}</span>
-                  <span class="sub">{t('nightwave.reputation', { reputation: ch.reputation })}</span
-                  >
-                </li>
-              {/each}
-            </ul>
-          {/if}
-        {/each}
+        {@const count = (kind: 'daily' | 'weekly' | 'elite') =>
+          nw.challenges.filter((ch) => ch.kind === kind).length}
+        <p class="lead counts">
+          {parts([
+            ['nightwave.dailyCount', count('daily')],
+            ['nightwave.weeklyCount', count('weekly')],
+            ['nightwave.eliteCount', count('elite')],
+          ])}
+        </p>
+        <details
+          class="fold"
+          open={isFoldOpen('nightwave')}
+          ontoggle={(e) => setFoldOpen('nightwave', e.currentTarget.open)}
+        >
+          <summary>{t('nightwave.showList')}</summary>
+          {#each ['daily', 'weekly', 'elite'] as const as kind (kind)}
+            {@const list = nw.challenges.filter((ch) => ch.kind === kind)}
+            {#if list.length > 0}
+              <p class="group">{t(`nightwave.${kind}`)}</p>
+              <ul>
+                {#each list as ch, i (i)}
+                  <li>
+                    <span title={ch.description}>{ch.title}</span>
+                    <span class="sub"
+                      >{t('nightwave.reputation', { reputation: ch.reputation })}</span
+                    >
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          {/each}
+        </details>
       {/if}
     </RotationCard>
 
@@ -292,6 +353,10 @@
     justify-content: space-between;
   }
 
+  .bar.quiet {
+    justify-content: flex-end;
+  }
+
   h2 {
     margin: 0;
     font-size: 0.85rem;
@@ -336,7 +401,8 @@
 
   .missions {
     margin: 0;
-    padding-left: 1.2rem;
+    padding-left: 0;
+    list-style: none;
     display: grid;
     gap: 0.45rem;
   }
@@ -353,6 +419,34 @@
   summary {
     cursor: pointer;
     color: var(--fg);
+  }
+
+  /* A card's folded part: its summary reads as a quiet control, the content indents under it. */
+  .fold > summary {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  .fold > summary:hover {
+    color: var(--fg);
+  }
+
+  .fold[open] > summary {
+    margin-bottom: 0.35rem;
+  }
+
+  .fold {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .mission {
+    font-weight: 600;
+    font-size: 0.85rem;
   }
 
   summary .badge {

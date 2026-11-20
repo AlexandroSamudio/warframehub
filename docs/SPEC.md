@@ -278,7 +278,7 @@ Rules:
    - **Top bar:** reset clocks (daily, weekly, Sortie, next 8-hour, every 4 days, Baro), each with a countdown and local time plus UTC. A clock is highlighted when its reset is less than 3 hours away (24 hours for weekly and every 4 days).
    - **Left column:** checklist sections. Each has a progress meter and its reset label; `manual` sections have a **Clear** button.
    - **Right column:** live rotations (Archon Hunt with shard colour, Sortie, Teshin, Darvo, Baro, Nightwave, events). Each card has a freshness badge: **Live** / **Estimated** / **May be outdated** / **Check in game**.
-   - Stacks to one column on narrow windows.
+   - Narrow windows (under 60rem) show one column at a time, picked with a Checklist · Live rotations switch that this browser remembers (Alex, 20 Nov 2026). Long rotation details (Archimedea risks and modifiers, the Nightwave list) are folded by default.
 2. **Edit mode** (a toggle on the Tracker, not a separate page)
    - Add, rename, describe, hide or delete items and sections. Delete only applies to custom ones; default ones are hidden instead.
    - Drag to reorder.
