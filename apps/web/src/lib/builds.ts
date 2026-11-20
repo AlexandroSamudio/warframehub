@@ -97,6 +97,7 @@ export function emptyContent(): BuildContent {
     patch: '',
     description: '',
     guide: '',
+    forma: null,
     aura: null,
     exilus: null,
     slots: Array<null>(MOD_SLOTS).fill(null),

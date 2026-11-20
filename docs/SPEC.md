@@ -530,6 +530,12 @@ Each phase ends with something you can run and check.
   - **The Circuit:** a weapon is "In the Circuit" when its name is one of this week's Steel Path Circuit picks (`duviriCycle` `EXC_HARD`, §7), read from the live-data cache (fetched only when old).
   - **API:** each version has `evolutions` (`kind` genesis or native, the wiki `page`, `tiers`); the list item and the page have `inCircuit`.
 
+#### Forma and Endo on builds (20 Nov 2026, Alex's request; Warframe and weapon builds)
+
+- **Forma** is typed by the author (optional whole number 0–60, `content.forma`; null = not entered; 0 = none). Builds don't record slot polarities, so it can't be computed (Alex chose "typed" over computing it from native slots, 20 Nov 2026). It is part of share codes.
+- **Endo to max** is computed, never stored: every mod in the build (aura, Exilus, stance and the 8 slots; arcanes and Riven left out) from rank 0 to its **maximum rank**: `10 × rarity × (2^rank − 1)`, Common 1, Uncommon 2, Rare 3, Legendary 4 (wiki, "Endo" › Fusion Costs, checked 20 Nov 2026; the same formula covers Primed, Galvanized and Archon mods by their rarity). A mod with no rarity or max rank in the data isn't counted and the page says "+n without data". `endoToMax` in `packages/shared/src/builds.ts`.
+- Shown as "FORMA 7 · ENDO TO MAX 157,000" on the right of the Mods title (`BuildCosts.svelte`); edited in the build's About fields.
+
 ### 15.1 Weapon builds (16 Nov 2026, Alex's request)
 
 - **What:** a library of weapon builds, like Warframe builds (§14.1) but with **no guide** (Alex: the "how to play" is for Warframes). Each build is for **one version** (Braton, Prime, Vandal or Mk1); a new one starts on the Prime when there is one. Every weapon gets builds, arch weapons too.

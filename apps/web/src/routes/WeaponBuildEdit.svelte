@@ -790,6 +790,18 @@
               bind:value={content.patch}
             />
           </label>
+          <label>
+            <span>{t('build.forma')} <i>{t('build.optional')}</i></span>
+            <input
+              type="number"
+              inputmode="numeric"
+              min="0"
+              max="60"
+              step="1"
+              placeholder={t('build.formaPlaceholder')}
+              bind:value={content.forma}
+            />
+          </label>
         </div>
       </section>
 

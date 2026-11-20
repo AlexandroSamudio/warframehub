@@ -91,6 +91,7 @@ function bratonPrime(): Partial<WeaponBuildContent> {
     sourceUrl: 'https://overframe.gg/build/1/',
     author: 'Someone',
     patch: 'Update 41',
+    forma: 4,
     exilus: slot(VIGILANTE_SUPPLIES, 'Vigilante Supplies', 5),
     slots: [
       slot(SERRATION, 'Serration', 10, 'Base damage'),

@@ -83,6 +83,7 @@ function mesaBuild(): Partial<BuildContent> {
     sourceUrl: 'https://overframe.gg/build/123/',
     author: 'Someone',
     patch: 'Update 41',
+    forma: 6,
     description: 'Peacemaker nuke for Steel Path survival.',
     guide: '## How to play\n\nPress **4**.',
     aura: slot(GROWING_POWER, 'Growing Power', 5),
@@ -176,12 +177,21 @@ describe('builds', () => {
     expect(view!.content.description).toBe('Peacemaker nuke for Steel Path survival.');
   });
 
+  it('keeps the Forma the author typed (0 is an answer) and refuses nonsense', async () => {
+    expect(Build.parse((await create(ctx, { forma: 0 })).json()).content.forma).toBe(0);
+    expect(Build.parse((await create(ctx, mesaBuild())).json()).content.forma).toBe(6);
+    expect((await create(ctx, { forma: -1 })).statusCode).toBe(400);
+    expect((await create(ctx, { forma: 2.5 })).statusCode).toBe(400);
+    expect((await create(ctx, { forma: 61 })).statusCode).toBe(400);
+  });
+
   it('fills in defaults for parts left out', async () => {
     const saved = Build.parse((await create(ctx, {})).json());
     expect(saved.content.slots).toEqual(Array(8).fill(null));
     expect(saved.content.arcanes).toEqual([null, null]);
     expect(saved.content).toMatchObject({
       aura: null,
+      forma: null,
       shards: [],
       weapons: [],
       sourceUrl: '',

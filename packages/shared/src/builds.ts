@@ -388,6 +388,37 @@ export const SourceUrl = z
   ])
   .default('');
 
+/**
+ * Forma the author says the build needs (typed in: builds don't record slot polarities).
+ * 0 is a real answer ("none"); null means not entered. 60 is a ceiling, not a game rule.
+ */
+export const BuildForma = z.int().min(0).max(60).nullable().default(null);
+
+/**
+ * Endo to take every mod from rank 0 to its maximum rank: 10 × rarity × (2^rank − 1), with
+ * Common 1, Uncommon 2, Rare 3, Legendary 4 (wiki, "Endo" › Fusion Costs, checked 20 Nov 2026).
+ * Mods whose rarity or maximum rank the data lacks are not counted, and are returned in
+ * `unknown` so the page can say so.
+ */
+const RARITY_FACTOR: Record<string, number> = { Common: 1, Uncommon: 2, Rare: 3, Legendary: 4 };
+
+export function endoToMax(
+  mods: readonly ({ rarity: string | null; maxRank: number | null } | null)[],
+): {
+  endo: number;
+  unknown: number;
+} {
+  let endo = 0;
+  let unknown = 0;
+  for (const m of mods) {
+    if (!m) continue;
+    const factor = m.rarity ? RARITY_FACTOR[m.rarity] : undefined;
+    if (factor === undefined || m.maxRank === null) unknown++;
+    else endo += 10 * factor * (2 ** m.maxRank - 1);
+  }
+  return { endo, unknown };
+}
+
 /** Everything in a build besides its name and place. Stored as one JSON document. */
 export const BuildContent = z.object({
   sourceUrl: SourceUrl,
@@ -398,6 +429,7 @@ export const BuildContent = z.object({
   description: z.string().trim().max(300).default(''),
   /** How to play it: a small Markdown subset (headings, lists, bold, italic, links). */
   guide: z.string().max(20_000).default(''),
+  forma: BuildForma,
   aura: BuildSlot.nullable().default(null),
   exilus: BuildSlot.nullable().default(null),
   slots: z.array(BuildSlot.nullable()).length(MOD_SLOTS).default(Array(MOD_SLOTS).fill(null)),

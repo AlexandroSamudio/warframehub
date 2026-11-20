@@ -16,6 +16,7 @@ export function emptyWeaponContent(variant: WeaponVariantKind): WeaponBuildConte
     author: '',
     patch: '',
     description: '',
+    forma: null,
     exilus: null,
     slots: Array(WEAPON_MOD_SLOTS).fill(null),
     arcanes: Array(WEAPON_ARCANE_SLOTS).fill(null),

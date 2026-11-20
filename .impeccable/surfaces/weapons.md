@@ -79,3 +79,9 @@ The list showed all ~450 tiles at once. Confirmed with Alex: numbered pages, 48 
 - A new search, filter, slot or order goes back to page 1. Opening a weapon and coming back returns to the same page.
 - **Anti-goals:** no infinite scroll, no per-slot pagers, no page-size picker.
 - **After the critique (27/40):** a row under the count line with **slot jumps** (each slot's first page) and compact ‹ › steps, so a page can be turned without scrolling; the bottom pager is left-aligned with 40px cells; "cont." is visible and "continued" is spoken; disabled steps say "(first page)" / "(last page)" to screen readers.
+
+---
+
+# Addendum: Build costs (20 Nov 2026)
+
+Alex asked for the total Forma and the Endo to max the mods, on Warframe and weapon builds. Decisions: Forma is typed by the author (builds hold no slot polarities); Endo is computed to each mod's maximum rank. Placement: a quiet readout on the Mods title row (follows the Warframe Builds page), not a new section; edit field beside Game update. Anti-goals: no capacity or drain maths, no per-slot polarity picker, no Endo for arcanes or Rivens.
