@@ -65,3 +65,17 @@ Follows **the Warframe Builds page** and **the build edit page** (DESIGN.md "Bui
 - **Edit page:** About (name, description, source, author, update), **Version** (Segmented; changing it reloads what fits), Mods (Exilus/Stance pair, 8 slots: the Warframe edit page's cells and Picker), Arcanes (one or two slots, or none), Incarnon (one Segmented per tier 2–5 listing its perks, "None" first; the chosen perk's lines under it, a note), Riven (name, polarity Segmented, up to 4 stat rows: stat select from the weapon type's list, value field, "negative" checkbox only where allowed; Add a stat), Progenitor (Kuva/Tenet/Coda only: element select, % number 25–60). Import panel, leave guard, Save/Cancel/Delete as on Warframe builds.
 - **List:** "n builds" as a plain badge on tiles; a **With builds** checkbox next to Incarnon only.
 - **Anti-goals:** no guide, no stat maths or DPS, no Riven grading, no new colour.
+
+---
+
+# Addendum: Pagination (16 Nov 2026)
+
+The list showed all ~450 tiles at once. Confirmed with Alex: numbered pages, 48 a page, the slot groups flow across pages.
+
+- **Where:** in the browser (the list is already loaded, filtered and sorted there); the page is in the address (`#/weapons?page=3`, `#/weapons?tab=arch&page=2`), so Back, reload and a shared link keep it. A page past the end shows the last one.
+- **Count line** above the tiles ("Showing 49–96 of 453 · Page 2 of 10"), quiet like the meta line; it takes focus after the pager is used and the page scrolls back to it.
+- **Slot headings** appear where a slot's weapons start; the heading's number is the slot's whole count, and "continued" follows it when the slot began on an earlier page.
+- **Pager** (below the tiles, only with more than one page): outlined Previous / numbers / Next in the Segmented control's look, the current page gold on a gold tint (`aria-current="page"`), `…` for gaps, a disabled step at each end. On phones: Previous · "Page 2 of 10" · Next (no numbers).
+- A new search, filter, slot or order goes back to page 1. Opening a weapon and coming back returns to the same page.
+- **Anti-goals:** no infinite scroll, no per-slot pagers, no page-size picker.
+- **After the critique (27/40):** a row under the count line with **slot jumps** (each slot's first page) and compact ‹ › steps, so a page can be turned without scrolling; the bottom pager is left-aligned with 40px cells; "cont." is visible and "continued" is spoken; disabled steps say "(first page)" / "(last page)" to screen readers.

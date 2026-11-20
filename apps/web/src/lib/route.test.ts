@@ -5,6 +5,7 @@ import {
   paramFromHash,
   routeFromHash,
   subFromHash,
+  weaponPageFromHash,
   weaponsHref,
   weaponTabFromHash,
 } from './route.svelte.ts';
@@ -123,5 +124,25 @@ describe('weapon builds', () => {
       '#/weapons/braton/builds/7',
     );
     expect(buildHref('mesa')).toBe('#/warframes/mesa/builds');
+  });
+});
+
+describe('weapon list pages', () => {
+  it('reads the page from the list address only', () => {
+    expect(weaponPageFromHash('#/weapons')).toBe(1);
+    expect(weaponPageFromHash('#/weapons?page=3')).toBe(3);
+    expect(weaponPageFromHash('#/weapons?tab=arch&page=2')).toBe(2);
+    expect(weaponPageFromHash('#/weapons?page=0')).toBe(1);
+    expect(weaponPageFromHash('#/weapons?page=abc')).toBe(1);
+    expect(weaponPageFromHash('#/weapons/braton?page=3')).toBe(1);
+    expect(weaponTabFromHash('#/weapons?tab=arch&page=2')).toBe('arch');
+  });
+
+  it('writes the address of a tab and page, leaving out the defaults', () => {
+    expect(weaponsHref('weapons')).toBe('#/weapons');
+    expect(weaponsHref('weapons', 1)).toBe('#/weapons');
+    expect(weaponsHref('weapons', 4)).toBe('#/weapons?page=4');
+    expect(weaponsHref('arch', 2)).toBe('#/weapons?tab=arch&page=2');
+    expect(weaponsHref('arch')).toBe('#/weapons?tab=arch');
   });
 });

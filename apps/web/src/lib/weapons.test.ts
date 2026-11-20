@@ -6,6 +6,10 @@ import {
   filterWeapons,
   formatStat,
   groupBySlot,
+  pageGroups,
+  pageWindow,
+  paginate,
+  slotStartPages,
   sortWeapons,
   type WeaponFilters,
 } from './weapons.ts';
@@ -138,5 +142,104 @@ describe('labels', () => {
     expect(formatStat(1.75, 'es')).toBe('1,75');
     expect(attackKey('Heavy Slam Attack')).toBe('heavySlam');
     expect(attackKey('Glass Explosion')).toBeNull();
+  });
+});
+
+describe('paginate', () => {
+  const ten = Array.from({ length: 10 }, (_, i) => i + 1);
+
+  it('cuts a page and says where it is', () => {
+    expect(paginate(ten, 2, 4)).toEqual({
+      items: [5, 6, 7, 8],
+      page: 2,
+      pages: 3,
+      from: 5,
+      to: 8,
+      total: 10,
+    });
+    expect(paginate(ten, 3, 4).items).toEqual([9, 10]);
+  });
+
+  it('keeps an out-of-range page inside the list, and copes with nothing', () => {
+    expect(paginate(ten, 99, 4).page).toBe(3);
+    expect(paginate(ten, 0, 4).page).toBe(1);
+    expect(paginate(ten, Number.NaN, 4).page).toBe(1);
+    expect(paginate([], 5, 4)).toEqual({ items: [], page: 1, pages: 1, from: 0, to: 0, total: 0 });
+  });
+
+  it('uses 48 a page by default', () => {
+    const many = Array.from({ length: 477 }, (_, i) => i);
+    expect(paginate(many, 1).items).toHaveLength(48);
+    expect(paginate(many, 1).pages).toBe(10);
+    expect(paginate(many, 10).items).toHaveLength(45);
+  });
+});
+
+describe('pageWindow', () => {
+  it('links the ends and the pages around the current one, with gaps', () => {
+    expect(pageWindow(7, 14)).toEqual([1, 'gap', 5, 6, 7, 8, 9, 'gap', 14]);
+    expect(pageWindow(1, 10)).toEqual([1, 2, 3, 'gap', 10]);
+    expect(pageWindow(10, 10)).toEqual([1, 'gap', 8, 9, 10]);
+  });
+
+  it('writes a number where a gap would hide only one', () => {
+    expect(pageWindow(5, 8)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(pageWindow(4, 8)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]); // 7 stands for the one gap
+    expect(pageWindow(6, 10)).toEqual([1, 'gap', 4, 5, 6, 7, 8, 9, 10]);
+  });
+
+  it('is just 1 for one page', () => {
+    expect(pageWindow(1, 1)).toEqual([1]);
+  });
+});
+
+describe('pageGroups', () => {
+  const mk = (n: number, slot: WeaponListItem['slot']) =>
+    Array.from({ length: n }, (_, i) => weapon({ name: `${slot}${i}`, slot }));
+  const all = [
+    { slot: 'primary' as const, items: mk(5, 'primary') },
+    { slot: 'secondary' as const, items: mk(3, 'secondary') },
+    { slot: 'melee' as const, items: mk(4, 'melee') },
+  ];
+  const flat = all.flatMap((g) => g.items);
+
+  it('puts a page’s weapons under their slot headings', () => {
+    const groups = pageGroups(all, paginate(flat, 1, 6));
+    expect(groups.map((g) => [g.slot, g.items.length, g.total, g.continued])).toEqual([
+      ['primary', 5, 5, false],
+      ['secondary', 1, 3, false],
+    ]);
+  });
+
+  it('marks a slot that started on an earlier page as continued', () => {
+    const groups = pageGroups(all, paginate(flat, 2, 6));
+    expect(groups.map((g) => [g.slot, g.items.length, g.total, g.continued])).toEqual([
+      ['secondary', 2, 3, true],
+      ['melee', 4, 4, false],
+    ]);
+    // Every weapon appears once across the pages.
+    const seen = [1, 2].flatMap((p) =>
+      pageGroups(all, paginate(flat, p, 6)).flatMap((g) => g.items.map((w) => w.name)),
+    );
+    expect(seen).toEqual(flat.map((w) => w.name));
+  });
+
+  it('has no groups for an empty page', () => {
+    expect(pageGroups([], paginate([], 1, 6))).toEqual([]);
+  });
+});
+
+describe('slotStartPages', () => {
+  it('says which page each slot starts on', () => {
+    const g = (slot: WeaponListItem['slot'], n: number) => ({ slot, items: new Array(n) });
+    expect(slotStartPages([g('primary', 153), g('secondary', 115), g('melee', 184)])).toEqual([
+      { slot: 'primary', page: 1 },
+      { slot: 'secondary', page: 4 },
+      { slot: 'melee', page: 6 },
+    ]);
+    expect(slotStartPages([g('primary', 5), g('melee', 4)], 6)).toEqual([
+      { slot: 'primary', page: 1 },
+      { slot: 'melee', page: 1 },
+    ]);
   });
 });

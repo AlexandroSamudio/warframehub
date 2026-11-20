@@ -97,7 +97,7 @@
     {:else if router.route === 'weapons' && router.param}
       <WeaponPage slug={router.param} sub={router.sub} />
     {:else if router.route === 'weapons'}
-      <Weapons tab={router.weaponTab} />
+      <Weapons tab={router.weaponTab} page={router.weaponPage} />
     {:else if router.route === 'inventory'}
       <Inventory />
     {:else if router.route === 'profile'}

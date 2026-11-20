@@ -164,7 +164,10 @@
 
 <div class="page">
   <p class="sr-only" role="status">{announce}</p>
-  <a class="back" href={weaponsHref(backTab)}>
+  <a
+    class="back"
+    href={weaponsHref(backTab, backTab === weaponListState.lastTab ? weaponListState.lastPage : 1)}
+  >
     <span class="flip"><Icon name="chevron" size={12} /></span>
     {backTab === 'arch' ? t('wp.backArch') : t('wp.back')}
   </a>
