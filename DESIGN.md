@@ -226,10 +226,12 @@ A dark, cool-neutral console with two restrained accents and a small set of stat
 ## Layout
 
 - **Page:** a centred column, at most 90rem wide, with 1rem side padding (1.5rem top). The header has the mark and the name on the left, together one link home (the Tracker; gold, brightening to Readout White on hover, no underline), and the nav on the right. No tagline (Alex, 11 Nov 2026). A thin seam separates the footer.
-- **Tracker:**
-  - reset clocks in a self-filling grid (`auto-fit`, minimum 8.75rem; two per row on phones);
-  - below them, two columns: the checklist (a grid of section panels, minimum 22rem each) and the live-rotations column (17–22rem);
-  - under 60rem the columns stack, rotations after the checklist.
+- **Tracker** (layout refined 20 Nov 2026):
+  - reset clocks in **even rows**: 6 a row, 3 under 72rem, 2 under 30rem (never one alone on a row);
+  - below them, two columns, each opening with the same header row (a muted uppercase h2 and its action on the right): **Checklist** + Edit checklist, and **Live rotations** + Refresh, so both start level;
+  - the checklist's section panels **stack in CSS columns** (`columns: 2 22rem`, `break-inside: avoid`, 1rem gaps): no holes beside short panels; they read down the first column, then the second; one column under ~46rem (so between ~60 and ~80rem the checklist is one column beside the rotations). Which weeklies end up under the dailies depends on how the columns balance; accepted (Alex chose the plain CSS flow);
+  - under 60rem the two columns become one, and a **Segmented switch** (Checklist · Live rotations) under the clocks shows one at a time (the other stays mounted; remembered in this browser). Both column headings are then read out only (the switch names them) and their actions stay on the right;
+  - long rotation cards fold: Archimedea shows its three missions, with a teal uppercase summary "Show details (6 risks · 4 modifiers)" (singular and plural forms; a zero part is left out); Nightwave shows its counts ("3 daily · 5 weekly · 2 elite") and folds the list under "Show challenges". Folded by default, open state remembered per card.
 - **Spacing:** a compact rem rhythm: 0.5rem between clocks, 1rem between panels and columns, 0.4–0.6rem inside lists. Panels use about 1rem of inner padding.
 - **Density:** glanceable but compact. One panel holds a whole section, so a section reads without scrolling inside it.
 - **Responsive:** no sideways scrolling at any width (checked at 360 px, 768 px and desktop). Below 30rem the clocks shrink a step (countdown 1.3rem).
